@@ -9,13 +9,13 @@ const App: FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-            <Route path="/sharity-web/" element={<Home />} />
-            <Route path="/sharity-web/classes" element={<Classes />} />
-            <Route path="/sharity-web/events" element={<Events />} />
-            <Route path="/sharity-web/store" element={<Store />} />
-          </Routes>
+        <Route path="/sharity-web/" element={<Home />} />
+        <Route path="/sharity-web/classes" element={<Classes />} />
+        <Route path="/sharity-web/events" element={<Events />} />
+        <Route path="/sharity-web/store" element={<Store />} />
+      </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
 export default App
