@@ -13,9 +13,9 @@ const App: FC = () => {
           <strong>Sharity Web</strong>
           <nav style={{ display: 'flex', gap: 12 }}>
             <Link to="/">Home</Link>
-            <Link to="/classes">Classes</Link>
-            <Link to="/events">Events</Link>
-            <Link to="/store">Store</Link>
+            <Link to="/sharity-web/classes">Classes</Link>
+            <Link to="/sharity-web/events">Events</Link>
+            <Link to="/sharity-web/store">Store</Link>
           </nav>
         </header>
 
