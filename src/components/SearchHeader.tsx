@@ -14,10 +14,14 @@ const SearchHeader: FC<SearchHeaderProps> = ({
     <div
       style={{
         paddingRight: 56,
-        height: 40,
+        paddingBottom: 8,
+        height: 48,
         display: "flex",
         flex: 1,
         alignItems: "center",
+        borderBottomStyle: "solid",
+        borderBottomWidth: 1,
+        borderBottomColor: "#F0EDE6",
       }}
     >
       <div
@@ -46,11 +50,11 @@ const SearchHeader: FC<SearchHeaderProps> = ({
           style={{
             position: "absolute",
             left: 4,
-            top: 2,
+            top: 1,
             width: 40,
             maxWidth: 40,
             padding: "8px",
-            color: "#999",
+            color: "#7D7D7D",
           }}
         >
           <VuesaxIcon name="search" size={16} color="#999" />

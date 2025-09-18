@@ -21,8 +21,6 @@ const Store: FC = () => {
         searchValue={searchValue}
         onSearchChange={handleSearchChange}
       />
-      <h1>Store</h1>
-      <p>Продажа / Обмен / Аренда / Благотворительность.</p>
     </section>
   );
 };
