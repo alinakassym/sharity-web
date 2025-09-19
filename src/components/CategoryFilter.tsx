@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import type { FC } from "react";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { Colors } from "../theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
 
 export type Category = {
@@ -17,10 +19,6 @@ type Props = {
   onOpenFilter?: () => void; // клик по "Фильтр"
 };
 
-const PURPLE = "#907BE2";
-const BG = "#F5F2F2";
-const TEXT = "#111";
-
 export const CategoryFilter: FC<Props> = ({
   title = "Категории",
   categories,
@@ -29,6 +27,8 @@ export const CategoryFilter: FC<Props> = ({
   multi = true,
   onOpenFilter,
 }) => {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme];
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
   const toggle = (id: string) => {
@@ -58,14 +58,14 @@ export const CategoryFilter: FC<Props> = ({
           marginBottom: 16,
         }}
       >
-        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{title}</h2>
+        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: colors.text }}>{title}</h2>
         <button
           onClick={onOpenFilter}
           style={{
             background: "none",
             border: "none",
             padding: 0,
-            color: PURPLE,
+            color: colors.primary,
             fontSize: 14,
             fontWeight: 600,
             cursor: "pointer",
@@ -99,8 +99,8 @@ export const CategoryFilter: FC<Props> = ({
                 border: "none",
                 cursor: "pointer",
                 borderRadius: 24,
-                backgroundColor: active ? PURPLE : BG,
-                color: active ? "#fff" : TEXT,
+                backgroundColor: active ? colors.primary : colors.controlColor,
+                color: active ? colors.lighter : colors.text,
                 textAlign: "left",
                 boxShadow: "0 0 0 1px rgba(0,0,0,0.02)",
                 outline: "none",
