@@ -5,6 +5,7 @@ import Home from './pages/sharity-web/Home'
 import Classes from './pages/sharity-web/Classes'
 import Events from './pages/sharity-web/Events'
 import Store from './pages/sharity-web/Store'
+import Product from './pages/sharity-web/Product'
 
 const App: FC = () => {
   useBodyBackground();
@@ -16,6 +17,7 @@ const App: FC = () => {
         <Route path="/sharity-web/classes" element={<Classes />} />
         <Route path="/sharity-web/events" element={<Events />} />
         <Route path="/sharity-web/store" element={<Store />} />
+        <Route path="/sharity-web/product/:id" element={<Product />} />
       </Routes>
     </BrowserRouter>
   );

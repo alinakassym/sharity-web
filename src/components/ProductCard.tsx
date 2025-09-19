@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
 import HeartIcon from "./icons/HeartIcon";
@@ -22,11 +23,19 @@ export const ProductCard: FC<Props> = ({
   isLiked = false,
   onHeartPress,
 }) => {
+  const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
+  const handleCardClick = () => {
+    navigate(`/sharity-web/product/${product.id}`);
+  };
+
   return (
-    <div style={{ background: "transparent" }}>
+    <div
+      style={{ background: "transparent", cursor: "pointer" }}
+      onClick={handleCardClick}
+    >
       {/* изображение + сердце */}
       <div style={{ position: "relative", marginBottom: 8 }}>
         <img
@@ -44,7 +53,10 @@ export const ProductCard: FC<Props> = ({
         <button
           type="button"
           aria-label={isLiked ? "Убрать из избранного" : "В избранное"}
-          onClick={() => onHeartPress?.(product.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onHeartPress?.(product.id);
+          }}
           style={{
             position: "absolute",
             top: 8,
