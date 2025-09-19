@@ -1,4 +1,6 @@
 import type { FC } from "react";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { Colors } from "../theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
 
 interface SearchHeaderProps {
@@ -10,6 +12,9 @@ const SearchHeader: FC<SearchHeaderProps> = ({
   searchValue,
   onSearchChange,
 }) => {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme];
+
   return (
     <div
       style={{
@@ -21,7 +26,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
         alignItems: "center",
         borderBottomStyle: "solid",
         borderBottomWidth: 1,
-        borderBottomColor: "#F0EDE6",
+        borderBottomColor: colors.surfaceColor,
       }}
     >
       <div
@@ -33,7 +38,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
           justifyContent: "center",
         }}
       >
-        <VuesaxIcon name="location" size={24} color="#907BE2" />
+        <VuesaxIcon name="location" size={24} color={colors.primary} />
       </div>
 
       <div
@@ -43,7 +48,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
           display: "flex",
           flex: 1,
           borderRadius: 8,
-          backgroundColor: "#F5F2F2",
+          backgroundColor: colors.controlColor,
         }}
       >
         <div
@@ -54,10 +59,11 @@ const SearchHeader: FC<SearchHeaderProps> = ({
             width: 40,
             maxWidth: 40,
             padding: "8px",
-            color: "#7D7D7D",
+            color: colors.text,
+            zIndex: 2,
           }}
         >
-          <VuesaxIcon name="search" size={16} color="#999" />
+          <VuesaxIcon name="search" size={16} color={colors.lightText} />
         </div>
         <input
           name="search"
@@ -72,6 +78,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
             border: "none",
             outline: "none",
             backgroundColor: "transparent",
+            color: colors.text,
           }}
         />
       </div>

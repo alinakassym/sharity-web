@@ -1,4 +1,6 @@
 import type { FC } from "react";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { Colors } from "../theme/colors";
 import HeartIcon from "./icons/HeartIcon";
 
 export type ProductData = {
@@ -15,18 +17,14 @@ type Props = {
   onHeartPress?: (productId: string) => void;
 };
 
-const colors = {
-  border: "#E8E8E8",
-  text: "#111",
-  lightText: "#777",
-  primary: "#907BE2",
-};
-
 export const ProductCard: FC<Props> = ({
   product,
   isLiked = false,
   onHeartPress,
 }) => {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme];
+
   return (
     <div style={{ background: "transparent" }}>
       {/* изображение + сердце */}
