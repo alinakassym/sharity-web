@@ -82,6 +82,7 @@ const TabBar: FC = () => {
               cursor: "pointer",
               color: isActive ? colors.primary : colors.text,
               transition: "color 0.2s ease",
+              outline: "none",
             }}
           >
             <VuesaxIcon
