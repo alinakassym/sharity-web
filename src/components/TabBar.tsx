@@ -58,9 +58,7 @@ const TabBar: FC = () => {
         backgroundColor: colors.background,
         borderTop: `1px solid ${colors.surfaceColor}`,
         display: "flex",
-        paddingBottom: "12px",
-        paddingLeft: "8px",
-        paddingRight: "8px",
+        paddingBottom: "16px",
         zIndex: 1000,
       }}
     >
@@ -77,25 +75,24 @@ const TabBar: FC = () => {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: "4px",
+              gap: 1,
               padding: "8px 4px",
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: isActive ? colors.primary : colors.lightText,
+              color: isActive ? colors.primary : colors.text,
               transition: "color 0.2s ease",
             }}
           >
             <VuesaxIcon
               name={tab.icon}
               size={28}
-              color={isActive ? colors.primary : colors.lightText}
+              color={isActive ? colors.primary : colors.text}
             />
             <span
               style={{
-                fontSize: "10px",
-                fontWeight: isActive ? 600 : 400,
-                color: isActive ? colors.primary : colors.lightText,
+                fontSize: 10,
+                color: isActive ? colors.primary : colors.text,
               }}
             >
               {tab.label}
