@@ -3,6 +3,7 @@ import { useState } from "react";
 import SearchHeader from "../../components/SearchHeader";
 import CategoryFilter, { type Category } from "../../components/CategoryFilter";
 import ProductGrid from "../../components/ProductGrid";
+import TabBar from "../../components/TabBar";
 import type { ProductData } from "../../components/ProductCard";
 
 const MOCK: ProductData[] = [
@@ -88,7 +89,7 @@ const Store: FC = () => {
           flexDirection: "column",
           gap: 16,
 
-          height: "calc(100vh - 136px)",
+          height: "calc(100vh - 136px - 64px)",
           overflowY: "auto",
         }}
       >
@@ -101,6 +102,7 @@ const Store: FC = () => {
         />
         <ProductGrid products={MOCK} />
       </div>
+      <TabBar />
     </section>
   );
 };
