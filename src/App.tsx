@@ -1,11 +1,14 @@
 import type { FC } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { useBodyBackground } from './hooks/useBodyBackground'
 import Home from './pages/sharity-web/Home'
 import Classes from './pages/sharity-web/Classes'
 import Events from './pages/sharity-web/Events'
 import Store from './pages/sharity-web/Store'
 
 const App: FC = () => {
+  useBodyBackground();
+
   return (
     <BrowserRouter>
       <Routes>

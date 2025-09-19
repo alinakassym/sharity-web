@@ -24,7 +24,7 @@ export const Colors = {
     tabIconDefault: grayColor,
     tabIconSelected: primaryColor,
     border: borderColor,
-    buttonColor: "#F5F2F2",
+    controlColor: "#F5F2F2",
     error: redColor,
   },
   dark: {
@@ -41,7 +41,7 @@ export const Colors = {
     tabIconDefault: grayColor,
     tabIconSelected: primaryColor,
     border: "#898989",
-    buttonColor: "#4B465A",
+    controlColor: "#4B465A",
     error: redColor,
   },
 } as const;
