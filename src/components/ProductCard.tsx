@@ -28,7 +28,7 @@ export const ProductCard: FC<Props> = ({
   const colors = Colors[scheme];
 
   const handleCardClick = () => {
-    navigate(`/sharity-web/product/${product.id}`);
+    navigate(`/product/${product.id}`);
   };
 
   return (
