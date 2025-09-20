@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useBodyBackground } from "./hooks/useBodyBackground";
 import TabBar from "./components/TabBar";
 import Home from "./pages/sharity-web/Home";
@@ -12,11 +12,10 @@ import Cart from "./pages/sharity-web/Cart";
 import Orders from "./pages/sharity-web/Orders";
 
 const AppContent: FC = () => {
-  const location = useLocation();
-
-  // Определяем, нужно ли показывать TabBar
+  const { pathname } = useLocation();
+  const path = pathname.replace(import.meta.env.BASE_URL, "/");
   const showTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
-    location.pathname,
+    path,
   );
 
   return (
