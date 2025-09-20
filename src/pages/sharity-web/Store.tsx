@@ -1,9 +1,9 @@
-import type { FC } from 'react'
+import type { FC } from "react";
 import { useState } from "react";
-import SearchHeader from "../../components/SearchHeader";
-import CategoryFilter, { type Category } from "../../components/CategoryFilter";
-import ProductGrid from "../../components/ProductGrid";
-import type { ProductData } from "../../components/ProductCard";
+import SearchHeader from "@/components/SearchHeader";
+import CategoryFilter, { type Category } from "@/components/CategoryFilter";
+import ProductGrid from "@/components/ProductGrid";
+import type { ProductData } from "@/components/ProductCard";
 
 const MOCK: ProductData[] = [
   {
@@ -87,7 +87,6 @@ const Store: FC = () => {
           display: "flex",
           flexDirection: "column",
           gap: 16,
-
           height: "calc(100vh - 136px - 64px)",
           overflowY: "auto",
         }}
@@ -105,4 +104,4 @@ const Store: FC = () => {
   );
 };
 
-export default Store
+export default Store;

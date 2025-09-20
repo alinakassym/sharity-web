@@ -2,11 +2,12 @@ import type { FC } from 'react'
 
 const Classes: FC = () => {
   return (
-    <section>
+    <section style={{ padding: 16 }}>
       <h1>Classes</h1>
-      <p>Каталог тренировок / курсов. Контент добавим позже.</p>
+      <p>Каталог тренировок / курсов</p>
+      <p>В разработке</p>
     </section>
-  )
+  );
 }
 
 export default Classes
