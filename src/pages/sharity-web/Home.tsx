@@ -6,6 +6,7 @@ const Home: FC = () => {
     <section style={{ padding: 16 }}>
       <h1>Home</h1>
       <p>Sharity App WebViews</p>
+      <p>DB: Firebase</p>
       <TabBar />
     </section>
   );
