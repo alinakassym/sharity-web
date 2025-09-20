@@ -75,10 +75,9 @@ const Favorites: FC = () => {
           padding: 16,
           display: "flex",
           flexDirection: "column",
-          gap: 8,
+          gap: 16,
           height: "calc(100vh - 136px - 64px)",
           overflowY: "auto",
-          boxSizing: "border-box",
         }}
       >
         <ProductGrid products={MOCK} />
