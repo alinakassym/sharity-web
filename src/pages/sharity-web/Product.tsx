@@ -1,8 +1,9 @@
 import type { FC } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useColorScheme } from "../../hooks/useColorScheme";
-import { Colors } from "../../theme/colors";
-import VuesaxIcon from "../../components/VuesaxIcon";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import VuesaxIcon from "@/components/VuesaxIcon";
+import ProductHeader from "@/components/ProductHeader";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,40 +36,7 @@ const Product: FC = () => {
       }}
     >
       {/* Header с кнопкой назад */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "16px",
-          borderBottom: `1px solid ${colors.surfaceColor}`,
-        }}
-      >
-        <button
-          onClick={handleBackClick}
-          style={{
-            background: "none",
-            border: "none",
-            padding: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "50%",
-            color: colors.text,
-          }}
-        >
-          <VuesaxIcon name="arrow-left" size={24} color={colors.text} />
-        </button>
-        <h1
-          style={{
-            margin: "0 0 0 16px",
-            fontSize: "20px",
-            fontWeight: 600,
-          }}
-        >
-          Товар
-        </h1>
-      </div>
+      <ProductHeader title={product.title} onGoBack={handleBackClick} />
 
       {/* Контент продукта */}
       <div style={{ padding: "16px" }}>
