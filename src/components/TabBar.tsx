@@ -24,12 +24,12 @@ const tabs: TabItem[] = [
     icon: "heart",
     path: "/sharity-web/favorites",
   },
-  {
-    id: "cart",
-    label: "Корзина",
-    icon: "shopping-cart",
-    path: "/sharity-web/cart",
-  },
+  // {
+  //   id: "cart",
+  //   label: "Корзина",
+  //   icon: "shopping-cart",
+  //   path: "/sharity-web/cart",
+  // },
   {
     id: "orders",
     label: "Мои заказы",
