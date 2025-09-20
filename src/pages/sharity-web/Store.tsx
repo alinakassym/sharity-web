@@ -1,54 +1,11 @@
+// src/pages/Store.tsx
 import type { FC } from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import ProductGrid from "@/components/ProductGrid";
 import type { ProductData } from "@/components/ProductCard";
-
-const MOCK: ProductData[] = [
-  {
-    id: "1",
-    image: "https://picsum.photos/600?1",
-    category: "Спорт/Гимнастика",
-    title: "Костюм размер 23",
-    price: "32 000 ₸",
-  },
-  {
-    id: "2",
-    image: "https://picsum.photos/600?2",
-    category: "Спорт/Гимнастика",
-    title: "Костюм",
-    price: "13 000 ₸",
-  },
-  {
-    id: "3",
-    image: "https://picsum.photos/600?3",
-    category: "Спорт/Теннис",
-    title: "Ракетка Wilson",
-    price: "25 000 ₸",
-  },
-  {
-    id: "4",
-    image: "https://picsum.photos/600?4",
-    category: "Спорт/Футбол",
-    title: "Бутсы Nike",
-    price: "18 500 ₸",
-  },
-  {
-    id: "5",
-    image: "https://picsum.photos/600?5",
-    category: "Спорт/Плавание",
-    title: "Очки для плавания",
-    price: "7 200 ₸",
-  },
-  {
-    id: "6",
-    image: "https://picsum.photos/600?6",
-    category: "Спорт/Бокс",
-    title: "Перчатки",
-    price: "15 000 ₸",
-  },
-];
+import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
 
 const ALL: Category[] = [
   { id: "gym", label: "Гимнастика", icon: "gymnastics" },
@@ -61,26 +18,57 @@ const ALL: Category[] = [
   { id: "run", label: "Бег", icon: "run" },
 ];
 
+const KZT = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "KZT",
+  maximumFractionDigits: 0,
+});
+
 const Store: FC = () => {
-  const [selected, setSelected] = useState<string[]>(["gym"]);
+  const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-  };
+  const { products: rows, isLoading } = useRequestGetProducts();
+
+  // Firestore -> ProductData (для грида)
+  const products: ProductData[] = useMemo(
+    () =>
+      rows.map((r, i) => ({
+        id: r.id,
+        image: r.image ?? `https://picsum.photos/600?${i + 1}`,
+        category: r.category ?? "",
+        title: r.name ?? "",
+        price: KZT.format(Number(r.price) || 0),
+      })),
+    [rows],
+  );
+
+  // выбранные ярлыки категорий
+  const selectedLabels = useMemo(() => {
+    return new Set(
+      selected
+        .map((id) => ALL.find((c) => c.id === id)?.label)
+        .filter(Boolean) as string[],
+    );
+  }, [selected]);
+
+  // фильтрация по категориям и поиску
+  const filtered = useMemo(() => {
+    const q = searchValue.trim().toLowerCase();
+    return products.filter((p) => {
+      const byCat = selectedLabels.size === 0 || selectedLabels.has(p.category);
+      const byQuery =
+        q.length === 0 ||
+        p.title.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q);
+      return byCat && byQuery;
+    });
+  }, [products, selectedLabels, searchValue]);
 
   return (
-    <section
-      style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-      }}
-    >
-      <SearchHeader
-        searchValue={searchValue}
-        onSearchChange={handleSearchChange}
-      />
+    <section style={{ position: "fixed", left: 0, right: 0 }}>
+      <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
+
       <div
         style={{
           padding: 16,
@@ -98,7 +86,12 @@ const Store: FC = () => {
           multi={true}
           onOpenFilter={() => console.log("open filter modal")}
         />
-        <ProductGrid products={MOCK} />
+
+        {isLoading ? (
+          <div style={{ padding: 16 }}>Загрузка…</div>
+        ) : (
+          <ProductGrid products={filtered} />
+        )}
       </div>
     </section>
   );
