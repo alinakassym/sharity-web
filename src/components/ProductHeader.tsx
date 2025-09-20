@@ -4,11 +4,10 @@ import { Colors } from "../theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
 
 interface ProductHeaderProps {
-  title: string;
   onGoBack?: () => void;
 }
 
-const ProductHeader: FC<ProductHeaderProps> = ({ title, onGoBack }) => {
+const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
@@ -29,7 +28,8 @@ const ProductHeader: FC<ProductHeaderProps> = ({ title, onGoBack }) => {
       {/* кнопка назад */}
       <div
         style={{
-          width: 56,
+          paddingTop: 2,
+          width: 54,
           height: 40,
           display: "flex",
           alignItems: "center",
@@ -49,7 +49,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({ title, onGoBack }) => {
           alignItems: "center",
         }}
       >
-        {title}
+        Вернуться назад
       </div>
     </div>
   );

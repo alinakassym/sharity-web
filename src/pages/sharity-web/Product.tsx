@@ -30,18 +30,28 @@ const Product: FC = () => {
   return (
     <section
       style={{
-        minHeight: "100vh",
-        backgroundColor: colors.background,
-        color: colors.text,
+        position: "fixed",
+        left: 0,
+        right: 0,
       }}
     >
       {/* Header с кнопкой назад */}
-      <ProductHeader title={product.title} onGoBack={handleBackClick} />
+      <ProductHeader onGoBack={handleBackClick} />
 
       {/* Контент продукта */}
-      <div style={{ padding: "16px" }}>
+      <div
+        style={{
+          padding: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          height: "calc(100vh - 90px)",
+          overflowY: "auto",
+          boxSizing: "border-box",
+        }}
+      >
         {/* Изображение */}
-        <div style={{ marginBottom: "24px" }}>
+        <div style={{}}>
           <img
             src={product.image}
             alt={product.title}
@@ -56,10 +66,10 @@ const Product: FC = () => {
         </div>
 
         {/* Информация о товаре */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div
             style={{
-              fontSize: "14px",
+              fontSize: 14,
               color: colors.lightText,
             }}
           >
@@ -69,7 +79,7 @@ const Product: FC = () => {
           <h2
             style={{
               margin: 0,
-              fontSize: "24px",
+              fontSize: 16,
               fontWeight: 600,
               color: colors.text,
             }}
@@ -79,7 +89,7 @@ const Product: FC = () => {
 
           <div
             style={{
-              fontSize: "28px",
+              fontSize: 16,
               fontWeight: 600,
               color: colors.primary,
             }}
@@ -89,10 +99,10 @@ const Product: FC = () => {
 
           <div
             style={{
-              fontSize: "16px",
+              fontSize: 16,
               lineHeight: "1.5",
               color: colors.text,
-              marginTop: "16px",
+              marginTop: 16,
             }}
           >
             {product.description}
@@ -103,8 +113,9 @@ const Product: FC = () => {
         <div
           style={{
             display: "flex",
-            gap: "12px",
-            marginTop: "32px",
+            gap: 8,
+            marginTop: 16,
+            paddingBottom: 48,
           }}
         >
           <button
