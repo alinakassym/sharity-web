@@ -49,7 +49,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
           alignItems: "center",
         }}
       >
-        Вернуться назад
+        ВЕРНУТЬСЯ НАЗАД
       </div>
     </div>
   );
