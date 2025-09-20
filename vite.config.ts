@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "docs", // <- билд в docs
+    outDir: "docs",
     assetsDir: "assets",
     emptyOutDir: true,
   },
