@@ -28,8 +28,8 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
       {/* кнопка назад */}
       <div
         style={{
-          paddingTop: 2,
-          width: 54,
+          paddingTop: 0,
+          width: 56,
           height: 40,
           display: "flex",
           alignItems: "center",
