@@ -16,25 +16,25 @@ const tabs: TabItem[] = [
     id: "store",
     label: "Магазин",
     icon: "shop",
-    path: "/sharity-web/store",
+    path: "/store",
   },
   {
     id: "favorites",
     label: "Избранное",
     icon: "heart",
-    path: "/sharity-web/favorites",
+    path: "/favorites",
   },
   // {
   //   id: "cart",
   //   label: "Корзина",
   //   icon: "shopping-cart",
-  //   path: "/sharity-web/cart",
+  //   path: "/cart",
   // },
   {
     id: "orders",
     label: "Мои заказы",
     icon: "document",
-    path: "/sharity-web/orders",
+    path: "/orders",
   },
 ];
 

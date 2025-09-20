@@ -15,24 +15,21 @@ const AppContent: FC = () => {
   const location = useLocation();
 
   // Определяем, нужно ли показывать TabBar
-  const showTabBar = [
-    "/sharity-web/store",
-    "/sharity-web/favorites",
-    "/sharity-web/cart",
-    "/sharity-web/orders",
-  ].includes(location.pathname);
+  const showTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
+    location.pathname,
+  );
 
   return (
     <>
       <Routes>
-        <Route path="/sharity-web/" element={<Home />} />
-        <Route path="/sharity-web/classes" element={<Classes />} />
-        <Route path="/sharity-web/events" element={<Events />} />
-        <Route path="/sharity-web/store" element={<Store />} />
-        <Route path="/sharity-web/product/:id" element={<Product />} />
-        <Route path="/sharity-web/favorites" element={<Favorites />} />
-        <Route path="/sharity-web/cart" element={<Cart />} />
-        <Route path="/sharity-web/orders" element={<Orders />} />
+        <Route path="/" element={<Home />} />
+        <Route path="classes" element={<Classes />} />
+        <Route path="events" element={<Events />} />
+        <Route path="store" element={<Store />} />
+        <Route path="product/:id" element={<Product />} />
+        <Route path="favorites" element={<Favorites />} />
+        <Route path="cart" element={<Cart />} />
+        <Route path="orders" element={<Orders />} />
       </Routes>
       {showTabBar && <TabBar />}
     </>
@@ -43,7 +40,7 @@ const App: FC = () => {
   useBodyBackground();
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AppContent />
     </BrowserRouter>
   );
