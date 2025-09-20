@@ -13,4 +13,9 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  build: {
+    outDir: "docs", // <- билд в docs
+    assetsDir: "assets",
+    emptyOutDir: true,
+  },
 });
