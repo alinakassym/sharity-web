@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
+import ProductCard from "@/components/ProductCard";
 import {
   Stepper,
   Step,
@@ -23,6 +24,9 @@ const Create: FC = () => {
   const [category, setCategory] = useState("");
   const [condition, setCondition] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [productName, setProductName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
@@ -161,6 +165,8 @@ const Create: FC = () => {
             <TextField
               label="Название товара *"
               placeholder="Введите название товара"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
               fullWidth
               variant="outlined"
             />
@@ -191,6 +197,8 @@ const Create: FC = () => {
               placeholder="0"
               type="number"
               inputMode="numeric"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
               inputProps={{ pattern: "[0-9]*" }}
               fullWidth
               variant="outlined"
@@ -320,6 +328,8 @@ const Create: FC = () => {
             <TextField
               label="Описание товара"
               placeholder="Опишите товар подробно: состояние, размер, особенности..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               multiline
               rows={6}
               fullWidth
@@ -347,17 +357,148 @@ const Create: FC = () => {
 
         {currentStep === "review" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <p
-              style={{
-                fontSize: 16,
-                color: colors.text,
-                textAlign: "center",
-                margin: 0,
-              }}
-            >
-              Проверьте данные перед публикацией
-            </p>
-            {/* Здесь будет превью товара */}
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <h3
+                style={{
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: colors.text,
+                  margin: "0 0 8px",
+                }}
+              >
+                Предпросмотр объявления
+              </h3>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: colors.lightText,
+                  margin: 0,
+                }}
+              >
+                Проверьте, как будет выглядеть ваше объявление
+              </p>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <ProductCard
+                product={{
+                  id: "preview",
+                  image: selectedFiles.length > 0
+                    ? URL.createObjectURL(selectedFiles[0])
+                    : "https://picsum.photos/600?preview",
+                  category: category || "Без категории",
+                  title: productName || "Название товара",
+                  price: price ? `${Number(price).toLocaleString('ru-RU')} ₸` : "0 ₸",
+                }}
+              />
+            </div>
+
+            {description && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: colors.surfaceColor,
+                  borderRadius: 12,
+                  marginTop: 8,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: colors.text,
+                    margin: "0 0 8px",
+                  }}
+                >
+                  Описание
+                </h4>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: colors.text,
+                    margin: 0,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
+            )}
+
+            {condition && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: colors.surfaceColor,
+                  borderRadius: 12,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: colors.text,
+                    margin: "0 0 8px",
+                  }}
+                >
+                  Состояние
+                </h4>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: colors.text,
+                    margin: 0,
+                  }}
+                >
+                  {condition === "new" && "Новое"}
+                  {condition === "excellent" && "Отличное"}
+                  {condition === "good" && "Хорошее"}
+                  {condition === "satisfactory" && "Удовлетворительное"}
+                </p>
+              </div>
+            )}
+
+            {selectedFiles.length > 1 && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: colors.surfaceColor,
+                  borderRadius: 12,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: colors.text,
+                    margin: "0 0 12px",
+                  }}
+                >
+                  Дополнительные фото ({selectedFiles.length - 1})
+                </h4>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))",
+                    gap: 8,
+                  }}
+                >
+                  {selectedFiles.slice(1).map((file, index) => (
+                    <img
+                      key={index}
+                      src={URL.createObjectURL(file)}
+                      alt={`Photo ${index + 2}`}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        objectFit: "cover",
+                        borderRadius: 8,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
