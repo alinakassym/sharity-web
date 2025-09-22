@@ -152,6 +152,10 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
               "&:hover fieldset": {},
               "&.Mui-focused fieldset": {},
             },
+            "& > label": {
+              padding: "0 8px",
+              backgroundColor: colors.background,
+            },
           },
         },
       },
@@ -178,6 +182,10 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
             "& .MuiOutlinedInput-root": {
               borderRadius: 20,
             },
+            "& > label": {
+              padding: "0 8px",
+              backgroundColor: colors.background,
+            },
           },
         },
       },
@@ -193,7 +201,7 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
       MuiPaper: {
         styleOverrides: {
           root: {
-            backgroundColor: colors.surfaceColor,
+            backgroundColor: colors.background,
           },
         },
       },
