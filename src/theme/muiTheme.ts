@@ -2,7 +2,7 @@ import { createTheme } from '@mui/material/styles';
 import type { Theme } from '@mui/material/styles';
 import { Colors } from './colors';
 
-type Scheme = 'light' | 'dark';
+type Scheme = "light" | "dark";
 
 export const createCustomMuiTheme = (scheme: Scheme): Theme => {
   const colors = Colors[scheme];
@@ -147,16 +147,9 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
           root: {
             "& .MuiOutlinedInput-root": {
               borderRadius: 8,
-              backgroundColor: colors.controlColor,
-              "& fieldset": {
-                borderColor: "transparent",
-              },
-              "&:hover fieldset": {
-                borderColor: colors.border,
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: colors.primary,
-              },
+              "& fieldset": {},
+              "&:hover fieldset": {},
+              "&.Mui-focused fieldset": {},
             },
           },
         },

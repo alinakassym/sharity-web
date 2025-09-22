@@ -3,12 +3,24 @@ import { useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
-import { Stepper, Step, StepLabel, Button } from "@mui/material";
+import {
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
 const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
+  const [category, setCategory] = useState("");
+  const [condition, setCondition] = useState("");
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
@@ -123,107 +135,42 @@ const Create: FC = () => {
       >
         {currentStep === "basic" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: 8,
-                }}
-              >
-                Название товара *
-              </label>
-              <input
-                type="text"
-                placeholder="Введите название товара"
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "none",
-                  backgroundColor: colors.controlColor,
-                  color: colors.text,
-                  fontSize: 16,
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
+            <TextField
+              label="Название товара *"
+              placeholder="Введите название товара"
+              fullWidth
+              variant="outlined"
+            />
 
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: 8,
-                }}
+            <FormControl fullWidth>
+              <InputLabel>Категория *</InputLabel>
+              <Select
+                value={category}
+                label="Категория *"
+                onChange={(e) => setCategory(e.target.value)}
               >
-                Категория *
-              </label>
-              <select
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "none",
-                  backgroundColor: colors.controlColor,
-                  color: colors.text,
-                  fontSize: 16,
-                  boxSizing: "border-box",
-                }}
-              >
-                <option value="">Выберите категорию</option>
-                <option value="gym">Гимнастика</option>
-                <option value="dance">Танцы</option>
-                <option value="ballet">Балет</option>
-                <option value="volley">Волейбол</option>
-                <option value="tennis">Теннис</option>
-                <option value="football">Футбол</option>
-                <option value="hockey">Хоккей</option>
-                <option value="run">Бег</option>
-              </select>
-            </div>
+                <MenuItem value="">
+                  <em>Выберите категорию</em>
+                </MenuItem>
+                <MenuItem value="gym">Гимнастика</MenuItem>
+                <MenuItem value="dance">Танцы</MenuItem>
+                <MenuItem value="ballet">Балет</MenuItem>
+                <MenuItem value="volley">Волейбол</MenuItem>
+                <MenuItem value="tennis">Теннис</MenuItem>
+                <MenuItem value="football">Футбол</MenuItem>
+                <MenuItem value="hockey">Хоккей</MenuItem>
+                <MenuItem value="run">Бег</MenuItem>
+              </Select>
+            </FormControl>
 
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: 8,
-                }}
-              >
-                Цена *
-              </label>
-              <input
-                type="number"
-                placeholder="0"
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "none",
-                  backgroundColor: colors.controlColor,
-                  color: colors.text,
-                  fontSize: 16,
-                  boxSizing: "border-box",
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 12,
-                  color: colors.lightText,
-                  marginTop: 4,
-                  display: "block",
-                }}
-              >
-                Укажите цену в тенге
-              </span>
-            </div>
+            <TextField
+              label="Цена *"
+              placeholder="0"
+              type="number"
+              fullWidth
+              variant="outlined"
+              helperText="Укажите цену в тенге"
+            />
           </div>
         )}
 
@@ -264,67 +211,31 @@ const Create: FC = () => {
 
         {currentStep === "details" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: 8,
-                }}
-              >
-                Описание товара
-              </label>
-              <textarea
-                placeholder="Опишите товар подробно: состояние, размер, особенности..."
-                rows={6}
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "none",
-                  backgroundColor: colors.controlColor,
-                  color: colors.text,
-                  fontSize: 16,
-                  resize: "vertical",
-                  boxSizing: "border-box",
-                  fontFamily: "inherit",
-                }}
-              />
-            </div>
+            <TextField
+              label="Описание товара"
+              placeholder="Опишите товар подробно: состояние, размер, особенности..."
+              multiline
+              rows={6}
+              fullWidth
+              variant="outlined"
+            />
 
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: 8,
-                }}
+            <FormControl fullWidth>
+              <InputLabel>Состояние</InputLabel>
+              <Select
+                value={condition}
+                label="Состояние"
+                onChange={(e) => setCondition(e.target.value)}
               >
-                Состояние
-              </label>
-              <select
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "none",
-                  backgroundColor: colors.controlColor,
-                  color: colors.text,
-                  fontSize: 16,
-                  boxSizing: "border-box",
-                }}
-              >
-                <option value="">Выберите состояние</option>
-                <option value="new">Новое</option>
-                <option value="excellent">Отличное</option>
-                <option value="good">Хорошее</option>
-                <option value="satisfactory">Удовлетворительное</option>
-              </select>
-            </div>
+                <MenuItem value="">
+                  <em>Выберите состояние</em>
+                </MenuItem>
+                <MenuItem value="new">Новое</MenuItem>
+                <MenuItem value="excellent">Отличное</MenuItem>
+                <MenuItem value="good">Хорошее</MenuItem>
+                <MenuItem value="satisfactory">Удовлетворительное</MenuItem>
+              </Select>
+            </FormControl>
           </div>
         )}
 
