@@ -260,8 +260,7 @@ const Create: FC = () => {
       <div
         style={{
           position: "fixed",
-          height: 84,
-          bottom: 0,
+          bottom: 8,
           left: 0,
           right: 0,
           padding: 16,
@@ -274,11 +273,16 @@ const Create: FC = () => {
         }}
       >
         {currentStepIndex > 0 && (
-          <Button fullWidth={true} variant="outlined" onClick={handleBack}>
+          <Button
+            size="large"
+            fullWidth={true}
+            variant="outlined"
+            onClick={handleBack}
+          >
             Назад
           </Button>
         )}
-        <Button fullWidth variant="contained" onClick={handleNext}>
+        <Button size="large" fullWidth variant="contained" onClick={handleNext}>
           {currentStepIndex === steps.length - 1 ? "Опубликовать" : "Далее"}
         </Button>
       </div>

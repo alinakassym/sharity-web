@@ -119,7 +119,8 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 12,
+            height: 48,
+            borderRadius: 20,
             textTransform: "none",
             fontWeight: 600,
             fontSize: "1rem",
@@ -146,10 +147,36 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
         styleOverrides: {
           root: {
             "& .MuiOutlinedInput-root": {
-              borderRadius: 8,
+              borderRadius: 20,
               "& fieldset": {},
               "&:hover fieldset": {},
               "&.Mui-focused fieldset": {},
+            },
+          },
+        },
+      },
+      MuiSelect: {
+        styleOverrides: {
+          outlined: {
+            borderRadius: 20,
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderRadius: 20,
+              borderColor: "transparent",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: colors.border,
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: colors.primary,
+            },
+          },
+        },
+      },
+      MuiFormControl: {
+        styleOverrides: {
+          root: {
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 20,
             },
           },
         },
