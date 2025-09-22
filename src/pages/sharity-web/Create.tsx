@@ -21,6 +21,7 @@ const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
   const [condition, setCondition] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
@@ -56,6 +57,14 @@ const Create: FC = () => {
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
       setCurrentStep(steps[currentStepIndex + 1].id);
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const filesArray = Array.from(files);
+      setSelectedFiles([...selectedFiles, ...filesArray]);
     }
   };
 
@@ -203,14 +212,65 @@ const Create: FC = () => {
               </p>
               <p
                 style={{
-                  margin: 0,
+                  margin: "0 0 16px",
                   fontSize: 14,
                   color: colors.lightText,
                 }}
               >
-                Нажмите, чтобы выбрать файлы или перетащите их сюда
+                Выберите фотографии товара
               </p>
+              <Button
+                component="label"
+                variant="contained"
+                startIcon={
+                  <VuesaxIcon name="camera" color={colors.lighter} size={20} />
+                }
+              >
+                Выбрать фото
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  hidden
+                  onChange={handleFileChange}
+                />
+              </Button>
             </div>
+
+            {selectedFiles.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <h3
+                  style={{
+                    margin: "0 0 8px",
+                    fontSize: 16,
+                    color: colors.text,
+                  }}
+                >
+                  Выбранные файлы:
+                </h3>
+                {selectedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: "8px 12px",
+                      backgroundColor: colors.controlColor,
+                      borderRadius: 8,
+                      marginBottom: 8,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ color: colors.text, fontSize: 14 }}>
+                      {file.name}
+                    </span>
+                    <span style={{ color: colors.lightText, fontSize: 12 }}>
+                      {(file.size / 1024 / 1024).toFixed(1)} MB
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
