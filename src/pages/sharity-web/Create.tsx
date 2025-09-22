@@ -64,13 +64,16 @@ const Create: FC = () => {
       {/* Header */}
       <div
         style={{
-          height: 56,
-          backgroundColor: colors.background,
-          borderBottom: `1px solid ${colors.surfaceColor}`,
+          paddingLeft: 16,
+          paddingRight: 56,
+          paddingBottom: 8,
+          height: 48,
           display: "flex",
+          flex: 1,
           alignItems: "center",
-          padding: "0 16px",
-          gap: 16,
+          borderBottomStyle: "solid",
+          borderBottomWidth: 1,
+          borderBottomColor: colors.surfaceColor,
         }}
       >
         <div style={{ flex: 1 }}>
@@ -82,7 +85,7 @@ const Create: FC = () => {
               margin: 0,
             }}
           >
-            Размещение "Продажа"
+            Размещение: Продажа
           </h1>
         </div>
       </div>
@@ -128,7 +131,7 @@ const Create: FC = () => {
       <div
         style={{
           padding: "16px 16px 100px",
-          height: "100%",
+          height: "calc(100vh - 290px)",
           overflowY: "auto",
           backgroundColor: colors.background,
         }}
@@ -167,6 +170,8 @@ const Create: FC = () => {
               label="Цена *"
               placeholder="0"
               type="number"
+              inputMode="numeric"
+              inputProps={{ pattern: "[0-9]*" }}
               fullWidth
               variant="outlined"
               helperText="Укажите цену в тенге"
