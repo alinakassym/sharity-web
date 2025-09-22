@@ -32,83 +32,85 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
       },
       divider: colors.border,
       // Кастомные цвета для нашего приложения
-      ...(scheme === 'light' ? {
-        grey: {
-          50: '#fafafa',
-          100: colors.controlColor,
-          200: colors.border,
-          300: colors.lightText,
-          400: colors.lightText,
-          500: colors.lightText,
-          600: colors.text,
-          700: colors.darken,
-          800: colors.darken,
-          900: colors.darken,
-        }
-      } : {
-        grey: {
-          50: colors.darken,
-          100: colors.surfaceColor,
-          200: colors.controlColor,
-          300: colors.lightText,
-          400: colors.lightText,
-          500: colors.lightText,
-          600: colors.text,
-          700: colors.lighter,
-          800: colors.lighter,
-          900: colors.lighter,
-        }
-      })
+      ...(scheme === "light"
+        ? {
+            grey: {
+              50: "#fafafa",
+              100: colors.controlColor,
+              200: colors.border,
+              300: colors.lightText,
+              400: colors.lightText,
+              500: colors.lightText,
+              600: colors.text,
+              700: colors.darken,
+              800: colors.darken,
+              900: colors.darken,
+            },
+          }
+        : {
+            grey: {
+              50: colors.darken,
+              100: colors.surfaceColor,
+              200: colors.controlColor,
+              300: colors.lightText,
+              400: colors.lightText,
+              500: colors.lightText,
+              600: colors.text,
+              700: colors.lighter,
+              800: colors.lighter,
+              900: colors.lighter,
+            },
+          }),
     },
     typography: {
       fontFamily: [
-        '-apple-system',
-        'BlinkMacSystemFont',
+        "-apple-system",
+        "BlinkMacSystemFont",
         '"Segoe UI"',
-        'Roboto',
+        "Roboto",
         '"Helvetica Neue"',
-        'Arial',
-        'sans-serif',
+        "Arial",
+        "sans-serif",
         '"Apple Color Emoji"',
         '"Segoe UI Emoji"',
         '"Segoe UI Symbol"',
-      ].join(','),
+      ].join(","),
       h1: {
-        fontSize: '2rem',
+        fontSize: "2rem",
         fontWeight: 600,
         color: colors.text,
       },
       h2: {
-        fontSize: '1.5rem',
+        fontSize: "1.5rem",
         fontWeight: 600,
         color: colors.text,
       },
       h3: {
-        fontSize: '1.25rem',
+        fontSize: "1.25rem",
         fontWeight: 600,
         color: colors.text,
       },
       h4: {
-        fontSize: '1.125rem',
+        fontSize: "1.125rem",
         fontWeight: 600,
         color: colors.text,
       },
       h5: {
-        fontSize: '1rem',
+        fontSize: "1rem",
         fontWeight: 600,
         color: colors.text,
       },
       h6: {
-        fontSize: '0.875rem',
+        fontSize: "0.875rem",
         fontWeight: 600,
         color: colors.text,
       },
       body1: {
-        fontSize: '1rem',
+        fontSize: "1rem",
         color: colors.text,
       },
       body2: {
-        fontSize: '0.875rem',
+        fontSize: "0.875rem",
         color: colors.lightText,
       },
     },
@@ -118,16 +120,24 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
         styleOverrides: {
           root: {
             borderRadius: 12,
-            textTransform: 'none',
+            textTransform: "none",
             fontWeight: 600,
-            fontSize: '1rem',
+            fontSize: "1rem",
+            boxShadow: "none",
+            outline: "none",
+            "&:focus": {
+              outline: "none",
+            },
           },
           containedPrimary: {
             backgroundColor: colors.primary,
             color: colors.lighter,
-            '&:hover': {
+            "&:hover": {
               backgroundColor: colors.primary,
               opacity: 0.9,
+            },
+            "&:focus": {
+              outline: "none",
             },
           },
         },
@@ -135,16 +145,16 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
       MuiTextField: {
         styleOverrides: {
           root: {
-            '& .MuiOutlinedInput-root': {
+            "& .MuiOutlinedInput-root": {
               borderRadius: 8,
               backgroundColor: colors.controlColor,
-              '& fieldset': {
-                borderColor: 'transparent',
+              "& fieldset": {
+                borderColor: "transparent",
               },
-              '&:hover fieldset': {
+              "&:hover fieldset": {
                 borderColor: colors.border,
               },
-              '&.Mui-focused fieldset': {
+              "&.Mui-focused fieldset": {
                 borderColor: colors.primary,
               },
             },
@@ -188,7 +198,7 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
         styleOverrides: {
           root: {
             color: colors.lightText,
-            '&.Mui-selected': {
+            "&.Mui-selected": {
               color: colors.primary,
             },
           },
@@ -198,7 +208,7 @@ export const createCustomMuiTheme = (scheme: Scheme): Theme => {
         styleOverrides: {
           root: {
             color: colors.text,
-            '&:hover': {
+            "&:hover": {
               backgroundColor: `${colors.primary}20`,
             },
           },

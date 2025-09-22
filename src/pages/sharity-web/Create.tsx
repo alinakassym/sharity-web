@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
-import { Stepper, Step, StepLabel } from "@mui/material";
+import { Stepper, Step, StepLabel, Button } from "@mui/material";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
@@ -85,11 +85,21 @@ const Create: FC = () => {
         <Stepper activeStep={currentStepIndex} alternativeLabel>
           {steps.map((step) => (
             <Step key={step.id}>
-              <StepLabel>{step.title}</StepLabel>
+              <StepLabel></StepLabel>
             </Step>
           ))}
         </Stepper>
         <div style={{ textAlign: "center", marginTop: 16 }}>
+          <p
+            style={{
+              fontSize: 14,
+              fontWeight: "600",
+              color: colors.lightText,
+              margin: 0,
+            }}
+          >
+            {steps[currentStepIndex].title}
+          </p>
           <p
             style={{
               fontSize: 14,
@@ -105,8 +115,8 @@ const Create: FC = () => {
       {/* Content */}
       <div
         style={{
-          padding: 16,
-          height: "calc(100vh - 64px - 120px - 80px)",
+          padding: "16px 16px 100px",
+          height: "100%",
           overflowY: "auto",
           backgroundColor: colors.background,
         }}
@@ -338,47 +348,28 @@ const Create: FC = () => {
       {/* Bottom Navigation */}
       <div
         style={{
+          position: "fixed",
+          height: 84,
+          bottom: 0,
+          left: 0,
+          right: 0,
           padding: 16,
           backgroundColor: colors.background,
           borderTop: `1px solid ${colors.surfaceColor}`,
           display: "flex",
-          gap: 12,
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 8,
         }}
       >
         {currentStepIndex > 0 && (
-          <button
-            onClick={handleBack}
-            style={{
-              flex: 1,
-              padding: "12px 16px",
-              borderRadius: 12,
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.background,
-              color: colors.text,
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
+          <Button fullWidth={true} variant="outlined" onClick={handleBack}>
             Назад
-          </button>
+          </Button>
         )}
-        <button
-          onClick={handleNext}
-          style={{
-            flex: 1,
-            padding: "12px 16px",
-            borderRadius: 12,
-            border: "none",
-            backgroundColor: colors.primary,
-            color: colors.lighter,
-            fontSize: 16,
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+        <Button fullWidth variant="contained" onClick={handleNext}>
           {currentStepIndex === steps.length - 1 ? "Опубликовать" : "Далее"}
-        </button>
+        </Button>
       </div>
     </section>
   );
