@@ -13,6 +13,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  IconButton,
 } from "@mui/material";
 
 type StepType = "basic" | "photos" | "details" | "review";
@@ -64,8 +65,18 @@ const Create: FC = () => {
     const files = event.target.files;
     if (files) {
       const filesArray = Array.from(files);
-      setSelectedFiles([...selectedFiles, ...filesArray]);
+      // Фильтруем только изображения
+      const imageFiles = filesArray.filter((file) =>
+        file.type.startsWith("image/"),
+      );
+      setSelectedFiles([...selectedFiles, ...imageFiles]);
     }
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setSelectedFiles(
+      selectedFiles.filter((_, index) => index !== indexToRemove),
+    );
   };
 
   return (
@@ -241,34 +252,64 @@ const Create: FC = () => {
               <div style={{ marginTop: 16 }}>
                 <h3
                   style={{
-                    margin: "0 0 8px",
+                    margin: "0 0 12px",
                     fontSize: 16,
                     color: colors.text,
                   }}
                 >
-                  Выбранные файлы:
+                  Выбранные изображения ({selectedFiles.length}):
                 </h3>
-                {selectedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      padding: "8px 12px",
-                      backgroundColor: colors.controlColor,
-                      borderRadius: 8,
-                      marginBottom: 8,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ color: colors.text, fontSize: 14 }}>
-                      {file.name}
-                    </span>
-                    <span style={{ color: colors.lightText, fontSize: 12 }}>
-                      {(file.size / 1024 / 1024).toFixed(1)} MB
-                    </span>
-                  </div>
-                ))}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                    gap: 8,
+                  }}
+                >
+                  {selectedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: "relative",
+                        width: 80,
+                        height: 80,
+                        borderRadius: 8,
+                        overflow: "hidden",
+                        backgroundColor: colors.controlColor,
+                      }}
+                    >
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <IconButton
+                        onClick={() => removeFile(index)}
+                        size="small"
+                        sx={{
+                          position: "absolute",
+                          top: 4,
+                          right: 4,
+                          borderColor: colors.error,
+                          borderWidth: 1,
+                          borderStyle: "solid",
+                          boxSizing: "content-box",
+                          backgroundColor: `${colors.error}40`,
+                        }}
+                      >
+                        <VuesaxIcon
+                          name="close"
+                          size={6}
+                          color={colors.error}
+                        />
+                      </IconButton>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
