@@ -10,6 +10,7 @@ export type ProductData = {
   category: string;
   title: string;
   price: string;
+  isFavorite?: boolean;
 };
 
 type Props = {

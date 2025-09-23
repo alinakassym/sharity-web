@@ -25,6 +25,7 @@ const Favorites: FC = () => {
         category: r.category ?? "",
         title: r.name ?? "",
         price: KZT.format(Number(r.price) || 0),
+        isFavorite: r.isFavorite ?? false,
       })),
     [rows],
   );
