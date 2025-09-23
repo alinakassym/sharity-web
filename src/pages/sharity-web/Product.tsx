@@ -4,6 +4,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
+import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,21 +12,70 @@ const Product: FC = () => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
+  const { product: productData, isLoading, error } = useRequestGetProduct(id);
+
   const handleBackClick = () => {
     navigate(-1);
   };
 
-  // Здесь будет запрос данных о продукте по id
-  // Пока используем заглушку
-  const product = {
-    id: id || "1",
-    image: `https://picsum.photos/600?${id || "1"}`,
-    category: "Спорт/Гимнастика",
-    title: "Костюм размер 23",
-    price: "32 000 ₸",
-    description:
-      "Костюм для гимнастики, размер 23. Отличное состояние, подходит для тренировок и выступлений.",
+  // Форматирование цены
+  const KZT = new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "KZT",
+    maximumFractionDigits: 0,
+  });
+
+  // Генерируем стабильный индекс для fallback картинки на основе ID
+  const getImageIndex = (id: string) => {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      const char = id.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash % 1000) + 1;
   };
+
+  const product = productData ? {
+    id: productData.id,
+    image: productData.image || `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+    category: productData.category || "",
+    title: productData.name || "",
+    price: KZT.format(Number(productData.price) || 0),
+    description: productData.description || "",
+  } : null;
+
+  if (isLoading) {
+    return (
+      <section
+        style={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+        }}
+      >
+        <ProductHeader onGoBack={handleBackClick} />
+        <div style={{ padding: 16 }}>Загрузка…</div>
+      </section>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <section
+        style={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+        }}
+      >
+        <ProductHeader onGoBack={handleBackClick} />
+        <div style={{ padding: 16, color: colors.lightText }}>
+          {error || "Продукт не найден"}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
