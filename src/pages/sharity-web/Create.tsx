@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
@@ -31,6 +32,7 @@ const Create: FC = () => {
   const [description, setDescription] = useState("");
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+  const navigate = useNavigate();
 
   const { createProduct, isLoading: isCreating } = useRequestCreateProduct();
 
@@ -114,8 +116,7 @@ const Create: FC = () => {
 
       if (result.success) {
         alert("Товар успешно добавлен!");
-        // Можно перенаправить на страницу товара или сбросить форму
-        window.history.back();
+        navigate("/store");
       } else {
         alert(`Ошибка: ${result.error}`);
       }
