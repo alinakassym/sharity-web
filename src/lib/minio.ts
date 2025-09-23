@@ -1,38 +1,51 @@
-// Конфигурация для Minio
+import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
-export const MINIO_CONFIG = {
-  // import.meta.env.VITE_FIREBASE_API_KEY
-  endpoint: import.meta.env.VITE_MINIO_ENDPOINT,
-  port: Number(import.meta.env.VITE_MINIO_PORT),
-  useSSL: import.meta.env.VITE_MINIO_USE_SSL,
-  accessKey: import.meta.env.VITE_MINIO_ACCESS_KEY,
-  secretKey: import.meta.env.VITE_MINIO_SECRET_KEY,
-};
+// Конфигурация для Hetzner Object Storage (S3-совместимое хранилище)
+export const s3Client = new S3Client({
+  endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === "true" ? "https" : "http"}://${import.meta.env.VITE_MINIO_ENDPOINT}`,
+  region: "us-east-1", // Обязательно для S3 совместимых хранилищ
+  credentials: {
+    accessKeyId: import.meta.env.VITE_MINIO_ACCESS_KEY,
+    secretAccessKey: import.meta.env.VITE_MINIO_SECRET_KEY,
+  },
+  forcePathStyle: true, // Обязательно для совместимости с Object Storage
+});
 
 // Название bucket для изображений продуктов
 export const PRODUCTS_BUCKET =
   import.meta.env.VITE_MINIO_PRODUCTS_BUCKET || "products";
 
-// Простая функция для тестирования подключения к Minio
+// Тест подключения через листинг содержимого bucket "sharity"
 export const testConnection = async (): Promise<boolean> => {
   try {
-    console.log("Тестируем подключение к Minio через HTTP...");
+    console.log(
+      "Тестируем подключение к Hetzner Object Storage через AWS S3 SDK...",
+    );
+    console.log("Пытаемся получить список объектов в bucket 'sharity'...");
 
-    const protocol = MINIO_CONFIG.useSSL ? "https" : "http";
-    const url = `${protocol}://${MINIO_CONFIG.endpoint}:${MINIO_CONFIG.port}/minio/health/live`;
+    // Листинг содержимого bucket "sharity"
+    const command = new ListObjectsV2Command({
+      Bucket: "sharity",
+    });
 
-    const response = await fetch(url);
-    console.log("Ответ сервера:", response.status);
+    const response = await s3Client.send(command);
 
-    if (response.ok) {
-      console.log("Подключение к Minio успешно!");
-      return true;
-    } else {
-      console.log("Сервер Minio недоступен");
-      return false;
+    const objectCount = response.Contents?.length || 0;
+    console.log(
+      `Подключение успешно! Найдено объектов в bucket 'sharity': ${objectCount}`,
+    );
+
+    // Выводим первые несколько объектов для демонстрации
+    if (response.Contents && response.Contents.length > 0) {
+      console.log("Примеры объектов:");
+      response.Contents.slice(0, 5).forEach((obj) => {
+        console.log("- ", obj.Key);
+      });
     }
+
+    return true;
   } catch (error) {
-    console.error("Ошибка подключения к Minio:", error);
+    console.error("Ошибка подключения к Object Storage:", error);
     return false;
   }
 };

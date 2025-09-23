@@ -1,10 +1,11 @@
 import type { FC } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
+import { testConnection } from "@/lib/minio";
 import {
   Stepper,
   Step,
@@ -32,6 +33,16 @@ const Create: FC = () => {
   const colors = Colors[scheme];
 
   const { createProduct, isLoading: isCreating } = useRequestCreateProduct();
+
+  // Тестируем подключение к Minio при загрузке компонента
+  useEffect(() => {
+    const testMinioConnection = async () => {
+      console.log("Проверяем подключение к Minio...");
+      const isConnected = await testConnection();
+      console.log("Результат подключения:", isConnected);
+    };
+    testMinioConnection();
+  }, []);
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
