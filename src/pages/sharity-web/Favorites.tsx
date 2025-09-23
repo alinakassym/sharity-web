@@ -21,14 +21,28 @@ const Favorites: FC = () => {
     () =>
       rows
         .filter(r => r.isFavorite === true)
-        .map((r, i) => ({
-          id: r.id,
-          image: r.image ?? `https://picsum.photos/600?${i + 1}`,
-          category: r.category ?? "",
-          title: r.name ?? "",
-          price: KZT.format(Number(r.price) || 0),
-          isFavorite: r.isFavorite ?? false,
-        })),
+        .map((r, i) => {
+          // Приоритет отображения изображений:
+          // 1. Первое изображение из imagesArray
+          // 2. Поле image (для совместимости)
+          // 3. Fallback заглушка
+          let imageUrl = `https://picsum.photos/600?${i + 1}`;
+
+          if (r.imagesArray && r.imagesArray.length > 0) {
+            imageUrl = r.imagesArray[0];
+          } else if (r.image) {
+            imageUrl = r.image;
+          }
+
+          return {
+            id: r.id,
+            image: imageUrl,
+            category: r.category ?? "",
+            title: r.name ?? "",
+            price: KZT.format(Number(r.price) || 0),
+            isFavorite: r.isFavorite ?? false,
+          };
+        }),
     [rows],
   );
 

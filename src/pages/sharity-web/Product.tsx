@@ -43,13 +43,21 @@ const Product: FC = () => {
     ? {
         id: productData.id,
         image:
-          productData.image ||
-          imageParam ||
-          `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+          // Приоритет отображения изображений:
+          // 1. Первое изображение из imagesArray
+          // 2. Параметр image из URL
+          // 3. Поле image (для совместимости)
+          // 4. Fallback заглушка
+          (productData.imagesArray && productData.imagesArray.length > 0)
+            ? productData.imagesArray[0]
+            : imageParam ||
+              productData.image ||
+              `https://picsum.photos/600?${getImageIndex(productData.id)}`,
         category: productData.category || "",
         title: productData.name || "",
         price: KZT.format(Number(productData.price) || 0),
         description: productData.description || "",
+        imagesArray: productData.imagesArray || [],
       }
     : null;
 
