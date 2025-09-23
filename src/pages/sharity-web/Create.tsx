@@ -4,6 +4,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
+import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import {
   Stepper,
   Step,
@@ -29,6 +30,8 @@ const Create: FC = () => {
   const [description, setDescription] = useState("");
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+
+  const { createProduct, isLoading: isCreating } = useRequestCreateProduct();
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
@@ -62,6 +65,36 @@ const Create: FC = () => {
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
       setCurrentStep(steps[currentStepIndex + 1].id);
+    } else {
+      // Публикация товара
+      handlePublish();
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!productName.trim() || !category || !price.trim()) {
+      alert("Пожалуйста, заполните все обязательные поля");
+      return;
+    }
+
+    const productData = {
+      name: productName.trim(),
+      category,
+      price: Number(price),
+      description: description.trim() || undefined,
+      condition: condition || undefined,
+      // TODO: Здесь нужно будет добавить загрузку изображений в Firebase Storage
+      // images: selectedFiles.length > 0 ? ["placeholder"] : undefined,
+    };
+
+    const result = await createProduct(productData);
+
+    if (result.success) {
+      alert("Товар успешно добавлен!");
+      // Можно перенаправить на страницу товара или сбросить форму
+      window.history.back();
+    } else {
+      alert(`Ошибка: ${result.error}`);
     }
   };
 
@@ -181,14 +214,14 @@ const Create: FC = () => {
                 <MenuItem value="">
                   <em>Выберите категорию</em>
                 </MenuItem>
-                <MenuItem value="gym">Гимнастика</MenuItem>
-                <MenuItem value="dance">Танцы</MenuItem>
-                <MenuItem value="ballet">Балет</MenuItem>
-                <MenuItem value="volley">Волейбол</MenuItem>
-                <MenuItem value="tennis">Теннис</MenuItem>
-                <MenuItem value="football">Футбол</MenuItem>
-                <MenuItem value="hockey">Хоккей</MenuItem>
-                <MenuItem value="run">Бег</MenuItem>
+                <MenuItem value="Гимнастика">Гимнастика</MenuItem>
+                <MenuItem value="Танцы">Танцы</MenuItem>
+                <MenuItem value="Балет">Балет</MenuItem>
+                <MenuItem value="Волейбол">Волейбол</MenuItem>
+                <MenuItem value="Теннис">Теннис</MenuItem>
+                <MenuItem value="Футбол">Футбол</MenuItem>
+                <MenuItem value="Хоккей">Хоккей</MenuItem>
+                <MenuItem value="Бег">Бег</MenuItem>
               </Select>
             </FormControl>
 
@@ -346,10 +379,12 @@ const Create: FC = () => {
                 <MenuItem value="">
                   <em>Выберите состояние</em>
                 </MenuItem>
-                <MenuItem value="new">Новое</MenuItem>
-                <MenuItem value="excellent">Отличное</MenuItem>
-                <MenuItem value="good">Хорошее</MenuItem>
-                <MenuItem value="satisfactory">Удовлетворительное</MenuItem>
+                <MenuItem value="Новое">Новое</MenuItem>
+                <MenuItem value="Отличное">Отличное</MenuItem>
+                <MenuItem value="Хорошее">Хорошее</MenuItem>
+                <MenuItem value="Удовлетворительное">
+                  Удовлетворительное
+                </MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -383,12 +418,15 @@ const Create: FC = () => {
               <ProductCard
                 product={{
                   id: "preview",
-                  image: selectedFiles.length > 0
-                    ? URL.createObjectURL(selectedFiles[0])
-                    : "https://picsum.photos/600?preview",
+                  image:
+                    selectedFiles.length > 0
+                      ? URL.createObjectURL(selectedFiles[0])
+                      : "https://picsum.photos/600?preview",
                   category: category || "Без категории",
                   title: productName || "Название товара",
-                  price: price ? `${Number(price).toLocaleString('ru-RU')} ₸` : "0 ₸",
+                  price: price
+                    ? `${Number(price).toLocaleString("ru-RU")} ₸`
+                    : "0 ₸",
                 }}
               />
             </div>
@@ -450,10 +488,7 @@ const Create: FC = () => {
                     margin: 0,
                   }}
                 >
-                  {condition === "new" && "Новое"}
-                  {condition === "excellent" && "Отличное"}
-                  {condition === "good" && "Хорошее"}
-                  {condition === "satisfactory" && "Удовлетворительное"}
+                  {condition}
                 </p>
               </div>
             )}
@@ -529,8 +564,18 @@ const Create: FC = () => {
             Назад
           </Button>
         )}
-        <Button size="large" fullWidth variant="contained" onClick={handleNext}>
-          {currentStepIndex === steps.length - 1 ? "Опубликовать" : "Далее"}
+        <Button
+          size="large"
+          fullWidth
+          variant="contained"
+          onClick={handleNext}
+          disabled={isCreating}
+        >
+          {currentStepIndex === steps.length - 1
+            ? isCreating
+              ? "Публикуем..."
+              : "Опубликовать"
+            : "Далее"}
         </Button>
       </div>
     </section>
