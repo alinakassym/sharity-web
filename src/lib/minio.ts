@@ -1,4 +1,8 @@
-import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  ListObjectsV2Command,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 
 // Конфигурация для Hetzner Object Storage (S3-совместимое хранилище)
 export const s3Client = new S3Client({
@@ -13,7 +17,7 @@ export const s3Client = new S3Client({
 
 // Название bucket для изображений продуктов
 export const PRODUCTS_BUCKET =
-  import.meta.env.VITE_MINIO_PRODUCTS_BUCKET || "products";
+  import.meta.env.VITE_MINIO_PRODUCTS_BUCKET || "sharity";
 
 // Тест подключения через листинг содержимого bucket "sharity"
 export const testConnection = async (): Promise<boolean> => {
@@ -50,5 +54,70 @@ export const testConnection = async (): Promise<boolean> => {
   }
 };
 
-// TODO: Функции для работы с файлами будут добавлены позже
-// после того как убедимся что базовое подключение работает
+// Функция для загрузки одного файла в S3
+export const uploadFile = async (
+  bucketName: string,
+  objectName: string,
+  file: File,
+): Promise<string> => {
+  try {
+    console.log(
+      `Загружаем файл ${file.name} в bucket ${bucketName} как ${objectName}`,
+    );
+
+    // Конвертируем File в ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Загружаем файл
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: objectName,
+      Body: new Uint8Array(arrayBuffer),
+      ContentType: file.type,
+    });
+
+    await s3Client.send(command);
+
+    // Формируем URL файла
+    const protocol =
+      import.meta.env.VITE_MINIO_USE_SSL === "true" ? "https" : "http";
+    const endpoint = import.meta.env.VITE_MINIO_ENDPOINT;
+    const port = import.meta.env.VITE_MINIO_PORT;
+
+    const url = `${protocol}://${endpoint}${port === "443" || port === "80" ? "" : `:${port}`}/${bucketName}/${objectName}`;
+
+    console.log(`Файл успешно загружен: ${url}`);
+    return url;
+  } catch (error) {
+    console.error("Ошибка загрузки файла:", error);
+    throw error;
+  }
+};
+
+// Функция для загрузки массива файлов
+export const uploadFiles = async (
+  bucketName: string,
+  files: File[],
+): Promise<string[]> => {
+  try {
+    console.log(`Загружаем ${files.length} файлов в bucket ${bucketName}`);
+
+    const uploadPromises = files.map(async (file, index) => {
+      // Генерируем уникальное имя файла
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2);
+      const fileExtension = file.name.split(".").pop();
+      const objectName = `products/${timestamp}_${randomSuffix}_${index}.${fileExtension}`;
+
+      return uploadFile(bucketName, objectName, file);
+    });
+
+    const urls = await Promise.all(uploadPromises);
+    console.log(`Все файлы загружены успешно: ${urls.length} URL'ов`);
+
+    return urls;
+  } catch (error) {
+    console.error("Ошибка загрузки файлов:", error);
+    throw error;
+  }
+};

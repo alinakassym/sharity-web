@@ -9,6 +9,7 @@ export interface CreateProductData {
   description?: string;
   condition?: string;
   isFavorite?: boolean;
+  imagesArray?: string[];
   createdAt?: Date;
 }
 
