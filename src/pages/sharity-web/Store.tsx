@@ -8,14 +8,14 @@ import type { ProductData } from "@/components/ProductCard";
 import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
 
 const ALL: Category[] = [
-  { id: "gym", label: "Гимнастика", icon: "gymnastics" },
-  { id: "dance", label: "Танцы", icon: "dance" },
-  { id: "ballet", label: "Балет", icon: "ballet" },
-  { id: "volley", label: "Волейбол", icon: "volleyball" },
-  { id: "tennis", label: "Теннис", icon: "tennis" },
-  { id: "football", label: "Футбол", icon: "football" },
-  { id: "hockey", label: "Хоккей", icon: "hockey" },
-  { id: "run", label: "Бег", icon: "run" },
+  { id: "Гимнастика", label: "Гимнастика", icon: "gymnastics" },
+  { id: "Танцы", label: "Танцы", icon: "dance" },
+  { id: "Балет", label: "Балет", icon: "ballet" },
+  { id: "Волейбол", label: "Волейбол", icon: "volleyball" },
+  { id: "Теннис", label: "Теннис", icon: "tennis" },
+  { id: "Футбол", label: "Футбол", icon: "football" },
+  { id: "Хоккей", label: "Хоккей", icon: "hockey" },
+  { id: "Бег", label: "Бег", icon: "run" },
 ];
 
 const KZT = new Intl.NumberFormat("ru-RU", {
@@ -46,11 +46,7 @@ const Store: FC = () => {
 
   // выбранные ярлыки категорий
   const selectedLabels = useMemo(() => {
-    return new Set(
-      selected
-        .map((id) => ALL.find((c) => c.id === id)?.label)
-        .filter(Boolean) as string[],
-    );
+    return new Set(selected);
   }, [selected]);
 
   // фильтрация по категориям и поиску
