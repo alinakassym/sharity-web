@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
@@ -8,8 +8,6 @@ import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const imageParam = searchParams.get("image");
 
   const navigate = useNavigate();
   const scheme = useColorScheme();
@@ -33,7 +31,7 @@ const Product: FC = () => {
     let hash = 0;
     for (let i = 0; i < id.length; i++) {
       const char = id.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash % 1000) + 1;
@@ -48,10 +46,9 @@ const Product: FC = () => {
           // 2. Параметр image из URL
           // 3. Поле image (для совместимости)
           // 4. Fallback заглушка
-          (productData.imagesArray && productData.imagesArray.length > 0)
+          productData.imagesArray && productData.imagesArray.length > 0
             ? productData.imagesArray[0]
-            : imageParam ||
-              productData.image ||
+            : productData.image ||
               `https://picsum.photos/600?${getImageIndex(productData.id)}`,
         category: productData.category || "",
         title: productData.name || "",
