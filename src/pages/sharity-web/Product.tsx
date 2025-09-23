@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
@@ -8,6 +8,9 @@ import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const imageParam = searchParams.get("image");
+
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
@@ -36,14 +39,19 @@ const Product: FC = () => {
     return Math.abs(hash % 1000) + 1;
   };
 
-  const product = productData ? {
-    id: productData.id,
-    image: productData.image || `https://picsum.photos/600?${getImageIndex(productData.id)}`,
-    category: productData.category || "",
-    title: productData.name || "",
-    price: KZT.format(Number(productData.price) || 0),
-    description: productData.description || "",
-  } : null;
+  const product = productData
+    ? {
+        id: productData.id,
+        image:
+          productData.image ||
+          imageParam ||
+          `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+        category: productData.category || "",
+        title: productData.name || "",
+        price: KZT.format(Number(productData.price) || 0),
+        description: productData.description || "",
+      }
+    : null;
 
   if (isLoading) {
     return (
