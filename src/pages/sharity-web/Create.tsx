@@ -83,6 +83,7 @@ const Create: FC = () => {
       price: Number(price),
       description: description.trim() || undefined,
       condition: condition || undefined,
+      isFavorite: false,
       // TODO: Здесь нужно будет добавить загрузку изображений в Firebase Storage
       // images: selectedFiles.length > 0 ? ["placeholder"] : undefined,
     };

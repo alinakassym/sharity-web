@@ -8,6 +8,7 @@ export interface CreateProductData {
   price: number;
   description?: string;
   condition?: string;
+  isFavorite?: boolean;
   createdAt?: Date;
 }
 
