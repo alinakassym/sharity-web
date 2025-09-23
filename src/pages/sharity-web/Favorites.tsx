@@ -16,17 +16,19 @@ const Favorites: FC = () => {
 
   const { products: rows, isLoading } = useRequestGetProducts();
 
-  // Firestore -> ProductData (для грида)
+  // Firestore -> ProductData (для грида), фильтруем только избранные
   const products: ProductData[] = useMemo(
     () =>
-      rows.map((r, i) => ({
-        id: r.id,
-        image: r.image ?? `https://picsum.photos/600?${i + 1}`,
-        category: r.category ?? "",
-        title: r.name ?? "",
-        price: KZT.format(Number(r.price) || 0),
-        isFavorite: r.isFavorite ?? false,
-      })),
+      rows
+        .filter(r => r.isFavorite === true)
+        .map((r, i) => ({
+          id: r.id,
+          image: r.image ?? `https://picsum.photos/600?${i + 1}`,
+          category: r.category ?? "",
+          title: r.name ?? "",
+          price: KZT.format(Number(r.price) || 0),
+          isFavorite: r.isFavorite ?? false,
+        })),
     [rows],
   );
 
@@ -72,6 +74,27 @@ const Favorites: FC = () => {
       >
         {isLoading ? (
           <div style={{ padding: 16 }}>Загрузка…</div>
+        ) : products.length === 0 ? (
+          <div
+            style={{
+              padding: 32,
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+            }}
+          >
+            <div style={{ fontSize: 48 }}>💜</div>
+            <div>
+              <h3 style={{ margin: "0 0 8px", fontSize: 18 }}>
+                Пока нет избранных товаров
+              </h3>
+              <p style={{ margin: 0, fontSize: 14, opacity: 0.7 }}>
+                Добавьте товары в избранное, нажав на сердечко
+              </p>
+            </div>
+          </div>
         ) : (
           <ProductGrid products={filtered} />
         )}
