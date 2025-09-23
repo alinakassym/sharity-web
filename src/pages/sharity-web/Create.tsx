@@ -1,10 +1,11 @@
 import type { FC } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
+import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
   Stepper,
   Step,
@@ -32,6 +33,16 @@ const Create: FC = () => {
   const colors = Colors[scheme];
 
   const { createProduct, isLoading: isCreating } = useRequestCreateProduct();
+
+  // Тестируем подключение к Minio при загрузке компонента
+  useEffect(() => {
+    const testMinioConnection = async () => {
+      console.log("Проверяем подключение к Minio...");
+      const isConnected = await testConnection();
+      console.log("Результат подключения:", isConnected);
+    };
+    testMinioConnection();
+  }, []);
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
@@ -77,25 +88,40 @@ const Create: FC = () => {
       return;
     }
 
-    const productData = {
-      name: productName.trim(),
-      category,
-      price: Number(price),
-      description: description.trim() || undefined,
-      condition: condition || undefined,
-      isFavorite: false,
-      // TODO: Здесь нужно будет добавить загрузку изображений в Firebase Storage
-      // images: selectedFiles.length > 0 ? ["placeholder"] : undefined,
-    };
+    try {
+      let imagesArray: string[] = [];
 
-    const result = await createProduct(productData);
+      // Загружаем изображения в S3, если они выбраны
+      if (selectedFiles.length > 0) {
+        console.log(
+          `Загружаем ${selectedFiles.length} изображений в Object Storage...`,
+        );
+        imagesArray = await uploadFiles(PRODUCTS_BUCKET, selectedFiles);
+        console.log("Все изображения загружены:", imagesArray);
+      }
 
-    if (result.success) {
-      alert("Товар успешно добавлен!");
-      // Можно перенаправить на страницу товара или сбросить форму
-      window.history.back();
-    } else {
-      alert(`Ошибка: ${result.error}`);
+      const productData = {
+        name: productName.trim(),
+        category,
+        price: Number(price),
+        description: description.trim() || undefined,
+        condition: condition || undefined,
+        isFavorite: false,
+        imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
+      };
+
+      const result = await createProduct(productData);
+
+      if (result.success) {
+        alert("Товар успешно добавлен!");
+        // Можно перенаправить на страницу товара или сбросить форму
+        window.history.back();
+      } else {
+        alert(`Ошибка: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Ошибка при создании товара:", error);
+      alert(`Ошибка при загрузке изображений: ${error}`);
     }
   };
 
@@ -233,7 +259,7 @@ const Create: FC = () => {
               inputMode="numeric"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              inputProps={{ pattern: "[0-9]*" }}
+              slotProps={{ htmlInput: { pattern: "[0-9]*" } }}
               fullWidth
               variant="outlined"
               helperText="Укажите цену в тенге"

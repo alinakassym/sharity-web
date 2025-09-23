@@ -18,7 +18,7 @@ const Orders: FC = () => {
     >
       <h1
         style={{
-          margin: "0 0 24px 0",
+          margin: 0,
           fontSize: "24px",
           fontWeight: 600,
           color: colors.text,
@@ -31,13 +31,12 @@ const Orders: FC = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "300px",
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
           color: colors.lightText,
         }}
       >
-        <p>У вас пока нет заказов</p>
+        <p>В разработке</p>
       </div>
     </section>
   );

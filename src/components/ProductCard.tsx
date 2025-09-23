@@ -31,7 +31,7 @@ export const ProductCard: FC<Props> = ({
   const colors = Colors[scheme];
 
   const handleCardClick = () => {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.id}?image=${product.image}`);
   };
 
   return (

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
@@ -8,6 +8,9 @@ import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const imageParam = searchParams.get("image");
+
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
@@ -36,14 +39,27 @@ const Product: FC = () => {
     return Math.abs(hash % 1000) + 1;
   };
 
-  const product = productData ? {
-    id: productData.id,
-    image: productData.image || `https://picsum.photos/600?${getImageIndex(productData.id)}`,
-    category: productData.category || "",
-    title: productData.name || "",
-    price: KZT.format(Number(productData.price) || 0),
-    description: productData.description || "",
-  } : null;
+  const product = productData
+    ? {
+        id: productData.id,
+        image:
+          // Приоритет отображения изображений:
+          // 1. Первое изображение из imagesArray
+          // 2. Параметр image из URL
+          // 3. Поле image (для совместимости)
+          // 4. Fallback заглушка
+          (productData.imagesArray && productData.imagesArray.length > 0)
+            ? productData.imagesArray[0]
+            : imageParam ||
+              productData.image ||
+              `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+        category: productData.category || "",
+        title: productData.name || "",
+        price: KZT.format(Number(productData.price) || 0),
+        description: productData.description || "",
+        imagesArray: productData.imagesArray || [],
+      }
+    : null;
 
   if (isLoading) {
     return (
