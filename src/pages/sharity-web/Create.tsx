@@ -417,6 +417,7 @@ const Create: FC = () => {
 
             <div style={{ display: "flex", justifyContent: "center" }}>
               <ProductCard
+                showHeartBtn={false}
                 product={{
                   id: "preview",
                   image:

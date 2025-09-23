@@ -15,12 +15,14 @@ export type ProductData = {
 type Props = {
   product: ProductData;
   isLiked?: boolean;
+  showHeartBtn?: boolean;
   onHeartPress?: (productId: string) => void;
 };
 
 export const ProductCard: FC<Props> = ({
   product,
   isLiked = false,
+  showHeartBtn = true,
   onHeartPress,
 }) => {
   const navigate = useNavigate();
@@ -50,34 +52,36 @@ export const ProductCard: FC<Props> = ({
             display: "block",
           }}
         />
-        <button
-          type="button"
-          aria-label={isLiked ? "Убрать из избранного" : "В избранное"}
-          onClick={(e) => {
-            e.stopPropagation();
-            onHeartPress?.(product.id);
-          }}
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            padding: 0,
-            minWidth: 32,
-            maxWidth: 32,
-            height: 32,
-            borderRadius: 16,
-            background: "rgba(255,255,255,0.9)",
-            border: "none",
-            display: "flex",
-            placeItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-            outline: "none",
-          }}
-        >
-          <HeartIcon isLiked={isLiked} />
-        </button>
+        {showHeartBtn && (
+          <button
+            type="button"
+            aria-label={isLiked ? "Убрать из избранного" : "В избранное"}
+            onClick={(e) => {
+              e.stopPropagation();
+              onHeartPress?.(product.id);
+            }}
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              padding: 0,
+              minWidth: 32,
+              maxWidth: 32,
+              height: 32,
+              borderRadius: 16,
+              background: "rgba(255,255,255,0.9)",
+              border: "none",
+              display: "flex",
+              placeItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+              outline: "none",
+            }}
+          >
+            <HeartIcon isLiked={isLiked} />
+          </button>
+        )}
       </div>
 
       {/* текст */}
