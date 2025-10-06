@@ -12,6 +12,8 @@ import Favorites from "./pages/sharity-web/Favorites";
 import Cart from "./pages/sharity-web/Cart";
 import Orders from "./pages/sharity-web/Orders";
 import Create from "./pages/sharity-web/Create";
+import CreateCourse from "./pages/sharity-web/CreateCourse";
+import Course from "./pages/sharity-web/Course";
 
 const AppContent: FC = () => {
   const { pathname } = useLocation();
@@ -32,6 +34,8 @@ const AppContent: FC = () => {
         <Route path="cart" element={<Cart />} />
         <Route path="orders" element={<Orders />} />
         <Route path="create" element={<Create />} />
+        <Route path="create-course" element={<CreateCourse />} />
+        <Route path="course/:id" element={<Course />} />
       </Routes>
       {showTabBar && <TabBar />}
     </>
