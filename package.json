@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "cp docs/index.html docs/404.html",
+    "build:gh": "vite build && cp docs/index.html docs/404.html",
     "preview": "vite preview",
     "lint": "eslint ."
   },

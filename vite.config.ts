@@ -2,12 +2,18 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
 
+const isVercel = !!process.env.VERCEL;
+
 export default defineConfig({
-  base: "/sharity-web/",
+  base: isVercel ? "/" : "/sharity-web/",
   plugins: [react()],
   resolve: {
     dedupe: ["react", "react-dom"],
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  build: { outDir: "docs", assetsDir: "assets", emptyOutDir: true }, // <—
+  build: {
+    outDir: isVercel ? "dist" : "docs",
+    assetsDir: "assets",
+    emptyOutDir: true,
+  },
 });
