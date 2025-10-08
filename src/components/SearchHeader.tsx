@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
+import { CloseWebViewButton } from "./CloseWebViewButton";
 
 interface SearchHeaderProps {
   searchValue: string;
@@ -18,10 +19,9 @@ const SearchHeader: FC<SearchHeaderProps> = ({
   return (
     <div
       style={{
-        paddingRight: 56,
-        paddingBottom: 8,
-        height: 48,
+        padding: 8,
         display: "flex",
+        gap: 8,
         flex: 1,
         alignItems: "center",
         borderBottomStyle: "solid",
@@ -31,7 +31,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
     >
       <div
         style={{
-          width: 56,
+          width: 40,
           height: 40,
           display: "flex",
           alignItems: "center",
@@ -40,7 +40,6 @@ const SearchHeader: FC<SearchHeaderProps> = ({
       >
         <VuesaxIcon name="location" size={24} color={colors.primary} />
       </div>
-
       <div
         style={{
           position: "relative",
@@ -82,6 +81,8 @@ const SearchHeader: FC<SearchHeaderProps> = ({
           }}
         />
       </div>
+
+      <CloseWebViewButton />
     </div>
   );
 };

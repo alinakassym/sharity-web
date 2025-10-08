@@ -79,14 +79,13 @@ const Store: FC = () => {
   return (
     <section style={{ position: "fixed", left: 0, right: 0 }}>
       <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
-
       <div
         style={{
           padding: 16,
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          height: "calc(100vh - 136px - 64px)",
+          height: "calc(100vh - 140px)",
           overflowY: "auto",
         }}
       >
