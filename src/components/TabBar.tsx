@@ -51,14 +51,16 @@ const TabBar: FC = () => {
   return (
     <div
       style={{
-        position: "fixed",
+        position: "absolute",
         bottom: 0,
         left: 0,
         right: 0,
+        paddingBottom: 16,
+        width: "100%",
+        display: "flex",
+        justifyContent: "space-around",
         backgroundColor: colors.background,
         borderTop: `1px solid ${colors.surfaceColor}`,
-        display: "flex",
-        paddingBottom: "16px",
         zIndex: 1000,
       }}
     >

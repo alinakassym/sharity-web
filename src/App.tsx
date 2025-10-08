@@ -23,7 +23,7 @@ const AppContent: FC = () => {
   );
 
   return (
-    <>
+    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="classes" element={<Classes />} />
@@ -38,7 +38,7 @@ const AppContent: FC = () => {
         <Route path="course/:id" element={<Course />} />
       </Routes>
       {showTabBar && <TabBar />}
-    </>
+    </div>
   );
 };
 

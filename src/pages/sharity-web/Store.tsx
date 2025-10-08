@@ -85,7 +85,7 @@ const Store: FC = () => {
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          height: "calc(100vh - 140px)",
+          height: "calc(100vh - 130px)",
           overflowY: "auto",
         }}
       >
