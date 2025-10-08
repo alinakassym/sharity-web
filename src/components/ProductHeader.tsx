@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
+import { CloseWebViewButton } from "./CloseWebViewButton";
 
 interface ProductHeaderProps {
   onGoBack?: () => void;
@@ -14,7 +15,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
   return (
     <div
       style={{
-        paddingRight: 56,
+        paddingRight: 8,
         paddingBottom: 8,
         height: 48,
         display: "flex",
@@ -50,6 +51,9 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
         }}
       >
         ВЕРНУТЬСЯ НАЗАД
+      </div>
+      <div>
+        <CloseWebViewButton />
       </div>
     </div>
   );
