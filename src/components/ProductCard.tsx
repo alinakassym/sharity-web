@@ -86,11 +86,18 @@ export const ProductCard: FC<Props> = ({
       </div>
 
       {/* текст */}
-      <div style={{ display: "grid", gap: 4 }}>
+      <div style={{ display: "grid", gap: 0 }}>
         <div style={{ fontSize: 12, color: colors.lightText }}>
           {product.category}
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: colors.text }}>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            lineHeight: 1.2,
+            color: colors.text,
+          }}
+        >
           {product.title}
         </div>
         <div style={{ fontSize: 18, fontWeight: 600, color: colors.primary }}>
