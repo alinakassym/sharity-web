@@ -104,6 +104,7 @@ export const useTelegram = () => {
   const [webApp, setWebApp] = useState<TelegramWebApp | null>(null);
   const [user, setUser] = useState<TelegramUser | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isTelegramApp, setIsTelegramApp] = useState(false);
 
   useEffect(() => {
     // Проверяем доступность Telegram WebApp
@@ -119,6 +120,7 @@ export const useTelegram = () => {
       setWebApp(tg);
       setUser(tg.initDataUnsafe?.user || null);
       setIsReady(true);
+      setIsTelegramApp(true);
 
       console.log("Telegram WebApp initialized:", {
         user: tg.initDataUnsafe?.user,
@@ -138,6 +140,7 @@ export const useTelegram = () => {
           language_code: "ru",
         });
         setIsReady(true);
+        setIsTelegramApp(false);
       }
     }
   }, []);
@@ -207,6 +210,7 @@ export const useTelegram = () => {
     webApp,
     user,
     isReady,
+    isTelegramApp,
     showBackButton,
     hideBackButton,
     showMainButton,
