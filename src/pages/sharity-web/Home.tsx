@@ -39,13 +39,12 @@ const Home: FC = () => {
       {/* Main Content */}
       <div
         style={{
-          paddingTop: 60, // Space for fixed header
-          paddingBottom: 80, // Space for tab bar
-          padding: "60px 16px 80px",
+          paddingTop: "48px",
+          paddingBottom: "80px",
         }}
       >
         {/* Carousel Banner */}
-        <Carousel items={carouselItems} autoPlayInterval={3000} height={200} />
+        <Carousel items={carouselItems} autoPlayInterval={3000} />
 
         <h1 style={{ color: colors.text, marginTop: 24 }}>Home</h1>
         <p style={{ color: colors.text }}>Sharity App WebViews</p>

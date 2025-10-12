@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 
@@ -12,19 +12,17 @@ interface CarouselItem {
 interface CarouselProps {
   items: CarouselItem[];
   autoPlayInterval?: number;
-  height?: number;
 }
 
-const Carousel: FC<CarouselProps> = ({
-  items,
-  autoPlayInterval = 3000,
-  height = 200,
-}) => {
+const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const scheme = useColorScheme();
   const colors = Colors[scheme];
   const timeoutRef = useRef<number | null>(null);
+
+  // Aspect ratio: 113:360 (height:width)
+  const aspectRatio = 113 / 360;
 
   const goToSlide = (index: number) => {
     if (isTransitioning) return;
@@ -33,10 +31,10 @@ const Carousel: FC<CarouselProps> = ({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     const nextIndex = (currentIndex + 1) % items.length;
     goToSlide(nextIndex);
-  };
+  }, [currentIndex, items.length]);
 
   useEffect(() => {
     if (autoPlayInterval > 0) {
@@ -50,7 +48,7 @@ const Carousel: FC<CarouselProps> = ({
         }
       };
     }
-  }, [currentIndex, autoPlayInterval]);
+  }, [currentIndex, autoPlayInterval, goToNext]);
 
   if (items.length === 0) {
     return null;
@@ -61,19 +59,22 @@ const Carousel: FC<CarouselProps> = ({
       style={{
         position: "relative",
         width: "100%",
-        height: height,
+        paddingBottom: `${aspectRatio * 100}%`, // Maintain aspect ratio
         overflow: "hidden",
-        borderRadius: 16,
         backgroundColor: colors.surfaceColor,
       }}
     >
       {/* Images */}
       <div
         style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
           display: "flex",
           transition: isTransitioning ? "transform 0.3s ease-in-out" : "none",
           transform: `translateX(-${currentIndex * 100}%)`,
-          height: "100%",
         }}
       >
         {items.map((item) => (
@@ -120,9 +121,7 @@ const Carousel: FC<CarouselProps> = ({
               borderRadius: 4,
               border: "none",
               backgroundColor:
-                index === currentIndex
-                  ? colors.primary
-                  : colors.lighter + "80",
+                index === currentIndex ? colors.primary : colors.lighter + "80",
               cursor: "pointer",
               transition: "all 0.3s ease",
               padding: 0,
