@@ -1,6 +1,5 @@
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useTelegram } from "@/hooks/useTelegram";
 import { Colors } from "@/theme/colors";
 import LocationHeader from "@/components/LocationHeader";
 import Carousel from "@/components/Carousel";
@@ -14,7 +13,6 @@ import menuImg3 from "@/assets/menu-img3.png";
 const Home: FC = () => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
-  const { isTelegramApp } = useTelegram();
 
   const carouselItems = [
     {
@@ -107,6 +105,7 @@ const Home: FC = () => {
     <section
       style={{
         minHeight: "100vh",
+        paddingTop: "44px",
         paddingBottom: "160px",
       }}
     >
@@ -115,7 +114,6 @@ const Home: FC = () => {
       {/* Main Content */}
       <div
         style={{
-          paddingTop: isTelegramApp ? "112px" : "48px",
           display: "flex",
           flexDirection: "column",
           gap: 1,

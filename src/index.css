@@ -23,6 +23,7 @@ a:hover {
 }
 
 body {
+  padding-top: var(--tg-safe-area-inset-top);
   margin: 0;
   display: flex;
   min-width: 320px;
