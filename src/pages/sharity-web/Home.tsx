@@ -3,7 +3,11 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import LocationHeader from "@/components/LocationHeader";
 import Carousel from "@/components/Carousel";
+import MenuButtons from "@/components/MenuButtons";
 import bannerImage from "@/assets/banner.png";
+import menuImg1 from "@/assets/menu-img1.png";
+import menuImg2 from "@/assets/menu-img2.jpg";
+import menuImg3 from "@/assets/menu-img3.png";
 
 const Home: FC = () => {
   const scheme = useColorScheme();
@@ -27,6 +31,27 @@ const Home: FC = () => {
     },
   ];
 
+  const menuItems = [
+    {
+      id: "classes",
+      image: menuImg1,
+      label: "КЛАССЫ",
+      path: "/classes",
+    },
+    {
+      id: "events",
+      image: menuImg2,
+      label: "СОБЫТИЯ",
+      path: "/events",
+    },
+    {
+      id: "store",
+      image: menuImg3,
+      label: "МАГАЗИН",
+      path: "/store",
+    },
+  ];
+
   return (
     <section
       style={{
@@ -45,6 +70,9 @@ const Home: FC = () => {
       >
         {/* Carousel Banner */}
         <Carousel items={carouselItems} autoPlayInterval={3000} />
+
+        {/* Menu Buttons */}
+        <MenuButtons items={menuItems} />
 
         <h1 style={{ color: colors.text, marginTop: 24 }}>Home</h1>
         <p style={{ color: colors.text }}>Sharity App WebViews</p>
