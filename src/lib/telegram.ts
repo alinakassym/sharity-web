@@ -1,0 +1,55 @@
+// src/lib/telegram.ts
+export type TGUser = {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  is_premium?: boolean;
+};
+
+export type TG = {
+  initData?: string;
+  initDataUnsafe?: { user?: TGUser };
+  ready: () => void;
+  expand: () => void;
+  disableVerticalSwipes: () => void;
+  enableVerticalSwipes: () => void;
+  enableClosingConfirmation: () => void;
+  disableClosingConfirmation: () => void;
+  BackButton: {
+    show: () => void;
+    hide: () => void;
+    onClick: (cb: () => void) => void;
+    offClick: (cb: () => void) => void;
+  };
+};
+
+// (опционально) объявим типизированное окно — меньше any/кастов
+declare global {
+  interface Window {
+    Telegram?: { WebApp?: TG };
+  }
+}
+
+export function getTG(): TG | undefined {
+  return window?.Telegram?.WebApp as TG | undefined;
+}
+
+export const getTelegramUser = () => {
+  const tg = getTG();
+  return {
+    user: tg?.initDataUnsafe?.user,
+    initData: tg?.initData, // подписанная строка
+  };
+};
+
+export function isTelegramApp(): boolean {
+  if (typeof window === "undefined") return false;
+
+  const tg = (
+    window as Window & { Telegram?: { WebApp?: { initData?: string } } }
+  ).Telegram?.WebApp;
+  // Вне Telegram initData = "" (пустая строка)
+  return !!tg?.initData && tg.initData.length > 0;
+}

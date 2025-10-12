@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { getTG } from "./telegram";
+import { getTG } from "./lib/telegram.ts";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function Bootstrap() {

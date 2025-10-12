@@ -1,10 +1,11 @@
+// src/pages/sharity-web/Profile.tsx
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/VuesaxIcon";
 import MainTabBar from "@/components/MainTabBar";
-
+import { getTelegramUser, isTelegramApp } from "@/lib/telegram";
 interface MenuItem {
   id: string;
   title: string;
@@ -17,6 +18,10 @@ const Profile: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+  const { user } = getTelegramUser();
+  const isTelegram = isTelegramApp();
+
+  console.log("Telegram isTelegram:", isTelegram);
 
   const profileMenuItems: MenuItem[] = [
     {
@@ -65,6 +70,7 @@ const Profile: FC = () => {
   return (
     <section
       style={{
+        paddingTop: isTelegram ? 48 : 0,
         minHeight: "100vh",
         backgroundColor: colors.background,
         paddingBottom: 80,
@@ -111,7 +117,7 @@ const Profile: FC = () => {
                 margin: "0 0 4px",
               }}
             >
-              displayName
+              {user?.first_name} {user?.last_name}
             </h1>
             <p
               style={{
