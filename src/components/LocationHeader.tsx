@@ -14,6 +14,8 @@ const LocationHeader: FC<LocationHeaderProps> = ({
 }) => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+  // const { isTelegramApp } = useTelegram();
+  // console.log("isTelegramApp", isTelegramApp);
 
   return (
     <header

@@ -2,7 +2,6 @@ import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { useTelegram } from "@/hooks/useTelegram";
 import VuesaxIcon from "@/components/VuesaxIcon";
 import MainTabBar from "@/components/MainTabBar";
 
@@ -18,17 +17,6 @@ const Profile: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
-  const { user } = useTelegram();
-
-  const displayName = user
-    ? `${user.first_name}${user.last_name ? ` ${user.last_name}` : ""}`
-    : "Пользователь";
-
-  const displayUsername = user?.username
-    ? `@${user.username}`
-    : user?.id
-      ? `ID: ${user.id}`
-      : "user@example.com";
 
   const profileMenuItems: MenuItem[] = [
     {
@@ -123,7 +111,7 @@ const Profile: FC = () => {
                 margin: "0 0 4px",
               }}
             >
-              {displayName}
+              displayName
             </h1>
             <p
               style={{
@@ -132,7 +120,7 @@ const Profile: FC = () => {
                 margin: 0,
               }}
             >
-              {displayUsername}
+              displayUsername
             </p>
           </div>
 
