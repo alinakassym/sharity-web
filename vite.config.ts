@@ -11,6 +11,9 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
+  server: {
+    allowedHosts: [".ngrok-free.dev", ".ngrok.io"],
+  },
   build: {
     outDir: isVercel ? "dist" : "docs",
     assetsDir: "assets",
