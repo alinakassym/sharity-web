@@ -33,7 +33,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
           alignItems: "center",
           justifyContent: "center",
           gap: 8,
-          backgroundColor: colors.surfaceColor,
+          backgroundColor: colors.background,
         }}
       >
         <VuesaxIcon name="location" size={20} color={colors.primary} />
