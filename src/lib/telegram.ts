@@ -53,3 +53,33 @@ export function isTelegramApp(): boolean {
   // Вне Telegram initData = "" (пустая строка)
   return !!tg?.initData && tg.initData.length > 0;
 }
+
+// Аккуратно просим fullscreen, если клиент умеет
+export async function requestTgFullscreen(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+
+  // Типобезопасный доступ к Telegram.WebApp
+  const tg = (window as Window & {
+    Telegram?: { WebApp?: { 
+      ready: () => void;
+      expand: () => void;
+      requestFullscreen?: () => void; // новые клиенты
+      isExpanded?: boolean;            // бэк-совместимости нет, просто не упасть
+    }};
+  }).Telegram?.WebApp;
+
+  if (!tg) return false;
+
+  try {
+    // сначала разворачиваем доступную высоту
+    tg.expand();
+    // если у клиента есть новый API — просим fullscreen
+    if (typeof tg.requestFullscreen === "function") {
+      tg.requestFullscreen();
+      return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
