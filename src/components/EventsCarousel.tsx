@@ -31,7 +31,13 @@ const EventsCarousel: FC<EventsCarouselProps> = ({
   }
 
   return (
-    <div style={{ marginBottom: 24 }}>
+    <div
+      style={{
+        paddingTop: 16,
+        paddingBottom: 16,
+        backgroundColor: colors.background,
+      }}
+    >
       {/* Title */}
       <h2
         style={{
@@ -52,7 +58,7 @@ const EventsCarousel: FC<EventsCarouselProps> = ({
           overflowY: "hidden",
           display: "flex",
           gap: 16,
-          padding: "0 16px 16px",
+          paddingLeft: 16,
           scrollbarWidth: "none", // Firefox
           msOverflowStyle: "none", // IE/Edge
         }}

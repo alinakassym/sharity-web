@@ -113,17 +113,6 @@ const EventCard: FC<EventCardProps> = ({
             background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
           }}
         >
-          <h3
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: colors.lighter,
-              margin: "0 0 8px",
-            }}
-          >
-            {title}
-          </h3>
-
           <button
             onClick={handleViewAll}
             style={{
@@ -148,37 +137,19 @@ const EventCard: FC<EventCardProps> = ({
       {/* Content */}
       <div style={{ padding: 16 }}>
         {/* Title */}
-        <h3
-          style={{
-            fontSize: 18,
-            fontWeight: 700,
-            color: colors.text,
-            margin: "0 0 12px",
-          }}
-        >
-          {title}
-        </h3>
-
-        {/* View All Button */}
-        <button
-          onClick={handleViewAll}
-          style={{
-            background: "none",
-            border: "none",
-            padding: 0,
-            fontSize: 14,
-            fontWeight: 500,
-            color: colors.lightText,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            marginBottom: 12,
-          }}
-        >
-          Смотреть все
-          <VuesaxIcon name="arrow-right" size={16} color={colors.lightText} />
-        </button>
+        <div>
+          {/* Title */}
+          <h3
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: colors.text,
+              margin: "0 0 12px",
+            }}
+          >
+            {title}
+          </h3>
+        </div>
 
         {/* Location */}
         <div
@@ -193,7 +164,8 @@ const EventCard: FC<EventCardProps> = ({
           <span
             style={{
               fontSize: 14,
-              color: colors.text,
+              fontWeight: 500,
+              color: colors.lightText,
             }}
           >
             {location}
@@ -209,7 +181,7 @@ const EventCard: FC<EventCardProps> = ({
           }}
         >
           {/* Avatars */}
-          <div style={{ display: "flex", marginLeft: -4 }}>
+          <div style={{ display: "flex", marginLeft: 8 }}>
             {participantAvatars.slice(0, 4).map((avatar, index) => (
               <div
                 key={index}

@@ -22,7 +22,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: colors.background,
+        backgroundColor: colors.surfaceColor,
         borderBottom: `1px solid ${colors.surfaceColor}`,
         zIndex: 100,
       }}
@@ -36,7 +36,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
           gap: 8,
         }}
       >
-        <VuesaxIcon name="location" size={24} color={colors.primary} />
+        <VuesaxIcon name="location" size={20} color={colors.primary} />
         <button
           onClick={onLocationClick}
           style={{
@@ -51,7 +51,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
         >
           <p
             style={{
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: 400,
               color: colors.text,
               margin: 0,

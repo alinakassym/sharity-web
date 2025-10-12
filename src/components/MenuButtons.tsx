@@ -30,6 +30,7 @@ const MenuButtons: FC<MenuButtonsProps> = ({ items }) => {
         justifyContent: "center",
         gap: 32,
         padding: "16px 0",
+        backgroundColor: colors.background,
       }}
     >
       {items.map((item) => (
