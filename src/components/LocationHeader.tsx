@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
+import { useTelegram } from "@/hooks/useTelegram";
 
 interface LocationHeaderProps {
   location?: string;
@@ -15,11 +16,14 @@ const LocationHeader: FC<LocationHeaderProps> = ({
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
+  const { isTelegramApp } = useTelegram();
+
   return (
     <header
       style={{
         position: "fixed",
         top: 0,
+        paddingTop: isTelegramApp ? "68px" : "48px",
         left: 0,
         right: 0,
         backgroundColor: colors.surfaceColor,

@@ -107,6 +107,7 @@ const Home: FC = () => {
     <section
       style={{
         minHeight: "100vh",
+        paddingBottom: "160px",
       }}
     >
       <LocationHeader />
@@ -114,7 +115,7 @@ const Home: FC = () => {
       {/* Main Content */}
       <div
         style={{
-          paddingTop: isTelegramApp ? "68px" : "48px",
+          paddingTop: isTelegramApp ? "112px" : "48px",
           display: "flex",
           flexDirection: "column",
           gap: 1,
