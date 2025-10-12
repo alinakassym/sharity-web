@@ -22,7 +22,7 @@ const tabs: TabItem[] = [
     id: "create",
     label: "Создать",
     icon: "add",
-    path: "/create",
+    path: "/add",
   },
   {
     id: "profile",
