@@ -74,6 +74,8 @@ interface TelegramWebApp {
   ready(): void;
   expand(): void;
   close(): void;
+  enableClosingConfirmation(): void;
+  disableClosingConfirmation(): void;
   sendData(data: string): void;
   openLink(url: string, options?: { try_instant_view?: boolean }): void;
   openTelegramLink(url: string): void;
@@ -116,6 +118,9 @@ export const useTelegram = () => {
 
       // Расширяем на весь экран
       tg.expand();
+
+      // Включаем подтверждение при закрытии (защита от случайного свайпа)
+      tg.enableClosingConfirmation();
 
       setWebApp(tg);
       setUser(tg.initDataUnsafe?.user || null);
