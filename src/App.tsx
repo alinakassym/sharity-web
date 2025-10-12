@@ -2,7 +2,8 @@ import type { FC } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useBodyBackground } from "./hooks/useBodyBackground";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import TabBar from "./components/StoreTabBar";
+import StoreTabBar from "./components/StoreTabBar";
+import MainTabBar from "./components/MainTabBar";
 import Home from "./pages/sharity-web/Home";
 import Classes from "./pages/sharity-web/Classes";
 import Events from "./pages/sharity-web/Events";
@@ -19,7 +20,8 @@ import Add from "./pages/sharity-web/Add";
 const AppContent: FC = () => {
   const { pathname } = useLocation();
   const path = pathname.replace(import.meta.env.BASE_URL, "/");
-  const showTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
+  const showMainTabBar = ["/", "/add", "/", "/"].includes(path);
+  const showStoreTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
     path,
   );
 
@@ -39,7 +41,8 @@ const AppContent: FC = () => {
         <Route path="create-course" element={<CreateCourse />} />
         <Route path="course/:id" element={<Course />} />
       </Routes>
-      {showTabBar && <TabBar />}
+      {showMainTabBar && <MainTabBar />}
+      {showStoreTabBar && <StoreTabBar />}
     </div>
   );
 };

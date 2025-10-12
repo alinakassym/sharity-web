@@ -2,7 +2,6 @@ import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import MainTabBar from "@/components/MainTabBar";
 
 interface PlacementOption {
   id: string;
@@ -221,8 +220,6 @@ const Add: FC = () => {
           </button>
         </div>
       </div>
-
-      <MainTabBar />
     </section>
   );
 };
