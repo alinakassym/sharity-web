@@ -23,11 +23,10 @@ const LocationHeader: FC<LocationHeaderProps> = ({
       style={{
         position: "fixed",
         top: 0,
-        paddingTop: isTelegramApp ? "68px" : "48px",
         left: 0,
         right: 0,
-        backgroundColor: colors.surfaceColor,
-        borderBottom: `1px solid ${colors.surfaceColor}`,
+        paddingTop: isTelegramApp ? "68px" : "48px",
+        backgroundColor: colors.background,
         zIndex: 100,
       }}
     >
@@ -38,6 +37,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
           alignItems: "center",
           justifyContent: "center",
           gap: 8,
+          backgroundColor: colors.surfaceColor,
         }}
       >
         <VuesaxIcon name="location" size={20} color={colors.primary} />
