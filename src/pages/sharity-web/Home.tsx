@@ -2,10 +2,30 @@ import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import LocationHeader from "@/components/LocationHeader";
+import Carousel from "@/components/Carousel";
+import bannerImage from "@/assets/banner.png";
 
 const Home: FC = () => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+
+  const carouselItems = [
+    {
+      id: "1",
+      image: bannerImage,
+      alt: "INTERTOP - Мечтай. Играй. Побеждай!",
+    },
+    {
+      id: "2",
+      image: "https://picsum.photos/400/200?random=1",
+      alt: "Banner 2",
+    },
+    {
+      id: "3",
+      image: "https://picsum.photos/400/200?random=2",
+      alt: "Banner 3",
+    },
+  ];
 
   return (
     <section
@@ -24,7 +44,10 @@ const Home: FC = () => {
           padding: "60px 16px 80px",
         }}
       >
-        <h1 style={{ color: colors.text }}>Home</h1>
+        {/* Carousel Banner */}
+        <Carousel items={carouselItems} autoPlayInterval={3000} height={200} />
+
+        <h1 style={{ color: colors.text, marginTop: 24 }}>Home</h1>
         <p style={{ color: colors.text }}>Sharity App WebViews</p>
         <p style={{ color: colors.text }}>DB: Firebase</p>
         <p>
