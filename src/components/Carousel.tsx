@@ -15,8 +15,8 @@ interface CarouselProps {
 }
 
 const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 (first real slide)
+  const [isTransitioning, setIsTransitioning] = useState(true);
   const scheme = useColorScheme();
   const colors = Colors[scheme];
   const timeoutRef = useRef<number | null>(null);
@@ -24,18 +24,40 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
   // Aspect ratio: 113:360 (height:width)
   const aspectRatio = 113 / 360;
 
-  const goToSlide = (index: number) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex(index);
-    setTimeout(() => setIsTransitioning(false), 300);
-  };
+  // Create extended items array with clones for infinite effect
+  // [last, ...items, first]
+  const extendedItems = items.length > 0
+    ? [items[items.length - 1], ...items, items[0]]
+    : [];
 
   const goToNext = useCallback(() => {
-    const nextIndex = (currentIndex + 1) % items.length;
-    goToSlide(nextIndex);
-  }, [currentIndex, items.length]);
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
 
+  const goToSlide = (index: number) => {
+    setIsTransitioning(true);
+    setCurrentIndex(index + 1); // +1 because of the cloned first item
+  };
+
+  // Handle infinite loop reset
+  useEffect(() => {
+    if (currentIndex === 0) {
+      // We're at the clone of the last item, jump to the real last item
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex(items.length);
+      }, 300);
+    } else if (currentIndex === extendedItems.length - 1) {
+      // We're at the clone of the first item, jump to the real first item
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex(1);
+      }, 300);
+    }
+  }, [currentIndex, items.length, extendedItems.length]);
+
+  // Auto-play
   useEffect(() => {
     if (autoPlayInterval > 0) {
       timeoutRef.current = window.setTimeout(() => {
@@ -53,6 +75,13 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
   if (items.length === 0) {
     return null;
   }
+
+  // Calculate the actual index for indicators (without clones)
+  const getActualIndex = () => {
+    if (currentIndex === 0) return items.length - 1;
+    if (currentIndex === extendedItems.length - 1) return 0;
+    return currentIndex - 1;
+  };
 
   return (
     <div
@@ -77,9 +106,9 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
           transform: `translateX(-${currentIndex * 100}%)`,
         }}
       >
-        {items.map((item) => (
+        {extendedItems.map((item, index) => (
           <div
-            key={item.id}
+            key={`${item.id}-${index}`}
             style={{
               minWidth: "100%",
               height: "100%",
@@ -111,24 +140,30 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
           zIndex: 10,
         }}
       >
-        {items.map((item, index) => (
-          <button
-            key={item.id}
-            onClick={() => goToSlide(index)}
-            style={{
-              width: index === currentIndex ? 24 : 8,
-              height: 8,
-              borderRadius: 4,
-              border: "none",
-              backgroundColor:
-                index === currentIndex ? colors.primary : colors.lighter + "80",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              padding: 0,
-            }}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+        {items.map((item, index) => {
+          const actualIndex = getActualIndex();
+          const isActive = index === actualIndex;
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => goToSlide(index)}
+              style={{
+                width: isActive ? 24 : 8,
+                height: 8,
+                borderRadius: 4,
+                border: "none",
+                backgroundColor: isActive
+                  ? colors.primary
+                  : colors.lighter + "80",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                padding: 0,
+              }}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          );
+        })}
       </div>
     </div>
   );
