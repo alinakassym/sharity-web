@@ -336,6 +336,106 @@ const icons: Record<string, IconDef> = {
       </>
     ),
   },
+  // created by claude
+  "arrow-right": {
+    viewBox: "0 0 24 24",
+    paths: ({ color }) => (
+      <path
+        d="M8.91003 20.67C8.72003 20.67 8.53003 20.6 8.38003 20.45C8.09003 20.16 8.09003 19.68 8.38003 19.39L14.9 12.87C15.38 12.39 15.38 11.61 14.9 11.13L8.38003 4.61C8.09003 4.32 8.09003 3.84 8.38003 3.55C8.67003 3.26 9.15003 3.26 9.44003 3.55L15.96 10.07C16.47 10.58 16.76 11.27 16.76 12C16.76 12.73 16.48 13.42 15.96 13.93L9.44003 20.45C9.29003 20.59 9.10003 20.67 8.91003 20.67Z"
+        fill={color ?? "currentColor"}
+      />
+    ),
+  },
+  edit: {
+    viewBox: "0 0 24 24",
+    paths: ({ color }) => (
+      <>
+        <path
+          d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M14.91 4.1499C15.58 6.5399 17.45 8.4099 19.85 9.0899"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </>
+    ),
+  },
+  setting: {
+    viewBox: "0 0 24 24",
+    paths: ({ color }) => (
+      <>
+        <path
+          d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M2 12.88V11.12C2 10.08 2.85 9.22 3.9 9.22C5.71 9.22 6.45 7.94 5.54 6.37C5.02 5.47 5.33 4.3 6.24 3.78L7.97 2.79C8.76 2.32 9.78 2.6 10.25 3.39L10.36 3.58C11.26 5.15 12.74 5.15 13.65 3.58L13.76 3.39C14.23 2.6 15.25 2.32 16.04 2.79L17.77 3.78C18.68 4.3 18.99 5.47 18.47 6.37C17.56 7.94 18.3 9.22 20.11 9.22C21.15 9.22 22.01 10.07 22.01 11.12V12.88C22.01 13.92 21.16 14.78 20.11 14.78C18.3 14.78 17.56 16.06 18.47 17.63C18.99 18.54 18.68 19.7 17.77 20.22L16.04 21.21C15.25 21.68 14.23 21.4 13.76 20.61L13.65 20.42C12.75 18.85 11.27 18.85 10.36 20.42L10.25 20.61C9.78 21.4 8.76 21.68 7.97 21.21L6.24 20.22C5.33 19.7 5.02 18.53 5.54 17.63C6.45 16.06 5.71 14.78 3.9 14.78C2.85 14.78 2 13.92 2 12.88Z"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </>
+    ),
+  },
+  "message-question": {
+    viewBox: "0 0 24 24",
+    paths: ({ color }) => (
+      <>
+        <path
+          d="M17 18.4301H13L8.54999 21.39C7.88999 21.83 7 21.3601 7 20.5601V18.4301C4 18.4301 2 16.4301 2 13.4301V7.42999C2 4.42999 4 2.42999 7 2.42999H17C20 2.42999 22 4.42999 22 7.42999V13.4301C22 16.4301 20 18.4301 17 18.4301Z"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M12 11.36V11.15C12 10.47 12.42 10.11 12.84 9.82001C13.25 9.54001 13.66 9.18002 13.66 8.52002C13.66 7.60002 12.92 6.85999 12 6.85999C11.08 6.85999 10.34 7.60002 10.34 8.52002"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M11.9955 13.75H12.0045"
+          stroke={color ?? "currentColor"}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </>
+    ),
+  },
 };
 
 const VuesaxIcon: FC<VuesaxIconProps> = ({

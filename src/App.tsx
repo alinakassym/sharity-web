@@ -16,11 +16,12 @@ import Create from "./pages/sharity-web/Create";
 import CreateCourse from "./pages/sharity-web/CreateCourse";
 import Course from "./pages/sharity-web/Course";
 import Add from "./pages/sharity-web/Add";
+import Profile from "./pages/sharity-web/Profile";
 
 const AppContent: FC = () => {
   const { pathname } = useLocation();
   const path = pathname.replace(import.meta.env.BASE_URL, "/");
-  const showMainTabBar = ["/", "/add", "/", "/"].includes(path);
+  const showMainTabBar = ["/", "/add", "/profile"].includes(path);
   const showStoreTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
     path,
   );
@@ -37,6 +38,7 @@ const AppContent: FC = () => {
         <Route path="cart" element={<Cart />} />
         <Route path="orders" element={<Orders />} />
         <Route path="add" element={<Add />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="create" element={<Create />} />
         <Route path="create-course" element={<CreateCourse />} />
         <Route path="course/:id" element={<Course />} />
