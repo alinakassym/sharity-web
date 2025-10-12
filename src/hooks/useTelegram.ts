@@ -76,6 +76,7 @@ interface TelegramWebApp {
   close(): void;
   enableClosingConfirmation(): void;
   disableClosingConfirmation(): void;
+  postEvent(eventType: string, eventData?: unknown): void;
   sendData(data: string): void;
   openLink(url: string, options?: { try_instant_view?: boolean }): void;
   openTelegramLink(url: string): void;
@@ -119,8 +120,11 @@ export const useTelegram = () => {
       // Расширяем на весь экран
       tg.expand();
 
-      // Включаем подтверждение при закрытии (защита от случайного свайпа)
+      // Включаем подтверждение при закрытии
       tg.enableClosingConfirmation();
+
+      // Отключаем закрытие свайпом (доступно с версии v7.7)
+      tg.postEvent("web_app_setup_swipe_behavior", { allow_vertical_swipe: false });
 
       setWebApp(tg);
       setUser(tg.initDataUnsafe?.user || null);
@@ -133,6 +137,24 @@ export const useTelegram = () => {
         version: tg.version,
         colorScheme: tg.colorScheme,
       });
+
+      // Дополнительная защита: предотвращаем pull-to-refresh и overscroll
+      const preventPullToRefresh = (e: TouchEvent) => {
+        const target = e.target as HTMLElement;
+        const scrollable = target.closest('[style*="overflow"]') || target.closest('[style*="scroll"]');
+
+        if (!scrollable && window.scrollY === 0) {
+          e.preventDefault();
+        }
+      };
+
+      document.addEventListener("touchstart", preventPullToRefresh, { passive: false });
+      document.addEventListener("touchmove", preventPullToRefresh, { passive: false });
+
+      return () => {
+        document.removeEventListener("touchstart", preventPullToRefresh);
+        document.removeEventListener("touchmove", preventPullToRefresh);
+      };
     } else {
       console.warn("Telegram WebApp is not available");
       // В режиме разработки можно использовать mock данные
