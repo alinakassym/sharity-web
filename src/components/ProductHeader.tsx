@@ -15,8 +15,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
   return (
     <div
       style={{
-        paddingRight: 8,
-        paddingBottom: 8,
+        padding: "8px 0",
         height: 48,
         display: "flex",
         flex: 1,
