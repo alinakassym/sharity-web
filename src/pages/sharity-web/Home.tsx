@@ -9,10 +9,12 @@ import bannerImage from "@/assets/banner.png";
 import menuImg1 from "@/assets/menu-img1.png";
 import menuImg2 from "@/assets/menu-img2.jpg";
 import menuImg3 from "@/assets/menu-img3.png";
+import { isTelegramApp } from "@/lib/telegram";
 
 const Home: FC = () => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+  const isTelegram = isTelegramApp();
 
   const carouselItems = [
     {
@@ -104,6 +106,7 @@ const Home: FC = () => {
   return (
     <section
       style={{
+        paddingTop: isTelegram ? 92 : 44,
         minHeight: "100vh",
         paddingBottom: "160px",
       }}
