@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
 import VuesaxIcon from "./VuesaxIcon";
@@ -13,8 +14,13 @@ const SearchHeader: FC<SearchHeaderProps> = ({
   searchValue,
   onSearchChange,
 }) => {
+  const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+
+  const handleClose = () => {
+    navigate("/");
+  };
 
   return (
     <div
@@ -81,6 +87,33 @@ const SearchHeader: FC<SearchHeaderProps> = ({
           }}
         />
       </div>
+
+      {/* Close Button */}
+      <button
+        onClick={handleClose}
+        style={{
+          width: 40,
+          height: 40,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          borderRadius: 8,
+          transition: "background-color 0.2s ease",
+          outline: "none",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = colors.controlColor;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "transparent";
+        }}
+        aria-label="Закрыть поиск"
+      >
+        <VuesaxIcon name="close-bold" size={20} color={colors.text} />
+      </button>
 
       <CloseWebViewButton />
     </div>

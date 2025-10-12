@@ -16,7 +16,7 @@ interface TelegramWebApp {
     query_id?: string;
     user?: TelegramUser;
     receiver?: TelegramUser;
-    chat?: any;
+    chat?: Record<string, unknown>;
     chat_type?: string;
     chat_instance?: string;
     start_param?: string;
