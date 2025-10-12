@@ -92,15 +92,18 @@ const SearchHeader: FC<SearchHeaderProps> = ({
       <button
         onClick={handleClose}
         style={{
-          width: 40,
-          height: 40,
+          marginLeft: 8,
+          marginRight: 8,
+          padding: 0,
+          width: 20,
+          height: 20,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           background: "none",
-          border: "none",
+          border: "1px solid " + colors.accent,
           cursor: "pointer",
-          borderRadius: 8,
+          borderRadius: 20,
           transition: "background-color 0.2s ease",
           outline: "none",
         }}
@@ -112,7 +115,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
         }}
         aria-label="Закрыть поиск"
       >
-        <VuesaxIcon name="close-bold" size={20} color={colors.text} />
+        <VuesaxIcon name="close" size={8} color={colors.accent} />
       </button>
 
       <CloseWebViewButton />
