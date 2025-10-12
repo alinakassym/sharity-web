@@ -2,7 +2,7 @@ import type { FC } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useBodyBackground } from "./hooks/useBodyBackground";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import TabBar from "./components/TabBar";
+import TabBar from "./components/StoreTabBar";
 import Home from "./pages/sharity-web/Home";
 import Classes from "./pages/sharity-web/Classes";
 import Events from "./pages/sharity-web/Events";

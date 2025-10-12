@@ -38,7 +38,7 @@ const tabs: TabItem[] = [
   },
 ];
 
-const TabBar: FC = () => {
+const StoreTabBar: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const scheme = useColorScheme();
@@ -107,4 +107,4 @@ const TabBar: FC = () => {
   );
 };
 
-export default TabBar;
+export default StoreTabBar;

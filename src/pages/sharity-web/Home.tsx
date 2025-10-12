@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import TabBar from "@/components/TabBar";
+import TabBar from "@/components/StoreTabBar";
 
 const Home: FC = () => {
   return (
