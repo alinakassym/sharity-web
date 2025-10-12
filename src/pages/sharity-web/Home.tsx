@@ -4,6 +4,7 @@ import { Colors } from "@/theme/colors";
 import LocationHeader from "@/components/LocationHeader";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
+import EventsCarousel from "@/components/EventsCarousel";
 import bannerImage from "@/assets/banner.png";
 import menuImg1 from "@/assets/menu-img1.png";
 import menuImg2 from "@/assets/menu-img2.jpg";
@@ -52,6 +53,54 @@ const Home: FC = () => {
     },
   ];
 
+  const upcomingEvents = [
+    {
+      id: "1",
+      image: "https://picsum.photos/320/200?random=10",
+      date: "30 АВГ",
+      time: "12:30",
+      title: "МИНИ МАРАФОН",
+      location: "Триатлон парк",
+      participants: 170,
+      participantAvatars: [
+        "https://i.pravatar.cc/150?img=1",
+        "https://i.pravatar.cc/150?img=2",
+        "https://i.pravatar.cc/150?img=3",
+        "https://i.pravatar.cc/150?img=4",
+      ],
+    },
+    {
+      id: "2",
+      image: "https://picsum.photos/320/200?random=11",
+      date: "15 СЕН",
+      time: "10:00",
+      title: "ТАНЦЕВАЛЬНЫЙ ФЕСТИВАЛЬ",
+      location: "Центр культуры",
+      participants: 250,
+      participantAvatars: [
+        "https://i.pravatar.cc/150?img=5",
+        "https://i.pravatar.cc/150?img=6",
+        "https://i.pravatar.cc/150?img=7",
+        "https://i.pravatar.cc/150?img=8",
+      ],
+    },
+    {
+      id: "3",
+      image: "https://picsum.photos/320/200?random=12",
+      date: "20 СЕН",
+      time: "14:00",
+      title: "ФУТБОЛЬНЫЙ ТУРНИР",
+      location: "Стадион Астана",
+      participants: 320,
+      participantAvatars: [
+        "https://i.pravatar.cc/150?img=9",
+        "https://i.pravatar.cc/150?img=10",
+        "https://i.pravatar.cc/150?img=11",
+        "https://i.pravatar.cc/150?img=12",
+      ],
+    },
+  ];
+
   return (
     <section
       style={{
@@ -73,6 +122,9 @@ const Home: FC = () => {
 
         {/* Menu Buttons */}
         <MenuButtons items={menuItems} />
+
+        {/* Upcoming Events */}
+        <EventsCarousel events={upcomingEvents} />
 
         <h1 style={{ color: colors.text, marginTop: 24 }}>Home</h1>
         <p style={{ color: colors.text }}>Sharity App WebViews</p>
