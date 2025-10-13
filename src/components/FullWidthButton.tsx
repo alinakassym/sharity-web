@@ -15,6 +15,7 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
   label,
   btnColor,
   color,
+  onClick,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -32,6 +33,7 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
         gap: 16,
         backgroundColor: btnColor ?? c.primary,
       }}
+      onClick={() => onClick && onClick()}
     >
       <VuesaxIcon name={iconName} size={24} color={color ?? c.lighter} />
       <p

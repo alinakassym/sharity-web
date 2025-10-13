@@ -23,7 +23,7 @@ const placementOptions: PlacementOption[] = [
     id: "purchase",
     title: "Покупка",
     icon: "shop",
-    path: "/create",
+    path: "/store",
   },
   {
     id: "rent",
@@ -84,6 +84,7 @@ const Add: FC = () => {
               iconName={o.icon}
               btnColor={c.controlColor}
               color={c.text}
+              onClick={() => handleOptionClick(o.path)}
             />
           ))}
         </div>
@@ -123,7 +124,7 @@ const Add: FC = () => {
             iconName="calendar"
             btnColor={c.controlColor}
             color={c.text}
-            onClick={() => handleOptionClick("/create-course")}
+            onClick={() => handleOptionClick("/create-event")}
           />
         </div>
       </div>
