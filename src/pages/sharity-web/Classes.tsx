@@ -1,5 +1,8 @@
 import type { FC } from "react";
 import { useState, useMemo } from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import CourseGrid from "@/components/CourseGrid";
@@ -24,6 +27,10 @@ const KZT = new Intl.NumberFormat("ru-RU", {
 });
 
 const Classes: FC = () => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
+
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
@@ -74,8 +81,16 @@ const Classes: FC = () => {
       return byCat && byQuery;
     });
   }, [courses, selectedLabels, searchValue]);
+
   return (
-    <section style={{ position: "fixed", left: 0, right: 0 }}>
+    <section
+      style={{
+        paddingTop: isTelegram ? 112 : 64,
+        minHeight: "100vh",
+        paddingBottom: "74px",
+        backgroundColor: c.background,
+      }}
+    >
       <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
 
       <div
@@ -84,8 +99,7 @@ const Classes: FC = () => {
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          height: "calc(100vh - 136px - 64px)",
-          overflowY: "auto",
+          backgroundColor: c.background,
         }}
       >
         <CategoryFilter
