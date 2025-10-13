@@ -1,58 +1,108 @@
 import type { FC } from "react";
-import { useColorScheme } from "../hooks/useColorScheme";
-import { Colors } from "../theme/colors";
+import { useNavigate } from "react-router-dom";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 import { CloseWebViewButton } from "./CloseWebViewButton";
+import { isTelegramApp } from "@/lib/telegram";
 
 interface ProductHeaderProps {
   onGoBack?: () => void;
 }
 
 const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack }) => {
+  const navigate = useNavigate();
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
+
+  const handleClose = () => {
+    navigate("/");
+  };
 
   return (
     <div
       style={{
-        padding: "8px 0",
-        height: 48,
-        display: "flex",
-        flex: 1,
-        alignItems: "center",
-        borderBottomStyle: "solid",
-        borderBottomWidth: 1,
-        borderBottomColor: colors.surfaceColor,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        paddingTop: isTelegram ? 92 : 0,
+        borderBottom: "1px solid " + c.surfaceColor,
+        backgroundColor: isTelegram ? c.background : c.background,
+        zIndex: 100,
       }}
     >
-      {/* кнопка назад */}
       <div
         style={{
-          paddingTop: 0,
-          width: 56,
-          height: 40,
+          paddingRight: 16,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: "pointer",
-        }}
-        onClick={onGoBack}
-      >
-        <VuesaxIcon name="arrow-left" size={24} color={colors.primary} />
-      </div>
-      <div
-        style={{
-          position: "relative",
-          height: 56,
-          display: "flex",
-          flex: 1,
-          alignItems: "center",
+          gap: 8,
+          backgroundColor: c.background,
         }}
       >
-        ВЕРНУТЬСЯ НАЗАД
-      </div>
-      <div>
-        <CloseWebViewButton />
+        {/* кнопка назад */}
+        <div
+          style={{
+            paddingTop: 0,
+            width: 56,
+            height: 40,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+          onClick={onGoBack}
+        >
+          <VuesaxIcon name="arrow-left" size={24} color={c.primary} />
+        </div>
+        <div
+          style={{
+            position: "relative",
+            height: 64,
+            display: "flex",
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
+          ВЕРНУТЬСЯ НАЗАД
+        </div>
+        <div>
+          {/* Close Button */}
+          {isTelegram && (
+            <button
+              onClick={handleClose}
+              style={{
+                marginLeft: 8,
+                marginRight: 8,
+                padding: 0,
+                width: 20,
+                height: 20,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "none",
+                border: "1px solid " + c.accent,
+                cursor: "pointer",
+                borderRadius: 20,
+                transition: "background-color 0.2s ease",
+                outline: "none",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = c.controlColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+              aria-label="Закрыть поиск"
+            >
+              <VuesaxIcon name="close" size={8} color={c.accent} />
+            </button>
+          )}
+          <CloseWebViewButton />
+        </div>
       </div>
     </div>
   );

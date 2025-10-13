@@ -22,7 +22,7 @@ function Bootstrap() {
     }
 
     // Дополнительно: спрашивать подтверждение при закрытии
-    tg.enableClosingConfirmation();
+    // tg.enableClosingConfirmation();
 
     // Готово
     tg.ready();

@@ -101,34 +101,36 @@ const SearchHeader: FC<SearchHeaderProps> = ({
         </div>
 
         {/* Close Button */}
-        <button
-          onClick={handleClose}
-          style={{
-            marginLeft: 8,
-            marginRight: 8,
-            padding: 0,
-            width: 20,
-            height: 20,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "none",
-            border: "1px solid " + c.accent,
-            cursor: "pointer",
-            borderRadius: 20,
-            transition: "background-color 0.2s ease",
-            outline: "none",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = c.controlColor;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-          }}
-          aria-label="Закрыть поиск"
-        >
-          <VuesaxIcon name="close" size={8} color={c.accent} />
-        </button>
+        {isTelegram && (
+          <button
+            onClick={handleClose}
+            style={{
+              marginLeft: 8,
+              marginRight: 8,
+              padding: 0,
+              width: 20,
+              height: 20,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "none",
+              border: "1px solid " + c.accent,
+              cursor: "pointer",
+              borderRadius: 20,
+              transition: "background-color 0.2s ease",
+              outline: "none",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = c.controlColor;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+            aria-label="Закрыть поиск"
+          >
+            <VuesaxIcon name="close" size={8} color={c.accent} />
+          </button>
+        )}
 
         <CloseWebViewButton />
       </div>

@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import Container from "@/components/Container";
@@ -12,7 +13,9 @@ const Product: FC = () => {
 
   const navigate = useNavigate();
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
+
+  const isTelegram = isTelegramApp();
 
   const { product: productData, isLoading, error } = useRequestGetProduct(id);
 
@@ -72,7 +75,7 @@ const Product: FC = () => {
     return (
       <Container>
         <ProductHeader onGoBack={handleBackClick} />
-        <div style={{ padding: 16, color: colors.lightText }}>
+        <div style={{ padding: 16, color: c.lightText }}>
           {error || "Продукт не найден"}
         </div>
       </Container>
@@ -80,7 +83,14 @@ const Product: FC = () => {
   }
 
   return (
-    <Container>
+    <section
+      style={{
+        paddingTop: isTelegram ? 112 : 44,
+        minHeight: "100vh",
+        paddingBottom: "160px",
+        backgroundColor: c.background,
+      }}
+    >
       {/* Header с кнопкой назад */}
       <ProductHeader onGoBack={handleBackClick} />
 
@@ -106,7 +116,7 @@ const Product: FC = () => {
               aspectRatio: "1 / 1",
               objectFit: "cover",
               borderRadius: "12px",
-              border: `1px solid ${colors.border}`,
+              border: `1px solid ${c.border}`,
             }}
           />
         </div>
@@ -116,7 +126,7 @@ const Product: FC = () => {
           <div
             style={{
               fontSize: 14,
-              color: colors.lightText,
+              color: c.lightText,
             }}
           >
             {product.category}
@@ -127,7 +137,7 @@ const Product: FC = () => {
               margin: 0,
               fontSize: 16,
               fontWeight: 600,
-              color: colors.text,
+              color: c.text,
             }}
           >
             {product.title}
@@ -137,7 +147,7 @@ const Product: FC = () => {
             style={{
               fontSize: 16,
               fontWeight: 600,
-              color: colors.primary,
+              color: c.primary,
             }}
           >
             {product.price}
@@ -147,7 +157,7 @@ const Product: FC = () => {
             style={{
               fontSize: 16,
               lineHeight: "1.5",
-              color: colors.text,
+              color: c.text,
               marginTop: 16,
             }}
           >
@@ -168,8 +178,8 @@ const Product: FC = () => {
             style={{
               flex: 1,
               padding: "16px",
-              backgroundColor: colors.primary,
-              color: colors.lighter,
+              backgroundColor: c.primary,
+              color: c.lighter,
               border: "none",
               borderRadius: "12px",
               fontSize: "16px",
@@ -183,8 +193,8 @@ const Product: FC = () => {
           <button
             style={{
               padding: "16px",
-              backgroundColor: colors.controlColor,
-              color: colors.text,
+              backgroundColor: c.controlColor,
+              color: c.text,
               border: "none",
               borderRadius: "12px",
               cursor: "pointer",
@@ -193,11 +203,11 @@ const Product: FC = () => {
               justifyContent: "center",
             }}
           >
-            <VuesaxIcon name="search" size={20} color={colors.text} />
+            <VuesaxIcon name="search" size={20} color={c.text} />
           </button>
         </div>
       </div>
-    </Container>
+    </section>
   );
 };
 

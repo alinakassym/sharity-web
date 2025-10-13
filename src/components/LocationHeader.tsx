@@ -25,7 +25,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
         left: 0,
         right: 0,
         paddingTop: isTelegram ? 92 : 0,
-        backgroundColor: isTelegram ? colors.surfaceColor : colors.background,
+        backgroundColor: isTelegram ? colors.background : colors.background,
         zIndex: 100,
       }}
     >
@@ -36,6 +36,8 @@ const LocationHeader: FC<LocationHeaderProps> = ({
           alignItems: "center",
           justifyContent: "center",
           gap: 8,
+          borderTop: "1px solid " + colors.surfaceColor,
+          borderBottom: "1px solid " + colors.surfaceColor,
           backgroundColor: colors.background,
         }}
       >

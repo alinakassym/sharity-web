@@ -55,7 +55,7 @@ const Add: FC = () => {
   };
 
   return (
-    <Container showLocationHeader>
+    <Container showLocationHeader paddingTop={92}>
       {/* Main Content */}
       <div
         style={{
