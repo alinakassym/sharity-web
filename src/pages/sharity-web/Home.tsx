@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import LocationHeader from "@/components/LocationHeader";
+import Container from "@/components/Container";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
@@ -9,12 +9,10 @@ import bannerImage from "@/assets/banner.png";
 import menuImg1 from "@/assets/menu-img1.png";
 import menuImg2 from "@/assets/menu-img2.jpg";
 import menuImg3 from "@/assets/menu-img3.png";
-import { isTelegramApp } from "@/lib/telegram";
 
 const Home: FC = () => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
-  const isTelegram = isTelegramApp();
 
   const carouselItems = [
     {
@@ -104,15 +102,7 @@ const Home: FC = () => {
   ];
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 92 : 44,
-        minHeight: "100vh",
-        paddingBottom: "160px",
-      }}
-    >
-      <LocationHeader />
-
+    <Container showLocationHeader>
       {/* Main Content */}
       <div
         style={{
@@ -131,7 +121,7 @@ const Home: FC = () => {
         {/* Upcoming Events */}
         <EventsCarousel events={upcomingEvents} />
       </div>
-    </section>
+    </Container>
   );
 };
 
