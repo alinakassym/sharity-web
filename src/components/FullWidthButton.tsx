@@ -7,6 +7,7 @@ interface FullWidthButtonProps {
   label: string;
   btnColor?: string;
   color?: string;
+  inProgress?: boolean;
   onClick?: () => void;
 }
 
@@ -16,6 +17,7 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
   btnColor,
   color,
   onClick,
+  inProgress = false,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -24,28 +26,50 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
     <div
       style={{
         width: "100%",
-        padding: "16px",
+        height: 56,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         borderRadius: 12,
-        cursor: "pointer",
         gap: 16,
         backgroundColor: btnColor ?? c.primary,
+        opacity: inProgress ? 0.7 : 1,
+        cursor: inProgress ? "not-allowed" : "pointer",
       }}
-      onClick={() => onClick && onClick()}
+      onClick={() => !inProgress && onClick && onClick()}
     >
       <VuesaxIcon name={iconName} size={24} color={color ?? c.lighter} />
-      <p
+      <div
         style={{
-          fontSize: 14,
-          fontWeight: 600,
-          margin: 0,
-          color: color ?? c.lighter,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {label}
-      </p>
+        <p
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            margin: 0,
+            color: color ?? c.lighter,
+          }}
+        >
+          {label}
+        </p>
+        {inProgress && (
+          <p
+            style={{
+              fontSize: 10,
+              lineHeight: 1.1,
+              margin: 0,
+              color: c.lightText,
+            }}
+          >
+            в разработке
+          </p>
+        )}
+      </div>
     </div>
   );
 };
