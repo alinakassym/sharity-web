@@ -1,10 +1,11 @@
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import Container from "@/components/Container";
+import { isTelegramApp } from "@/lib/telegram";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
+import LocationHeader from "@/components/LocationHeader";
 import bannerImage from "@/assets/banner.png";
 import menuImg1 from "@/assets/menu-img1.png";
 import menuImg2 from "@/assets/menu-img2.jpg";
@@ -12,7 +13,8 @@ import menuImg3 from "@/assets/menu-img3.png";
 
 const Home: FC = () => {
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
 
   const carouselItems = [
     {
@@ -102,14 +104,22 @@ const Home: FC = () => {
   ];
 
   return (
-    <Container showLocationHeader>
+    <section
+      style={{
+        paddingTop: isTelegram ? 92 : 44,
+        minHeight: "100vh",
+        paddingBottom: "160px",
+        backgroundColor: c.background,
+      }}
+    >
+      <LocationHeader />
       {/* Main Content */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           gap: 1,
-          backgroundColor: colors.surfaceColor,
+          backgroundColor: c.surfaceColor,
         }}
       >
         {/* Carousel Banner */}
@@ -121,7 +131,7 @@ const Home: FC = () => {
         {/* Upcoming Events */}
         <EventsCarousel events={upcomingEvents} />
       </div>
-    </Container>
+    </section>
   );
 };
 

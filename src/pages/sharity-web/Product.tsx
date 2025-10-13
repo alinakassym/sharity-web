@@ -4,6 +4,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
+import Container from "@/components/Container";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 
 const Product: FC = () => {
@@ -60,44 +61,26 @@ const Product: FC = () => {
 
   if (isLoading) {
     return (
-      <section
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-        }}
-      >
+      <Container>
         <ProductHeader onGoBack={handleBackClick} />
         <div style={{ padding: 16 }}>Загрузка…</div>
-      </section>
+      </Container>
     );
   }
 
   if (error || !product) {
     return (
-      <section
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-        }}
-      >
+      <Container>
         <ProductHeader onGoBack={handleBackClick} />
         <div style={{ padding: 16, color: colors.lightText }}>
           {error || "Продукт не найден"}
         </div>
-      </section>
+      </Container>
     );
   }
 
   return (
-    <section
-      style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-      }}
-    >
+    <Container>
       {/* Header с кнопкой назад */}
       <ProductHeader onGoBack={handleBackClick} />
 
@@ -214,7 +197,7 @@ const Product: FC = () => {
           </button>
         </div>
       </div>
-    </section>
+    </Container>
   );
 };
 

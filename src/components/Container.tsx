@@ -5,11 +5,13 @@ import LocationHeader from "@/components/LocationHeader";
 import { isTelegramApp } from "@/lib/telegram";
 
 interface ThemeProviderProps {
+  paddingTop?: number;
   showLocationHeader?: boolean;
   children: ReactNode;
 }
 
 const Container: FC<ThemeProviderProps> = ({
+  paddingTop = 48,
   showLocationHeader = false,
   children,
 }) => {
@@ -20,7 +22,8 @@ const Container: FC<ThemeProviderProps> = ({
   return (
     <section
       style={{
-        paddingTop: isTelegram ? 92 : 44,
+        position: "relative",
+        paddingTop: isTelegram ? paddingTop : 44,
         minHeight: "100vh",
         paddingBottom: "160px",
         backgroundColor: colors.background,

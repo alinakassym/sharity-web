@@ -5,6 +5,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import MainTabBar from "@/components/MainTabBar";
+import Container from "@/components/Container";
 import { getTelegramUser, isTelegramApp } from "@/lib/telegram";
 interface MenuItem {
   id: string;
@@ -68,14 +69,7 @@ const Profile: FC = () => {
   };
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 48 : 0,
-        minHeight: "100vh",
-        backgroundColor: colors.background,
-        paddingBottom: 80,
-      }}
-    >
+    <Container>
       {/* Header */}
       <div
         style={{
@@ -338,7 +332,7 @@ const Profile: FC = () => {
       </div>
 
       <MainTabBar />
-    </section>
+    </Container>
   );
 };
 

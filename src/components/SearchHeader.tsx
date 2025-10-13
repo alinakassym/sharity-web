@@ -4,6 +4,7 @@ import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 import { CloseWebViewButton } from "./CloseWebViewButton";
+import { isTelegramApp } from "@/lib/telegram";
 
 interface SearchHeaderProps {
   searchValue: string;
@@ -16,7 +17,8 @@ const SearchHeader: FC<SearchHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
 
   const handleClose = () => {
     navigate("/");
@@ -25,100 +27,111 @@ const SearchHeader: FC<SearchHeaderProps> = ({
   return (
     <div
       style={{
-        padding: 8,
-        display: "flex",
-        gap: 8,
-        flex: 1,
-        alignItems: "center",
-        borderBottomStyle: "solid",
-        borderBottomWidth: 1,
-        borderBottomColor: colors.surfaceColor,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        paddingTop: isTelegram ? 92 : 0,
+        borderBottom: "1px solid " + c.surfaceColor,
+        backgroundColor: isTelegram ? c.background : c.background,
+        zIndex: 100,
       }}
     >
       <div
         style={{
-          width: 40,
-          height: 40,
+          padding: "12px 16px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-        }}
-      >
-        <VuesaxIcon name="location" size={24} color={colors.primary} />
-      </div>
-      <div
-        style={{
-          position: "relative",
-          height: 40,
-          display: "flex",
-          flex: 1,
-          borderRadius: 8,
-          backgroundColor: colors.controlColor,
+          gap: 8,
+          backgroundColor: c.background,
         }}
       >
         <div
           style={{
-            position: "absolute",
-            left: 4,
-            top: 1,
             width: 40,
-            maxWidth: 40,
-            padding: "8px",
-            color: colors.text,
-            zIndex: 2,
+            height: 40,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <VuesaxIcon name="search" size={16} color={colors.lightText} />
+          <VuesaxIcon name="location" size={24} color={c.primary} />
         </div>
-        <input
-          name="search"
-          type="text"
-          placeholder="Поиск"
-          value={searchValue}
-          onChange={(e) => onSearchChange(e.target.value)}
+        <div
           style={{
-            paddingLeft: 40,
-            fontSize: 16,
-            width: "100%",
-            border: "none",
-            outline: "none",
-            backgroundColor: "transparent",
-            color: colors.text,
+            position: "relative",
+            height: 40,
+            display: "flex",
+            flex: 1,
+            borderRadius: 8,
+            backgroundColor: c.controlColor,
           }}
-        />
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: 4,
+              top: 1,
+              width: 40,
+              maxWidth: 40,
+              padding: "8px",
+              color: c.text,
+              zIndex: 2,
+            }}
+          >
+            <VuesaxIcon name="search" size={16} color={c.lightText} />
+          </div>
+          <input
+            name="search"
+            type="text"
+            placeholder="Поиск"
+            value={searchValue}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{
+              paddingLeft: 40,
+              fontSize: 16,
+              width: "100%",
+              border: "none",
+              outline: "none",
+              backgroundColor: "transparent",
+              color: c.text,
+            }}
+          />
+        </div>
+
+        {/* Close Button */}
+        <button
+          onClick={handleClose}
+          style={{
+            marginLeft: 8,
+            marginRight: 8,
+            padding: 0,
+            width: 20,
+            height: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "none",
+            border: "1px solid " + c.accent,
+            cursor: "pointer",
+            borderRadius: 20,
+            transition: "background-color 0.2s ease",
+            outline: "none",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = c.controlColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }}
+          aria-label="Закрыть поиск"
+        >
+          <VuesaxIcon name="close" size={8} color={c.accent} />
+        </button>
+
+        <CloseWebViewButton />
       </div>
-
-      {/* Close Button */}
-      <button
-        onClick={handleClose}
-        style={{
-          marginLeft: 8,
-          marginRight: 8,
-          padding: 0,
-          width: 20,
-          height: 20,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "none",
-          border: "1px solid " + colors.accent,
-          cursor: "pointer",
-          borderRadius: 20,
-          transition: "background-color 0.2s ease",
-          outline: "none",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = colors.controlColor;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "transparent";
-        }}
-        aria-label="Закрыть поиск"
-      >
-        <VuesaxIcon name="close" size={8} color={colors.accent} />
-      </button>
-
-      <CloseWebViewButton />
     </div>
   );
 };
