@@ -10,6 +10,7 @@ interface PlacementOption {
   title: string;
   icon: string;
   path: string;
+  inProgress: boolean;
 }
 
 const placementOptions: PlacementOption[] = [
@@ -18,30 +19,35 @@ const placementOptions: PlacementOption[] = [
     title: "Продажа",
     icon: "coins",
     path: "/create",
+    inProgress: false,
   },
   {
     id: "purchase",
     title: "Покупка",
     icon: "shop",
     path: "/store",
+    inProgress: false,
   },
   {
     id: "rent",
     title: "Аренда",
     icon: "box-time",
     path: "/create-rent",
+    inProgress: true,
   },
   {
     id: "exchange",
     title: "Обмен",
     icon: "convert-boxes",
     path: "/create-exchange",
+    inProgress: true,
   },
   {
     id: "charity",
     title: "Благотворительность",
     icon: "gift",
     path: "/create-charity",
+    inProgress: true,
   },
 ];
 
@@ -84,6 +90,7 @@ const Add: FC = () => {
               iconName={o.icon}
               btnColor={c.controlColor}
               color={c.text}
+              inProgress={o.inProgress}
               onClick={() => handleOptionClick(o.path)}
             />
           ))}
