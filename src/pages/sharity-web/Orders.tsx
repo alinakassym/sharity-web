@@ -1,42 +1,41 @@
 import type { FC } from 'react';
-import { useColorScheme } from '../../hooks/useColorScheme';
-import { Colors } from "../../theme/colors";
+import { useNavigate } from "react-router-dom";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
+import ProductHeader from "@/components/ProductHeader";
 
 const Orders: FC = () => {
+  const navigate = useNavigate();
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
+
+  const handleBackClick = () => {
+    navigate(-1);
+  };
 
   return (
     <section
       style={{
+        paddingTop: isTelegram ? 112 : 44,
         minHeight: "100vh",
-        backgroundColor: colors.background,
-        color: colors.text,
-        padding: "16px",
-        paddingBottom: "80px",
+        paddingBottom: "160px",
+        backgroundColor: c.background,
       }}
     >
-      <h1
-        style={{
-          margin: 0,
-          fontSize: "24px",
-          fontWeight: 600,
-          color: colors.text,
-        }}
-      >
-        Мои заказы
-      </h1>
-
+      <ProductHeader onGoBack={handleBackClick} />
       <div
         style={{
+          padding: 16,
           display: "flex",
           flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "flex-start",
-          color: colors.lightText,
+          gap: 16,
+          color: c.lightText,
+          backgroundColor: c.background,
         }}
       >
-        <p>В разработке</p>
+        В разработке...
       </div>
     </section>
   );

@@ -1,5 +1,8 @@
 import type { FC } from "react";
 import { useState, useMemo } from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
 import SearchHeader from "@/components/SearchHeader";
 import type { ProductData } from "@/components/ProductCard";
 import ProductGrid from "@/components/ProductGrid";
@@ -12,6 +15,9 @@ const KZT = new Intl.NumberFormat("ru-RU", {
 });
 
 const Favorites: FC = () => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
   const [searchValue, setSearchValue] = useState("");
 
   const { products: rows, isLoading } = useRequestGetProducts();
@@ -20,7 +26,7 @@ const Favorites: FC = () => {
   const products: ProductData[] = useMemo(
     () =>
       rows
-        .filter(r => r.isFavorite === true)
+        .filter((r) => r.isFavorite === true)
         .map((r, i) => {
           // Приоритет отображения изображений:
           // 1. Первое изображение из imagesArray
@@ -65,9 +71,10 @@ const Favorites: FC = () => {
   return (
     <section
       style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
+        paddingTop: isTelegram ? 112 : 64,
+        minHeight: "100vh",
+        paddingBottom: "74px",
+        backgroundColor: c.background,
       }}
     >
       {/* Header с кнопкой назад */}
@@ -82,8 +89,7 @@ const Favorites: FC = () => {
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          height: "calc(100vh - 136px - 64px)",
-          overflowY: "auto",
+          backgroundColor: c.background,
         }}
       >
         {isLoading ? (
