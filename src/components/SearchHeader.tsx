@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
-import VuesaxIcon from "./VuesaxIcon";
+import VuesaxIcon from "./icons/VuesaxIcon";
 import { CloseWebViewButton } from "./CloseWebViewButton";
 
 interface SearchHeaderProps {

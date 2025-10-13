@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/VuesaxIcon";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 

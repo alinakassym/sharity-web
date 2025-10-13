@@ -3,7 +3,7 @@ import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/VuesaxIcon";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import MainTabBar from "@/components/MainTabBar";
 import { getTelegramUser, isTelegramApp } from "@/lib/telegram";
 interface MenuItem {

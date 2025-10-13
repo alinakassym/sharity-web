@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/VuesaxIcon";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";

@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
-import VuesaxIcon from "./VuesaxIcon";
+import VuesaxIcon from "./icons/VuesaxIcon";
 
 interface TabItem {
   id: string;

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/VuesaxIcon";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import CourseCard from "@/components/CourseCard";
 import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";

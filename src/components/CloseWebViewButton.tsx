@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { Colors } from "../theme/colors";
-import VuesaxIcon from "./VuesaxIcon";
+import VuesaxIcon from "./icons/VuesaxIcon";
 
 declare global {
   interface Window {
