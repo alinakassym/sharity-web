@@ -5,7 +5,6 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
-import Container from "@/components/Container";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 
 const Product: FC = () => {
@@ -64,28 +63,42 @@ const Product: FC = () => {
 
   if (isLoading) {
     return (
-      <Container>
+      <section
+        style={{
+          paddingTop: isTelegram ? 112 : 64,
+          minHeight: "100vh",
+          paddingBottom: "160px",
+          backgroundColor: c.background,
+        }}
+      >
         <ProductHeader onGoBack={handleBackClick} />
         <div style={{ padding: 16 }}>Загрузка…</div>
-      </Container>
+      </section>
     );
   }
 
   if (error || !product) {
     return (
-      <Container>
+      <section
+        style={{
+          paddingTop: isTelegram ? 112 : 64,
+          minHeight: "100vh",
+          paddingBottom: "160px",
+          backgroundColor: c.background,
+        }}
+      >
         <ProductHeader onGoBack={handleBackClick} />
         <div style={{ padding: 16, color: c.lightText }}>
           {error || "Продукт не найден"}
         </div>
-      </Container>
+      </section>
     );
   }
 
   return (
     <section
       style={{
-        paddingTop: isTelegram ? 112 : 44,
+        paddingTop: isTelegram ? 112 : 64,
         minHeight: "100vh",
         paddingBottom: "160px",
         backgroundColor: c.background,
