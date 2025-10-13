@@ -5,15 +5,16 @@ import VuesaxIcon from "./icons/VuesaxIcon";
 interface FullWidthButtonProps {
   iconName?: string;
   label: string;
+  btnColor?: string;
   color?: string;
-  iconColor?: string;
+  onClick?: () => void;
 }
 
 const FullWidthButton: FC<FullWidthButtonProps> = ({
   iconName = "heart",
   label,
+  btnColor,
   color,
-  iconColor,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -29,11 +30,20 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
         borderRadius: 12,
         cursor: "pointer",
         gap: 16,
-        backgroundColor: color ?? c.primary,
+        backgroundColor: btnColor ?? c.primary,
       }}
     >
-      <VuesaxIcon name={iconName} size={24} color={iconColor ?? c.lighter} />
-      <p style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>{label}</p>
+      <VuesaxIcon name={iconName} size={24} color={color ?? c.lighter} />
+      <p
+        style={{
+          fontSize: 14,
+          fontWeight: 600,
+          margin: 0,
+          color: color ?? c.lighter,
+        }}
+      >
+        {label}
+      </p>
     </div>
   );
 };

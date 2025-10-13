@@ -82,75 +82,49 @@ const Add: FC = () => {
             <FullWidthButton
               label={o.title}
               iconName={o.icon}
-              color={c.controlColor}
-              iconColor={c.darken}
+              btnColor={c.controlColor}
+              color={c.text}
             />
           ))}
         </div>
+      </div>
 
-        {/* Admin Section */}
-        <div style={{ marginTop: 48 }}>
-          <h3
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: c.text,
-              margin: "0 0 16px",
-            }}
-          >
-            Админ
-          </h3>
+      {/* Admin Content */}
+      <div
+        style={{
+          padding: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        <h2
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: c.text,
+            margin: 0,
+          }}
+        >
+          Администратор
+        </h2>
 
-          <button
-            onClick={() => handleOptionClick("/create-school")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              padding: "20px 24px",
-              backgroundColor: c.surfaceColor,
-              border: "none",
-              borderRadius: 16,
-              cursor: "pointer",
-              width: "100%",
-              transition: "all 0.2s ease",
-              outline: "none",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = c.controlColor;
-              e.currentTarget.style.transform = "scale(1.02)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = c.surfaceColor;
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            <div
-              style={{
-                fontSize: 28,
-                width: 48,
-                height: 48,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: c.background,
-                borderRadius: 12,
-              }}
-            >
-              ➕
-            </div>
-            <span
-              style={{
-                fontSize: 18,
-                fontWeight: 600,
-                color: c.text,
-                flex: 1,
-                textAlign: "left",
-              }}
-            >
-              Добавить школу
-            </span>
-          </button>
+        {/* Placement Options */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <FullWidthButton
+            label={"Добавить школу/курсы"}
+            iconName="add"
+            btnColor={c.controlColor}
+            color={c.text}
+            onClick={() => handleOptionClick("/create-course")}
+          />
+          <FullWidthButton
+            label={"Создать событие"}
+            iconName="calendar"
+            btnColor={c.controlColor}
+            color={c.text}
+            onClick={() => handleOptionClick("/create-course")}
+          />
         </div>
       </div>
     </Container>
