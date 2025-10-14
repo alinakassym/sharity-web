@@ -5,6 +5,7 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import UserProfileCard from "@/components/UserProfileCard";
+import UserProductsCard from "@/components/UserProductsCard";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const Profile: FC = () => {
@@ -47,6 +48,8 @@ const Profile: FC = () => {
         )}
 
         {userData && <UserProfileCard userData={userData} />}
+
+        {userData && <UserProductsCard />}
       </div>
     </section>
   );
