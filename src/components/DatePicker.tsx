@@ -36,14 +36,7 @@ const DatePicker: FC<DatePickerProps> = ({
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 4,
-        width: "100%",
-      }}
-    >
+    <div style={{}}>
       {label && (
         <label
           style={{
@@ -60,6 +53,13 @@ const DatePicker: FC<DatePickerProps> = ({
         style={{
           position: "relative",
           width: "100%",
+          maxWidth: "100%",
+          boxSizing: "border-box",
+          backgroundColor: colors.background,
+          borderColor: colors.muiBorder,
+          borderStyle: "solid",
+          borderWidth: 1,
+          borderRadius: 20,
         }}
       >
         <input
@@ -75,20 +75,21 @@ const DatePicker: FC<DatePickerProps> = ({
             padding: "0 48px 0 16px",
             fontSize: 16,
             fontWeight: 400,
+            textAlign: "left",
+            alignSelf: "flex-start",
             color: colors.text,
-            backgroundColor: colors.background,
-            border: `1px solid ${colors.border}`,
-            borderRadius: 12,
+            backgroundColor: "transparent",
+            border: "none",
             outline: "none",
-            transition: "border-color 0.2s",
-            boxSizing: "border-box",
             fontFamily: "inherit",
           }}
           onFocus={(e) => {
             e.target.style.borderColor = colors.primary;
+            e.target.style.borderWidth = "3";
           }}
           onBlur={(e) => {
             e.target.style.borderColor = colors.border;
+            e.target.style.borderWidth = "1";
           }}
         />
         <div

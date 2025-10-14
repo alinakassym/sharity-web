@@ -205,6 +205,8 @@ const CreateEvent: FC = () => {
       {/* Content */}
       <div
         style={{
+          position: "relative",
+          width: "100%",
           padding: "16px 16px 100px",
           height: "calc(100vh - 290px)",
           overflowY: "auto",
@@ -214,21 +216,23 @@ const CreateEvent: FC = () => {
         {currentStep === "basic" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <TextField
-              label="Название *"
-              placeholder="Введите название"
+              label="Заголовок *"
+              placeholder="Введите заголовок"
               value={eventName}
               onChange={(e) => setCourseName(e.target.value)}
               fullWidth
               variant="outlined"
             />
 
-            <DatePicker
-              label="Дата события *"
-              value={date}
-              onChange={setDate}
-              placeholder="Выберите дату события"
-              minDate={new Date()}
-            />
+            <div style={{ width: "100%", overflow: "hidden" }}>
+              <DatePicker
+                label="Дата события *"
+                value={date}
+                onChange={setDate}
+                placeholder="Выберите дату события"
+                minDate={new Date()}
+              />
+            </div>
           </div>
         )}
 
