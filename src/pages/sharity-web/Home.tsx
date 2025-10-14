@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
@@ -15,6 +16,8 @@ import menuImg3 from "@/assets/menu-img3.png";
 const Home: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
+
   const { events: eventsFromFirebase, isLoading } = useRequestGetEvents();
 
   const carouselItems = [
@@ -61,60 +64,68 @@ const Home: FC = () => {
     return eventsFromFirebase
       .sort((a, b) => {
         // Сортируем по дате от раннего к позднему
-        const dateA = a.date instanceof Date ? a.date :
-                     a.date?.toDate ? a.date.toDate() : new Date(a.date);
-        const dateB = b.date instanceof Date ? b.date :
-                     b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        const dateA =
+          a.date instanceof Date
+            ? a.date
+            : a.date?.toDate
+              ? a.date.toDate()
+              : new Date(a.date);
+        const dateB =
+          b.date instanceof Date
+            ? b.date
+            : b.date?.toDate
+              ? b.date.toDate()
+              : new Date(b.date);
         return dateA.getTime() - dateB.getTime();
       })
       .map((event, index) => {
-      // Приоритет отображения изображений:
-      // 1. Первое изображение из imagesArray
-      // 2. Поле image (для совместимости)
-      // 3. Fallback заглушка
-      let imageUrl = `https://picsum.photos/320/200?random=${index + 10}`;
+        // Приоритет отображения изображений:
+        // 1. Первое изображение из imagesArray
+        // 2. Поле image (для совместимости)
+        // 3. Fallback заглушка
+        let imageUrl = `https://picsum.photos/320/200?random=${index + 10}`;
 
-      if (event.imagesArray && event.imagesArray.length > 0) {
-        imageUrl = event.imagesArray[0];
-      } else if (event.image) {
-        imageUrl = event.image;
-      }
-
-      // Форматируем дату
-      let formattedDate = "";
-      if (event.date) {
-        try {
-          const dateObj =
-            event.date instanceof Date
-              ? event.date
-              : event.date.toDate
-                ? event.date.toDate()
-                : new Date(event.date);
-
-          formattedDate = `${dateObj.getDate()} ${dateObj
-            .toLocaleDateString("ru-RU", { month: "short" })
-            .toUpperCase()
-            .replace(".", "")}`;
-        } catch (e) {
-          console.error("Ошибка форматирования даты:", e);
+        if (event.imagesArray && event.imagesArray.length > 0) {
+          imageUrl = event.imagesArray[0];
+        } else if (event.image) {
+          imageUrl = event.image;
         }
-      }
 
-      return {
-        id: event.id,
-        image: imageUrl,
-        date: formattedDate,
-        time: event.time ?? "",
-        title: event.name ?? "",
-        location: event.location ?? "",
-        participants: event.participants ?? 0,
-        participantAvatars: event.participantAvatars ?? [],
-      };
-    });
+        // Форматируем дату
+        let formattedDate = "";
+        if (event.date) {
+          try {
+            const dateObj =
+              event.date instanceof Date
+                ? event.date
+                : event.date.toDate
+                  ? event.date.toDate()
+                  : new Date(event.date);
+
+            formattedDate = `${dateObj.getDate()} ${dateObj
+              .toLocaleDateString("ru-RU", { month: "short" })
+              .toUpperCase()
+              .replace(".", "")}`;
+          } catch (e) {
+            console.error("Ошибка форматирования даты:", e);
+          }
+        }
+
+        return {
+          id: event.id,
+          image: imageUrl,
+          date: formattedDate,
+          time: event.time ?? "",
+          title: event.name ?? "",
+          location: event.location ?? "",
+          participants: event.participants ?? 0,
+          participantAvatars: event.participantAvatars ?? [],
+        };
+      });
   }, [eventsFromFirebase]);
 
   return (
-    <Container showLocationHeader paddingTop={92}>
+    <Container showLocationHeader paddingTop={isTelegram ? 92 : 46}>
       {/* Main Content */}
       <div
         style={{
