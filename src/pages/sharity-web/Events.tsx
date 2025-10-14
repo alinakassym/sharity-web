@@ -1,13 +1,22 @@
-import type { FC } from 'react'
+import { useState, type FC } from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
+import Container from "@/components/Container";
+import SearchHeader from "@/components/SearchHeader";
 
 const Events: FC = () => {
-  return (
-    <section style={{ padding: 16 }}>
-      <h1>Events</h1>
-      <p>Анонсы и детали событий</p>
-      <p>В разработке</p>
-    </section>
-  );
-}
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+  const isTelegram = isTelegramApp();
 
-export default Events
+  const [searchValue, setSearchValue] = useState("");
+
+  return (
+    <Container paddingTop={isTelegram ? 92 : 44}>
+      <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
+    </Container>
+  );
+};
+
+export default Events;
