@@ -110,10 +110,17 @@ const CreateEvent: FC = () => {
         console.log("Все изображения загружены:", imagesArray);
       }
 
+      // Объединяем дату и время в один объект Date
+      const eventDateTime = date ? new Date(date) : new Date();
+      if (time) {
+        const [hours, minutes] = time.split(":").map(Number);
+        eventDateTime.setHours(hours, minutes, 0, 0);
+      }
+
       const eventData = {
         name: eventName.trim(),
-        date: date || new Date(),
-        time: time || "00:00",
+        date: eventDateTime, // Дата + время вместе
+        time: time || "00:00", // Время отдельно как строка
         url: "",
         description: description.trim() || undefined,
         isFavorite: false,
