@@ -41,6 +41,9 @@ const CreateEvent: FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [eventName, setCourseName] = useState("");
   const [location, setLocation] = useState("");
+  const [locationCoordinates, setLocationCoordinates] = useState<
+    [number, number] | undefined
+  >();
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<EventCategory | string>("");
   const [customCategory, setCustomCategory] = useState("");
@@ -135,6 +138,7 @@ const CreateEvent: FC = () => {
         description: description.trim() || undefined,
         isFavorite: false,
         location: location.trim() || "string",
+        locationCoordinates: locationCoordinates || undefined, // Координаты [lat, lng]
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
       };
 
@@ -264,8 +268,9 @@ const CreateEvent: FC = () => {
               <YandexMap
                 apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
                 height={300}
-                onLocationSelect={(address) => {
+                onLocationSelect={(address, coordinates) => {
                   setLocation(address);
+                  setLocationCoordinates(coordinates);
                 }}
               />
             </div>

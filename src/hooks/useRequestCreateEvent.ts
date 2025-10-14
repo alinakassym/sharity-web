@@ -11,6 +11,7 @@ export interface CreateEventData {
   description?: string;
   isFavorite?: boolean;
   location: string;
+  locationCoordinates?: [number, number];
   imagesArray?: string[];
   createdAt?: Date;
 }
