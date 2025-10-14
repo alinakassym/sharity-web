@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import CourseCard from "@/components/CourseCard";
 import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
@@ -19,18 +20,23 @@ import {
   InputLabel,
   IconButton,
 } from "@mui/material";
+import Container from "@/components/Container";
+import Header from "@/components/Header";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
 const Create: FC = () => {
+  const navigate = useNavigate();
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+
+  const isTelegram = isTelegramApp();
+
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
-  const scheme = useColorScheme();
-  const colors = Colors[scheme];
-  const navigate = useNavigate();
 
   const { createCourse, isLoading: isCreating } = useRequestCreateCourse();
 
@@ -136,41 +142,15 @@ const Create: FC = () => {
   };
 
   return (
-    <section style={{ position: "fixed", left: 0, right: 0 }}>
+    <Container paddingTop={isTelegram ? 92 : 44}>
       {/* Header */}
-      <div
-        style={{
-          paddingLeft: 16,
-          paddingRight: 56,
-          paddingBottom: 8,
-          height: 48,
-          display: "flex",
-          flex: 1,
-          alignItems: "center",
-          borderBottomStyle: "solid",
-          borderBottomWidth: 1,
-          borderBottomColor: colors.surfaceColor,
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <h1
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              color: colors.text,
-              margin: 0,
-            }}
-          >
-            Размещение: Классы/Школы
-          </h1>
-        </div>
-      </div>
+      <Header title="Размещение: Классы/Школы" />
 
       {/* Progress Bar */}
       <div
         style={{
           padding: "16px 16px 8px",
-          backgroundColor: colors.background,
+          backgroundColor: c.background,
         }}
       >
         <Stepper activeStep={currentStepIndex} alternativeLabel>
@@ -185,7 +165,7 @@ const Create: FC = () => {
             style={{
               fontSize: 14,
               fontWeight: "600",
-              color: colors.lightText,
+              color: c.text,
               margin: 0,
             }}
           >
@@ -194,7 +174,7 @@ const Create: FC = () => {
           <p
             style={{
               fontSize: 14,
-              color: colors.lightText,
+              color: c.lightText,
               margin: 0,
             }}
           >
@@ -209,7 +189,7 @@ const Create: FC = () => {
           padding: "16px 16px 100px",
           height: "calc(100vh - 290px)",
           overflowY: "auto",
-          backgroundColor: colors.background,
+          backgroundColor: c.background,
         }}
       >
         {currentStep === "basic" && (
@@ -250,20 +230,20 @@ const Create: FC = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div
               style={{
-                border: `2px dashed ${colors.border}`,
+                border: `2px dashed ${c.border}`,
                 borderRadius: 12,
                 padding: 32,
                 textAlign: "center",
-                backgroundColor: colors.surfaceColor,
+                backgroundColor: c.surfaceColor,
               }}
             >
-              <VuesaxIcon name="camera" color={colors.lightText} size={48} />
+              <VuesaxIcon name="camera" color={c.lightText} size={48} />
               <p
                 style={{
                   margin: "16px 0 8px",
                   fontSize: 16,
                   fontWeight: 600,
-                  color: colors.text,
+                  color: c.text,
                 }}
               >
                 Добавьте фотографии
@@ -272,7 +252,7 @@ const Create: FC = () => {
                 style={{
                   margin: "0 0 16px",
                   fontSize: 14,
-                  color: colors.lightText,
+                  color: c.lightText,
                 }}
               >
                 Выберите фотографии
@@ -281,7 +261,7 @@ const Create: FC = () => {
                 component="label"
                 variant="contained"
                 startIcon={
-                  <VuesaxIcon name="camera" color={colors.lighter} size={20} />
+                  <VuesaxIcon name="camera" color={c.lighter} size={20} />
                 }
               >
                 Выбрать фото
@@ -301,7 +281,7 @@ const Create: FC = () => {
                   style={{
                     margin: "0 0 12px",
                     fontSize: 16,
-                    color: colors.text,
+                    color: c.text,
                   }}
                 >
                   Выбранные изображения ({selectedFiles.length}):
@@ -322,7 +302,7 @@ const Create: FC = () => {
                         height: 80,
                         borderRadius: 8,
                         overflow: "hidden",
-                        backgroundColor: colors.controlColor,
+                        backgroundColor: c.controlColor,
                       }}
                     >
                       <img
@@ -341,18 +321,14 @@ const Create: FC = () => {
                           position: "absolute",
                           top: 4,
                           right: 4,
-                          borderColor: colors.error,
+                          borderColor: c.error,
                           borderWidth: 1,
                           borderStyle: "solid",
                           boxSizing: "content-box",
-                          backgroundColor: `${colors.error}40`,
+                          backgroundColor: `${c.error}40`,
                         }}
                       >
-                        <VuesaxIcon
-                          name="close"
-                          size={6}
-                          color={colors.error}
-                        />
+                        <VuesaxIcon name="close" size={6} color={c.error} />
                       </IconButton>
                     </div>
                   ))}
@@ -384,7 +360,7 @@ const Create: FC = () => {
                 style={{
                   fontSize: 18,
                   fontWeight: 600,
-                  color: colors.text,
+                  color: c.text,
                   margin: "0 0 8px",
                 }}
               >
@@ -393,7 +369,7 @@ const Create: FC = () => {
               <p
                 style={{
                   fontSize: 14,
-                  color: colors.lightText,
+                  color: c.lightText,
                   margin: 0,
                 }}
               >
@@ -420,7 +396,7 @@ const Create: FC = () => {
               <div
                 style={{
                   padding: 16,
-                  backgroundColor: colors.surfaceColor,
+                  backgroundColor: c.surfaceColor,
                   borderRadius: 12,
                   marginTop: 8,
                 }}
@@ -429,7 +405,7 @@ const Create: FC = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: 600,
-                    color: colors.text,
+                    color: c.text,
                     margin: "0 0 8px",
                   }}
                 >
@@ -438,7 +414,7 @@ const Create: FC = () => {
                 <p
                   style={{
                     fontSize: 14,
-                    color: colors.text,
+                    color: c.text,
                     margin: 0,
                     lineHeight: 1.5,
                   }}
@@ -452,7 +428,7 @@ const Create: FC = () => {
               <div
                 style={{
                   padding: 16,
-                  backgroundColor: colors.surfaceColor,
+                  backgroundColor: c.surfaceColor,
                   borderRadius: 12,
                 }}
               >
@@ -460,7 +436,7 @@ const Create: FC = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: 600,
-                    color: colors.text,
+                    color: c.text,
                     margin: "0 0 12px",
                   }}
                 >
@@ -501,8 +477,8 @@ const Create: FC = () => {
           left: 0,
           right: 0,
           padding: 16,
-          backgroundColor: colors.background,
-          borderTop: `1px solid ${colors.surfaceColor}`,
+          backgroundColor: c.background,
+          borderTop: `1px solid ${c.surfaceColor}`,
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
@@ -533,7 +509,7 @@ const Create: FC = () => {
             : "Далее"}
         </Button>
       </div>
-    </section>
+    </Container>
   );
 };
 
