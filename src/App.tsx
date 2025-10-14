@@ -14,6 +14,7 @@ import Cart from "./pages/sharity-web/Cart";
 import Orders from "./pages/sharity-web/Orders";
 import Create from "./pages/sharity-web/Create";
 import CreateCourse from "./pages/sharity-web/CreateCourse";
+import CreateEvent from "./pages/sharity-web/CreateEvent";
 import Course from "./pages/sharity-web/Course";
 import Add from "./pages/sharity-web/Add";
 import Profile from "./pages/sharity-web/Profile";
@@ -41,6 +42,7 @@ const AppContent: FC = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="create" element={<Create />} />
         <Route path="create-course" element={<CreateCourse />} />
+        <Route path="create-event" element={<CreateEvent />} />
         <Route path="course/:id" element={<Course />} />
       </Routes>
       {showMainTabBar && <MainTabBar />}

@@ -11,7 +11,7 @@ interface EventCardProps {
   time: string;
   title: string;
   location: string;
-  participants: number;
+  participants?: number;
   participantAvatars?: string[];
 }
 
