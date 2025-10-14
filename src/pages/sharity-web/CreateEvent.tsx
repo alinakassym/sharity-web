@@ -18,6 +18,7 @@ import {
 import EventCard from "@/components/EventCard";
 import DatePicker from "@/components/DatePicker";
 import TimePicker from "@/components/TimePicker";
+import YandexMap from "@/components/YandexMap";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 
@@ -232,7 +233,13 @@ const CreateEvent: FC = () => {
 
         {currentStep === "location" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <div id="map" style={{ width: "100%", height: 200 }}></div>
+            <YandexMap
+              apiKey="859a058a-12f3-412a-ae09-c427ecde4b95"
+              height={300}
+              onLocationSelect={(address) => {
+                setLocation(address);
+              }}
+            />
             <TextField
               label="Локация/адрес *"
               placeholder="Введите локацию/адрес"
