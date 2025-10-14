@@ -8,6 +8,7 @@ export interface CreateCourseData {
   description?: string;
   isFavorite?: boolean;
   imagesArray?: string[];
+  createdBy?: string; // Telegram username пользователя
   createdAt?: Date;
 }
 

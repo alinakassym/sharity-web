@@ -13,6 +13,7 @@ export interface CreateEventData {
   location: string;
   locationCoordinates?: [number, number];
   imagesArray?: string[];
+  createdBy?: string; // Telegram username пользователя
   createdAt?: Date;
 }
 

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import { isTelegramApp, getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { useRequestCreateEvent } from "@/hooks/useRequestCreateEvent";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
@@ -129,6 +129,10 @@ const CreateEvent: FC = () => {
       const finalCategory =
         category === "Другое" ? customCategory.trim() : category;
 
+      // Получаем данные пользователя Telegram
+      const { user } = getTelegramUser();
+      const createdBy = user?.username || user?.first_name || undefined;
+
       const eventData = {
         name: eventName.trim(),
         category: finalCategory, // Категория события
@@ -140,6 +144,7 @@ const CreateEvent: FC = () => {
         location: location.trim() || "string",
         locationCoordinates: locationCoordinates || undefined, // Координаты [lat, lng]
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
+        createdBy, // Добавляем username пользователя Telegram
       };
 
       const result = await createEvent(eventData);

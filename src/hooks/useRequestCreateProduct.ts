@@ -10,6 +10,7 @@ export interface CreateProductData {
   condition?: string;
   isFavorite?: boolean;
   imagesArray?: string[];
+  createdBy?: string; // Telegram username пользователя
   createdAt?: Date;
 }
 

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import { isTelegramApp, getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import CourseCard from "@/components/CourseCard";
 import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
@@ -101,12 +101,17 @@ const Create: FC = () => {
         console.log("Все изображения загружены:", imagesArray);
       }
 
+      // Получаем данные пользователя Telegram
+      const { user } = getTelegramUser();
+      const createdBy = user?.username || user?.first_name || undefined;
+
       const courseData = {
         name: courseName.trim(),
         category,
         description: description.trim() || undefined,
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
+        createdBy, // Добавляем username пользователя Telegram
       };
 
       const result = await createCourse(courseData);
