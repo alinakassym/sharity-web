@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import EventCard from "@/components/EventCard";
 import DatePicker from "@/components/DatePicker";
+import TimePicker from "@/components/TimePicker";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 
@@ -30,6 +31,7 @@ const CreateEvent: FC = () => {
   const isTelegram = isTelegramApp();
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [date, setDate] = useState<Date>();
+  const [time, setTime] = useState<string>("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [eventName, setCourseName] = useState("");
   const [location, setLocation] = useState("");
@@ -106,11 +108,11 @@ const CreateEvent: FC = () => {
       const eventData = {
         name: eventName.trim(),
         date: date || new Date(),
-        time: "8-00",
+        time: time || "00:00",
         url: "",
         description: description.trim() || undefined,
         isFavorite: false,
-        location: "string",
+        location: location.trim() || "string",
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
       };
 
@@ -216,6 +218,13 @@ const CreateEvent: FC = () => {
               onChange={setDate}
               placeholder="Выберите дату события"
               minDate={new Date()}
+            />
+
+            <TimePicker
+              label="Время события *"
+              value={time}
+              onChange={setTime}
+              placeholder="00:00"
             />
           </div>
         )}
@@ -399,9 +408,9 @@ const CreateEvent: FC = () => {
                       })
                     : ""
                 }
-                time=""
+                time={time}
                 title={eventName}
-                location=""
+                location={location}
                 id="preview"
               />
             </div>
