@@ -58,7 +58,16 @@ const Home: FC = () => {
 
   // Преобразуем данные из Firebase в формат для EventsCarousel
   const upcomingEvents = useMemo(() => {
-    return eventsFromFirebase.map((event, index) => {
+    return eventsFromFirebase
+      .sort((a, b) => {
+        // Сортируем по дате от раннего к позднему
+        const dateA = a.date instanceof Date ? a.date :
+                     a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date instanceof Date ? b.date :
+                     b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      })
+      .map((event, index) => {
       // Приоритет отображения изображений:
       // 1. Первое изображение из imagesArray
       // 2. Поле image (для совместимости)

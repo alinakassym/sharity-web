@@ -24,6 +24,14 @@ const Events: FC = () => {
     today.setHours(0, 0, 0, 0);
 
     return eventsFromFirebase
+      .sort((a, b) => {
+        // Сортируем по дате от раннего к позднему
+        const dateA = a.date instanceof Date ? a.date :
+                     a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date instanceof Date ? b.date :
+                     b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      })
       .map((event, index) => {
         // Обработка изображений
         let imageUrl = `https://picsum.photos/320/200?random=${index + 10}`;
