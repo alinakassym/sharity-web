@@ -54,8 +54,8 @@ const TelegramUserInit: FC = () => {
           firstName: user.first_name,
           lastName: user.last_name,
           languageCode: user.language_code,
+          photoUrl: user.photo_url,
         };
-        // alert("Данные пользователя: " + JSON.stringify(user));
 
         const result = await createOrUpdateUser(userData);
 
@@ -95,6 +95,7 @@ const TelegramUserInit: FC = () => {
       firstName: user.first_name,
       lastName: user.last_name,
       languageCode: user.language_code,
+      photoUrl: user.photo_url,
     };
 
     const result = await createOrUpdateUser(userData);

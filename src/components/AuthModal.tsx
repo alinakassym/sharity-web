@@ -109,9 +109,7 @@ const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <VuesaxIcon name="user" size={20} color={c.primary} />
-              <span style={{ fontSize: 14, color: c.text }}>
-                Имя и фамилия
-              </span>
+              <span style={{ fontSize: 14, color: c.text }}>Имя и фамилия</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <VuesaxIcon name="profile" size={20} color={c.primary} />
@@ -120,8 +118,8 @@ const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <VuesaxIcon name="global" size={20} color={c.primary} />
-              <span style={{ fontSize: 14, color: c.text }}>Язык</span>
+              <VuesaxIcon name="camera" size={20} color={c.primary} />
+              <span style={{ fontSize: 14, color: c.text }}>Фото профиля</span>
             </div>
           </div>
         </div>

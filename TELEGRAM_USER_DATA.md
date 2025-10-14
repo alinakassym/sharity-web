@@ -13,6 +13,7 @@
 - `username` (string) - Логин в Telegram (например, @john_doe)
 - `language_code` (string) - Код языка интерфейса (ru, en, и т.д.)
 - `is_premium` (boolean) - Наличие Telegram Premium подписки
+- `photo_url` (string) - URL фото профиля пользователя
 
 ## Структура в Firebase (коллекция `users`)
 
@@ -23,7 +24,8 @@ interface UserData {
   firstName: string;         // Имя
   lastName?: string;         // Фамилия
   languageCode?: string;     // Код языка (ru, en)
-  isPremium?: boolean;       // Telegram Premium статус
+  allowsWriteToPm?: boolean; // Разрешение на личные сообщения
+  photoUrl?: string;         // URL фото профиля
   phoneNumber?: string;      // Номер телефона (зарезервировано для будущего)
   createdAt: Date;          // Дата первой регистрации
   lastLoginAt: Date;        // Дата последнего входа
@@ -72,7 +74,8 @@ if (user) {
     firstName: user.first_name,
     lastName: user.last_name,
     languageCode: user.language_code,
-    isPremium: user.is_premium,
+    allowsWriteToPm: user.allows_write_to_pm,
+    photoUrl: user.photo_url,
   });
 }
 ```

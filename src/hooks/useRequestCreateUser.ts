@@ -7,6 +7,8 @@ export interface UserData {
   firstName: string;
   lastName?: string;
   languageCode?: string;
+  allowsWriteToPm?: boolean;
+  photoUrl?: string;
   phoneNumber?: string; // Для будущего использования
   createdAt: Date;
   lastLoginAt: Date;
