@@ -3,11 +3,17 @@ import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import UserProfileCard from "@/components/UserProfileCard";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const Profile: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
+  const { userData, isLoading, error } = useCurrentUser();
+
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <section
@@ -22,13 +28,25 @@ const Profile: FC = () => {
         style={{
           padding: 16,
           display: "flex",
+          flex: 1,
           flexDirection: "column",
           gap: 16,
-          color: c.lightText,
           backgroundColor: c.background,
         }}
       >
-        В разработке...
+        {error && (
+          <div
+            style={{
+              color: c.error || "#FF6B6B",
+              textAlign: "center",
+              padding: 20,
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {userData && <UserProfileCard userData={userData} />}
       </div>
     </section>
   );
