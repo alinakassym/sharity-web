@@ -32,6 +32,7 @@ const CreateEvent: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>("");
+  const [url, setUrl] = useState<string>("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [eventName, setCourseName] = useState("");
   const [location, setLocation] = useState("");
@@ -172,7 +173,7 @@ const CreateEvent: FC = () => {
             style={{
               fontSize: 14,
               fontWeight: "600",
-              color: c.lightText,
+              color: c.text,
               margin: 0,
             }}
           >
@@ -231,6 +232,7 @@ const CreateEvent: FC = () => {
 
         {currentStep === "location" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <div id="map" style={{ width: "100%", height: 200 }}></div>
             <TextField
               label="Локация/адрес *"
               placeholder="Введите локацию/адрес"
@@ -351,6 +353,15 @@ const CreateEvent: FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               multiline
+              rows={6}
+              fullWidth
+              variant="outlined"
+            />
+            <TextField
+              label="Ссылка на источник"
+              placeholder="Вставьте ссылку"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
               rows={6}
               fullWidth
               variant="outlined"
