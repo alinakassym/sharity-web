@@ -24,15 +24,11 @@ const Header: FC<LocationHeaderProps> = ({
   const isTelegram = isTelegramApp();
 
   const onGoBack = () => {
-    if (onGoBack) {
-      onGoBack();
-    } else {
-      navigate(-1);
-    }
+    navigate(-1);
   };
 
   const onClose = () => {
-    navigate("/");
+    navigate("/add");
   };
 
   return (
@@ -67,8 +63,9 @@ const Header: FC<LocationHeaderProps> = ({
         {showGoBackBtn && (
           <div
             style={{
+              marginLeft: -8,
               paddingTop: 0,
-              width: 56,
+              width: 40,
               height: 40,
               display: "flex",
               alignItems: "center",

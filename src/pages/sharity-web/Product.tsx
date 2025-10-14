@@ -6,6 +6,7 @@ import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
+import Container from "@/components/Container";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -96,14 +97,7 @@ const Product: FC = () => {
   }
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 112 : 64,
-        minHeight: "100vh",
-        paddingBottom: "160px",
-        backgroundColor: c.background,
-      }}
-    >
+    <Container paddingTop={isTelegram ? 112 : 64}>
       {/* Header с кнопкой назад */}
       <ProductHeader onGoBack={handleBackClick} />
 
@@ -220,7 +214,7 @@ const Product: FC = () => {
           </button>
         </div>
       </div>
-    </section>
+    </Container>
   );
 };
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { useRequestCreateEvent } from "@/hooks/useRequestCreateEvent";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
@@ -16,19 +17,23 @@ import {
 } from "@mui/material";
 import EventCard from "@/components/EventCard";
 import DatePicker from "@/components/DatePicker";
+import Container from "@/components/Container";
+import Header from "@/components/Header";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
 const CreateEvent: FC = () => {
+  const navigate = useNavigate();
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+
+  const isTelegram = isTelegramApp();
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [date, setDate] = useState<Date>();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [eventName, setCourseName] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  const scheme = useColorScheme();
-  const colors = Colors[scheme];
-  const navigate = useNavigate();
 
   const { createEvent, isLoading: isCreating } = useRequestCreateEvent();
 
@@ -137,40 +142,15 @@ const CreateEvent: FC = () => {
   };
 
   return (
-    <section style={{ position: "fixed", left: 0, right: 0 }}>
+    <Container paddingTop={isTelegram ? 92 : 44}>
       {/* Header */}
-      <div
-        style={{
-          paddingLeft: 16,
-          paddingRight: 56,
-          height: 64,
-          display: "flex",
-          flex: 1,
-          alignItems: "center",
-          borderBottomStyle: "solid",
-          borderBottomWidth: 1,
-          borderBottomColor: colors.surfaceColor,
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <h1
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              color: colors.text,
-              margin: 0,
-            }}
-          >
-            Размещение: Событие
-          </h1>
-        </div>
-      </div>
+      <Header title="Размещение: Событие" showGoBackBtn />
 
       {/* Progress Bar */}
       <div
         style={{
           padding: "16px 16px 8px",
-          backgroundColor: colors.background,
+          backgroundColor: c.background,
         }}
       >
         <Stepper activeStep={currentStepIndex} alternativeLabel>
@@ -185,7 +165,7 @@ const CreateEvent: FC = () => {
             style={{
               fontSize: 14,
               fontWeight: "600",
-              color: colors.lightText,
+              color: c.lightText,
               margin: 0,
             }}
           >
@@ -194,7 +174,7 @@ const CreateEvent: FC = () => {
           <p
             style={{
               fontSize: 14,
-              color: colors.lightText,
+              color: c.lightText,
               margin: 0,
             }}
           >
@@ -211,7 +191,7 @@ const CreateEvent: FC = () => {
           padding: "16px 16px 100px",
           height: "calc(100vh - 290px)",
           overflowY: "auto",
-          backgroundColor: colors.background,
+          backgroundColor: c.background,
         }}
       >
         {currentStep === "basic" && (
@@ -250,20 +230,20 @@ const CreateEvent: FC = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div
               style={{
-                border: `2px dashed ${colors.border}`,
+                border: `2px dashed ${c.border}`,
                 borderRadius: 12,
                 padding: 32,
                 textAlign: "center",
-                backgroundColor: colors.surfaceColor,
+                backgroundColor: c.surfaceColor,
               }}
             >
-              <VuesaxIcon name="camera" color={colors.lightText} size={48} />
+              <VuesaxIcon name="camera" color={c.lightText} size={48} />
               <p
                 style={{
                   margin: "16px 0 8px",
                   fontSize: 16,
                   fontWeight: 600,
-                  color: colors.text,
+                  color: c.text,
                 }}
               >
                 Добавьте изображение/фото
@@ -272,7 +252,7 @@ const CreateEvent: FC = () => {
                 style={{
                   margin: "0 0 16px",
                   fontSize: 14,
-                  color: colors.lightText,
+                  color: c.lightText,
                 }}
               >
                 Выберите изображение
@@ -281,7 +261,7 @@ const CreateEvent: FC = () => {
                 component="label"
                 variant="contained"
                 startIcon={
-                  <VuesaxIcon name="camera" color={colors.lighter} size={20} />
+                  <VuesaxIcon name="camera" color={c.lighter} size={20} />
                 }
               >
                 Выбрать
@@ -300,7 +280,7 @@ const CreateEvent: FC = () => {
                   style={{
                     margin: "0 0 12px",
                     fontSize: 16,
-                    color: colors.text,
+                    color: c.text,
                   }}
                 >
                   Выбранные изображения ({selectedFiles.length}):
@@ -321,7 +301,7 @@ const CreateEvent: FC = () => {
                         height: 80,
                         borderRadius: 8,
                         overflow: "hidden",
-                        backgroundColor: colors.controlColor,
+                        backgroundColor: c.controlColor,
                       }}
                     >
                       <img
@@ -340,18 +320,14 @@ const CreateEvent: FC = () => {
                           position: "absolute",
                           top: 4,
                           right: 4,
-                          borderColor: colors.error,
+                          borderColor: c.error,
                           borderWidth: 1,
                           borderStyle: "solid",
                           boxSizing: "content-box",
-                          backgroundColor: `${colors.error}40`,
+                          backgroundColor: `${c.error}40`,
                         }}
                       >
-                        <VuesaxIcon
-                          name="close"
-                          size={6}
-                          color={colors.error}
-                        />
+                        <VuesaxIcon name="close" size={6} color={c.error} />
                       </IconButton>
                     </div>
                   ))}
@@ -383,7 +359,7 @@ const CreateEvent: FC = () => {
                 style={{
                   fontSize: 18,
                   fontWeight: 600,
-                  color: colors.text,
+                  color: c.text,
                   margin: "0 0 8px",
                 }}
               >
@@ -392,7 +368,7 @@ const CreateEvent: FC = () => {
               <p
                 style={{
                   fontSize: 14,
-                  color: colors.lightText,
+                  color: c.lightText,
                   margin: 0,
                 }}
               >
@@ -427,7 +403,7 @@ const CreateEvent: FC = () => {
               <div
                 style={{
                   padding: 16,
-                  backgroundColor: colors.surfaceColor,
+                  backgroundColor: c.surfaceColor,
                   borderRadius: 12,
                   marginTop: 8,
                 }}
@@ -436,7 +412,7 @@ const CreateEvent: FC = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: 600,
-                    color: colors.text,
+                    color: c.text,
                     margin: "0 0 8px",
                   }}
                 >
@@ -445,7 +421,7 @@ const CreateEvent: FC = () => {
                 <p
                   style={{
                     fontSize: 14,
-                    color: colors.text,
+                    color: c.text,
                     margin: 0,
                     lineHeight: 1.5,
                   }}
@@ -459,7 +435,7 @@ const CreateEvent: FC = () => {
               <div
                 style={{
                   padding: 16,
-                  backgroundColor: colors.surfaceColor,
+                  backgroundColor: c.surfaceColor,
                   borderRadius: 12,
                 }}
               >
@@ -467,7 +443,7 @@ const CreateEvent: FC = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: 600,
-                    color: colors.text,
+                    color: c.text,
                     margin: "0 0 12px",
                   }}
                 >
@@ -508,8 +484,8 @@ const CreateEvent: FC = () => {
           left: 0,
           right: 0,
           padding: 16,
-          backgroundColor: colors.background,
-          borderTop: `1px solid ${colors.surfaceColor}`,
+          backgroundColor: c.background,
+          borderTop: `1px solid ${c.surfaceColor}`,
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
@@ -540,7 +516,7 @@ const CreateEvent: FC = () => {
             : "Далее"}
         </Button>
       </div>
-    </section>
+    </Container>
   );
 };
 

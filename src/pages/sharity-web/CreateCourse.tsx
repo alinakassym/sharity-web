@@ -144,7 +144,7 @@ const Create: FC = () => {
   return (
     <Container paddingTop={isTelegram ? 92 : 44}>
       {/* Header */}
-      <Header title="Размещение: Классы/Школы" />
+      <Header title="Размещение: Классы/Школы" showGoBackBtn />
 
       {/* Progress Bar */}
       <div

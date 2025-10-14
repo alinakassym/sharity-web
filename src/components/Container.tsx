@@ -16,17 +16,17 @@ const Container: FC<ThemeProviderProps> = ({
   children,
 }) => {
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
   const isTelegram = isTelegramApp();
 
   return (
     <section
       style={{
         position: "relative",
-        paddingTop: isTelegram ? paddingTop : 44,
+        paddingTop: paddingTop ? paddingTop : isTelegram ? paddingTop : 44,
         minHeight: "100vh",
         paddingBottom: "160px",
-        backgroundColor: colors.background,
+        backgroundColor: c.background,
       }}
     >
       {showLocationHeader && <LocationHeader />}
