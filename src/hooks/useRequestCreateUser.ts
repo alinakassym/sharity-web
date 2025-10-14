@@ -41,7 +41,7 @@ export const useRequestCreateUser = () => {
         await setDoc(
           userRef,
           {
-            ...userData,
+            // ...userData,
             lastLoginAt: new Date(),
           },
           { merge: true },
@@ -52,6 +52,9 @@ export const useRequestCreateUser = () => {
         // Новый пользователь - создаем документ
         const dataToSave: UserData = {
           ...userData,
+          firstName: userData?.firstName ?? "",
+          lastName: userData?.lastName ?? "",
+          photoUrl: userData?.photoUrl ?? "",
           createdAt: new Date(),
           lastLoginAt: new Date(),
         };
