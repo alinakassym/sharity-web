@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
@@ -30,6 +30,7 @@ const CreateEvent: FC = () => {
   const c = Colors[scheme];
 
   const isTelegram = isTelegramApp();
+  const [isPublishing, setIsPublishing] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>("");
@@ -38,8 +39,9 @@ const CreateEvent: FC = () => {
   const [eventName, setCourseName] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
+  const locationInputRef = useRef<HTMLDivElement>(null);
 
-  const { createEvent, isLoading: isCreating } = useRequestCreateEvent();
+  const { createEvent } = useRequestCreateEvent();
 
   // Тестируем подключение к Minio при загрузке компонента
   useEffect(() => {
@@ -90,6 +92,7 @@ const CreateEvent: FC = () => {
       setCurrentStep(steps[currentStepIndex + 1].id);
     } else {
       // Публикация товара
+      setIsPublishing(true);
       handlePublish();
     }
   };
@@ -122,7 +125,7 @@ const CreateEvent: FC = () => {
 
       if (result.success) {
         alert("Успешно добавлено!");
-        navigate("/classes");
+        navigate("/add");
       } else {
         alert(`Ошибка: ${result.error}`);
       }
@@ -197,8 +200,8 @@ const CreateEvent: FC = () => {
         style={{
           position: "relative",
           width: "100%",
-          padding: "16px 16px 100px",
-          height: "calc(100vh - 290px)",
+          padding: "16px 16px 250px",
+          // height: "calc(100vh - 290px)",
           overflowY: "auto",
           backgroundColor: c.background,
         }}
@@ -233,18 +236,29 @@ const CreateEvent: FC = () => {
 
         {currentStep === "location" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <YandexMap
-              apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
-              height={300}
-              onLocationSelect={(address) => {
-                setLocation(address);
-              }}
-            />
+            <div style={{ width: "80%", alignSelf: "center" }}>
+              <YandexMap
+                apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
+                height={300}
+                onLocationSelect={(address) => {
+                  setLocation(address);
+                }}
+              />
+            </div>
             <TextField
+              ref={locationInputRef}
               label="Локация/адрес *"
               placeholder="Введите локацию/адрес"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              onFocus={() => {
+                setTimeout(() => {
+                  locationInputRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }, 400);
+              }}
               fullWidth
               variant="outlined"
             />
@@ -490,10 +504,10 @@ const CreateEvent: FC = () => {
           fullWidth
           variant="contained"
           onClick={handleNext}
-          disabled={isCreating}
+          disabled={isPublishing}
         >
           {currentStepIndex === steps.length - 1
-            ? isCreating
+            ? isPublishing
               ? "Публикуем..."
               : "Опубликовать"
             : "Далее"}
