@@ -20,7 +20,7 @@ import DatePicker from "@/components/DatePicker";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 
-type StepType = "basic" | "photos" | "details" | "review";
+type StepType = "basic" | "location" | "photos" | "details" | "review";
 
 const CreateEvent: FC = () => {
   const navigate = useNavigate();
@@ -51,7 +51,12 @@ const CreateEvent: FC = () => {
     {
       id: "basic",
       title: "Основная информация",
-      description: "Заголовок, дата, локация",
+      description: "Заголовок, дата, время",
+    },
+    {
+      id: "location",
+      title: "Локация",
+      description: "Адрес",
     },
     { id: "photos", title: "Изображение", description: "Добавьте изображение" },
     {
@@ -212,17 +217,19 @@ const CreateEvent: FC = () => {
               placeholder="Выберите дату события"
               minDate={new Date()}
             />
+          </div>
+        )}
 
-            <div>
-              <TextField
-                label="Локация/адрес *"
-                placeholder="Введите локацию/адрес"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
-            </div>
+        {currentStep === "location" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <TextField
+              label="Локация/адрес *"
+              placeholder="Введите локацию/адрес"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              fullWidth
+              variant="outlined"
+            />
           </div>
         )}
 
