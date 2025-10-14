@@ -14,6 +14,8 @@ interface EventCardProps {
   participants?: number;
   participantAvatars?: string[];
   showParticipants?: boolean;
+  cardWidth?: string | number;
+  cardHeight?: string | number;
 }
 
 const EventCard: FC<EventCardProps> = ({
@@ -26,6 +28,8 @@ const EventCard: FC<EventCardProps> = ({
   participants,
   participantAvatars = [],
   showParticipants = false,
+  cardWidth = 320,
+  cardHeight = 200,
 }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
@@ -38,8 +42,8 @@ const EventCard: FC<EventCardProps> = ({
   return (
     <div
       style={{
-        minWidth: 320,
-        maxWidth: 320,
+        minWidth: cardWidth,
+        maxWidth: cardWidth,
         borderRadius: 20,
         backgroundColor: colors.surfaceColor,
         overflow: "hidden",
@@ -48,7 +52,7 @@ const EventCard: FC<EventCardProps> = ({
       }}
     >
       {/* Image with Date Badge */}
-      <div style={{ position: "relative", height: 200 }}>
+      <div style={{ position: "relative", height: cardHeight }}>
         <img
           src={image}
           alt={title}
