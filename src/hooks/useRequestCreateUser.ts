@@ -13,6 +13,17 @@ export interface UserData {
 }
 
 export const useRequestCreateUser = () => {
+  const checkUserExists = async (telegramId: number): Promise<boolean> => {
+    try {
+      const userRef = doc(db, "users", telegramId.toString());
+      const userSnap = await getDoc(userRef);
+      return userSnap.exists();
+    } catch (err) {
+      console.error("Ошибка при проверке пользователя:", err);
+      return false;
+    }
+  };
+
   const createOrUpdateUser = async (
     userData: Omit<UserData, "createdAt" | "lastLoginAt">,
   ) => {
@@ -58,6 +69,7 @@ export const useRequestCreateUser = () => {
   };
 
   return {
+    checkUserExists,
     createOrUpdateUser,
   };
 };
