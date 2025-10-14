@@ -4,6 +4,7 @@ import { useBodyBackground } from "./hooks/useBodyBackground";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import StoreTabBar from "./components/StoreTabBar";
 import MainTabBar from "./components/MainTabBar";
+import TelegramUserInit from "./components/TelegramUserInit";
 import Home from "./pages/sharity-web/Home";
 import Classes from "./pages/sharity-web/Classes";
 import Events from "./pages/sharity-web/Events";
@@ -18,8 +19,10 @@ import CreateEvent from "./pages/sharity-web/CreateEvent";
 import Course from "./pages/sharity-web/Course";
 import Add from "./pages/sharity-web/Add";
 import Profile from "./pages/sharity-web/Profile";
+import { isTelegramApp } from "./lib/telegram";
 
 const AppContent: FC = () => {
+  const isTelegram = isTelegramApp();
   const { pathname } = useLocation();
   const path = pathname.replace(import.meta.env.BASE_URL, "/");
   const showMainTabBar = ["/", "/add", "/profile"].includes(path);
@@ -29,6 +32,9 @@ const AppContent: FC = () => {
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
+      {/* Инициализация пользователя Telegram при старте */}
+      {isTelegram && <TelegramUserInit />}
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="classes" element={<Classes />} />
