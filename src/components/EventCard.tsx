@@ -1,5 +1,4 @@
 import type { FC } from "react";
-import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
@@ -11,6 +10,7 @@ interface EventCardProps {
   time: string;
   title: string;
   location: string;
+  url?: string;
   participants?: number;
   participantAvatars?: string[];
   showParticipants?: boolean;
@@ -25,22 +25,25 @@ const EventCard: FC<EventCardProps> = ({
   time,
   title,
   location,
+  url,
   participants,
   participantAvatars = [],
   showParticipants = false,
   cardWidth = 320,
   cardHeight = 200,
 }) => {
-  const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
-  const handleViewAll = () => {
-    navigate(`/events/${id}`);
+  const handleRegistration = () => {
+    if (url) {
+      window.open(url, "_blank");
+    }
   };
 
   return (
     <div
+      key={id}
       style={{
         minWidth: cardWidth,
         maxWidth: cardWidth,
@@ -109,35 +112,37 @@ const EventCard: FC<EventCardProps> = ({
         </div>
 
         {/* Title and Button Overlay */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: 16,
-            background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
-          }}
-        >
-          <button
-            onClick={handleViewAll}
+        {url && (
+          <div
             style={{
-              backgroundColor: colors.text,
-              color: colors.background,
-              border: "none",
-              borderRadius: 8,
-              padding: "8px 16px",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: 16,
+              background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
             }}
           >
-            Регистрация
-          </button>
-        </div>
+            <button
+              onClick={handleRegistration}
+              style={{
+                backgroundColor: colors.text,
+                color: colors.background,
+                border: "none",
+                borderRadius: 8,
+                padding: "8px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              Подробнее
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}

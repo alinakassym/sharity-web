@@ -134,7 +134,7 @@ const CreateEvent: FC = () => {
         category: finalCategory, // Категория события
         date: eventDateTime, // Дата + время вместе
         time: time || "00:00", // Время отдельно как строка
-        url: "",
+        url: url.trim() || undefined,
         description: description.trim() || undefined,
         isFavorite: false,
         location: location.trim() || "string",
@@ -463,6 +463,7 @@ const CreateEvent: FC = () => {
                 time={time}
                 title={eventName}
                 location={location}
+                url={url}
                 id="preview"
               />
             </div>

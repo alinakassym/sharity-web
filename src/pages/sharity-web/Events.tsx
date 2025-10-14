@@ -72,6 +72,7 @@ const Events: FC = () => {
           time: event.time ?? "",
           title: event.name ?? "",
           location: event.location ?? "",
+          url: event.url ?? "",
           participants: event.participants ?? 0,
           participantAvatars: event.participantAvatars ?? [],
           eventDate,
