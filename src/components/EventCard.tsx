@@ -13,6 +13,7 @@ interface EventCardProps {
   location: string;
   participants?: number;
   participantAvatars?: string[];
+  showParticipants?: boolean;
 }
 
 const EventCard: FC<EventCardProps> = ({
@@ -24,6 +25,7 @@ const EventCard: FC<EventCardProps> = ({
   location,
   participants,
   participantAvatars = [],
+  showParticipants = false,
 }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
@@ -173,51 +175,53 @@ const EventCard: FC<EventCardProps> = ({
         </div>
 
         {/* Participants */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          {/* Avatars */}
-          <div style={{ display: "flex", marginLeft: 8 }}>
-            {participantAvatars.slice(0, 4).map((avatar, index) => (
-              <div
-                key={index}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  border: `2px solid ${colors.background}`,
-                  marginLeft: -8,
-                  backgroundColor: colors.surfaceColor,
-                }}
-              >
-                <img
-                  src={avatar}
-                  alt={`Participant ${index + 1}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Participant Count */}
-          <span
+        {showParticipants && (
+          <div
             style={{
-              fontSize: 14,
-              color: colors.lightText,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
             }}
           >
-            +{participants} участников
-          </span>
-        </div>
+            {/* Avatars */}
+            <div style={{ display: "flex", marginLeft: 8 }}>
+              {participantAvatars.slice(0, 4).map((avatar, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    border: `2px solid ${colors.background}`,
+                    marginLeft: -8,
+                    backgroundColor: colors.surfaceColor,
+                  }}
+                >
+                  <img
+                    src={avatar}
+                    alt={`Participant ${index + 1}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Participant Count */}
+            <span
+              style={{
+                fontSize: 14,
+                color: colors.lightText,
+              }}
+            >
+              +{participants} участников
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
