@@ -19,6 +19,9 @@ import EventCard from "@/components/EventCard";
 import DatePicker from "@/components/DatePicker";
 import TimePicker from "@/components/TimePicker";
 import YandexMap from "@/components/YandexMap";
+import EventCategoryPicker, {
+  type EventCategory,
+} from "@/components/EventCategoryPicker";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 
@@ -39,6 +42,8 @@ const CreateEvent: FC = () => {
   const [eventName, setCourseName] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<EventCategory | string>("");
+  const [customCategory, setCustomCategory] = useState("");
   const locationInputRef = useRef<HTMLDivElement>(null);
 
   const { createEvent } = useRequestCreateEvent();
@@ -117,8 +122,13 @@ const CreateEvent: FC = () => {
         eventDateTime.setHours(hours, minutes, 0, 0);
       }
 
+      // Определяем итоговую категорию
+      const finalCategory =
+        category === "Другое" ? customCategory.trim() : category;
+
       const eventData = {
         name: eventName.trim(),
+        category: finalCategory, // Категория события
         date: eventDateTime, // Дата + время вместе
         time: time || "00:00", // Время отдельно как строка
         url: "",
@@ -222,6 +232,13 @@ const CreateEvent: FC = () => {
               onChange={(e) => setCourseName(e.target.value)}
               fullWidth
               variant="outlined"
+            />
+
+            <EventCategoryPicker
+              value={category}
+              onChange={setCategory}
+              customValue={customCategory}
+              onCustomValueChange={setCustomCategory}
             />
 
             <DatePicker
