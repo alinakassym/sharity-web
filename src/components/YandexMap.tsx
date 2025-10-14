@@ -35,7 +35,7 @@ interface YandexMapEvent {
 
 const YandexMap: FC<YandexMapProps> = ({
   apiKey,
-  center = [51.1694, 71.4491], // Астана по умолчанию
+  center = [51.091241, 71.458519], // Астана по умолчанию
   zoom = 12,
   onLocationSelect,
   height = 400,

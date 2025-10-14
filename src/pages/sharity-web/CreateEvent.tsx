@@ -234,7 +234,7 @@ const CreateEvent: FC = () => {
         {currentStep === "location" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
             <YandexMap
-              apiKey="859a058a-12f3-412a-ae09-c427ecde4b95"
+              apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
               height={300}
               onLocationSelect={(address) => {
                 setLocation(address);
