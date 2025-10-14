@@ -12,17 +12,16 @@ import {
   StepLabel,
   Button,
   TextField,
-  FormControl,
-  InputLabel,
   IconButton,
 } from "@mui/material";
 import EventCard from "@/components/EventCard";
+import DatePicker from "@/components/DatePicker";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
 const CreateEvent: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
-  const [date, setDate] = useState();
+  const [date, setDate] = useState<Date>();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [eventName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
@@ -95,7 +94,7 @@ const CreateEvent: FC = () => {
 
       const eventData = {
         name: eventName.trim(),
-        date: new Date(),
+        date: date || new Date(),
         time: "8-00",
         url: "",
         description: description.trim() || undefined,
@@ -223,10 +222,13 @@ const CreateEvent: FC = () => {
               variant="outlined"
             />
 
-            <FormControl fullWidth>
-              <InputLabel>Дата события *</InputLabel>
-              {/* TODO: добавить контрол для выбора даты */}
-            </FormControl>
+            <DatePicker
+              label="Дата события *"
+              value={date}
+              onChange={setDate}
+              placeholder="Выберите дату события"
+              minDate={new Date()}
+            />
           </div>
         )}
 
@@ -392,7 +394,15 @@ const CreateEvent: FC = () => {
                     ? URL.createObjectURL(selectedFiles[0])
                     : "https://picsum.photos/600?preview"
                 }
-                date={date ?? ""}
+                date={
+                  date
+                    ? date.toLocaleDateString("ru-RU", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })
+                    : ""
+                }
                 time=""
                 title={eventName}
                 location=""
