@@ -401,11 +401,12 @@ const CreateEvent: FC = () => {
                 }
                 date={
                   date
-                    ? date.toLocaleDateString("ru-RU", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })
+                    ? `${date.getDate()} ${date
+                        .toLocaleDateString("ru-RU", {
+                          month: "short",
+                        })
+                        .toUpperCase()
+                        .replace(".", "")}`
                     : ""
                 }
                 time={time}
