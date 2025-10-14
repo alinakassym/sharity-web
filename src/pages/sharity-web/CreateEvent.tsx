@@ -132,13 +132,13 @@ const CreateEvent: FC = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const filesArray = Array.from(files);
-      // Фильтруем только изображения
-      const imageFiles = filesArray.filter((file) =>
-        file.type.startsWith("image/"),
-      );
-      setSelectedFiles([...selectedFiles, ...imageFiles]);
+    if (files && files.length > 0) {
+      const file = files[0];
+      // Проверяем, что это изображение
+      if (file.type.startsWith("image/")) {
+        // Заменяем предыдущее фото новым (всегда только одно фото)
+        setSelectedFiles([file]);
+      }
     }
   };
 
@@ -299,54 +299,44 @@ const CreateEvent: FC = () => {
                     color: c.text,
                   }}
                 >
-                  Выбранные изображения ({selectedFiles.length}):
+                  Выбранное изображение:
                 </h3>
                 <div
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                    gap: 8,
+                    position: "relative",
+                    width: "100%",
+                    maxWidth: 200,
+                    height: 200,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    backgroundColor: c.controlColor,
                   }}
                 >
-                  {selectedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        position: "relative",
-                        width: 80,
-                        height: 80,
-                        borderRadius: 8,
-                        overflow: "hidden",
-                        backgroundColor: c.controlColor,
-                      }}
-                    >
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <IconButton
-                        onClick={() => removeFile(index)}
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          top: 4,
-                          right: 4,
-                          borderColor: c.error,
-                          borderWidth: 1,
-                          borderStyle: "solid",
-                          boxSizing: "content-box",
-                          backgroundColor: `${c.error}40`,
-                        }}
-                      >
-                        <VuesaxIcon name="close" size={6} color={c.error} />
-                      </IconButton>
-                    </div>
-                  ))}
+                  <img
+                    src={URL.createObjectURL(selectedFiles[0])}
+                    alt="Selected"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <IconButton
+                    onClick={() => removeFile(0)}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      borderColor: c.error,
+                      borderWidth: 1,
+                      borderStyle: "solid",
+                      boxSizing: "content-box",
+                      backgroundColor: `${c.error}40`,
+                    }}
+                  >
+                    <VuesaxIcon name="close" size={6} color={c.error} />
+                  </IconButton>
                 </div>
               </div>
             )}
@@ -445,48 +435,6 @@ const CreateEvent: FC = () => {
                 >
                   {description}
                 </p>
-              </div>
-            )}
-
-            {selectedFiles.length > 1 && (
-              <div
-                style={{
-                  padding: 16,
-                  backgroundColor: c.surfaceColor,
-                  borderRadius: 12,
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: c.text,
-                    margin: "0 0 12px",
-                  }}
-                >
-                  Дополнительные фото ({selectedFiles.length - 1})
-                </h4>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))",
-                    gap: 8,
-                  }}
-                >
-                  {selectedFiles.slice(1).map((file, index) => (
-                    <img
-                      key={index}
-                      src={URL.createObjectURL(file)}
-                      alt={`Photo ${index + 2}`}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                      }}
-                    />
-                  ))}
-                </div>
               </div>
             )}
           </div>
