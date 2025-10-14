@@ -14,7 +14,7 @@ const Events: FC = () => {
   const isTelegram = isTelegramApp();
 
   const [searchValue, setSearchValue] = useState("");
-  const [dateFilter, setDateFilter] = useState<DateFilterOption>("today");
+  const [dateFilter, setDateFilter] = useState<DateFilterOption>("all");
 
   const { events: eventsFromFirebase, isLoading } = useRequestGetEvents();
 
@@ -84,6 +84,10 @@ const Events: FC = () => {
           eventDay.setHours(0, 0, 0, 0);
 
           switch (dateFilter) {
+            case "all":
+              matchesDate = true; // Показываем все события
+              break;
+
             case "today":
               matchesDate = eventDay.getTime() === today.getTime();
               break;

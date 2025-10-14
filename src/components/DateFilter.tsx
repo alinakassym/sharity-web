@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 
-export type DateFilterOption = "today" | "this-week" | "weekend";
+export type DateFilterOption = "all" | "today" | "this-week" | "weekend";
 
 interface DateFilterProps {
   selected: DateFilterOption;
@@ -18,6 +18,11 @@ const DateFilter: FC<DateFilterProps> = ({ selected, onChange }) => {
     label: string;
     subtitle: string;
   }> = [
+    {
+      id: "all",
+      label: "Все",
+      subtitle: "Все события",
+    },
     {
       id: "today",
       label: "Сегодня",
