@@ -1,10 +1,12 @@
 import type { FC } from "react";
+import { useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
 import Container from "@/components/Container";
+import { useRequestGetEvents } from "@/hooks/useRequestGetEvents";
 import bannerImage from "@/assets/banner.png";
 import menuImg1 from "@/assets/menu-img1.png";
 import menuImg2 from "@/assets/menu-img2.jpg";
@@ -13,6 +15,7 @@ import menuImg3 from "@/assets/menu-img3.png";
 const Home: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const { events: eventsFromFirebase, isLoading } = useRequestGetEvents();
 
   const carouselItems = [
     {
@@ -53,53 +56,53 @@ const Home: FC = () => {
     },
   ];
 
-  const upcomingEvents = [
-    {
-      id: "1",
-      image: "https://picsum.photos/320/200?random=10",
-      date: "30 АВГ",
-      time: "12:30",
-      title: "МИНИ МАРАФОН",
-      location: "Триатлон парк",
-      participants: 170,
-      participantAvatars: [
-        "https://i.pravatar.cc/150?img=1",
-        "https://i.pravatar.cc/150?img=2",
-        "https://i.pravatar.cc/150?img=3",
-        "https://i.pravatar.cc/150?img=4",
-      ],
-    },
-    {
-      id: "2",
-      image: "https://picsum.photos/320/200?random=11",
-      date: "15 СЕН",
-      time: "10:00",
-      title: "ТАНЦЕВАЛЬНЫЙ ФЕСТИВАЛЬ",
-      location: "Центр культуры",
-      participants: 250,
-      participantAvatars: [
-        "https://i.pravatar.cc/150?img=5",
-        "https://i.pravatar.cc/150?img=6",
-        "https://i.pravatar.cc/150?img=7",
-        "https://i.pravatar.cc/150?img=8",
-      ],
-    },
-    {
-      id: "3",
-      image: "https://picsum.photos/320/200?random=12",
-      date: "20 СЕН",
-      time: "14:00",
-      title: "ФУТБОЛЬНЫЙ ТУРНИР",
-      location: "Стадион Астана",
-      participants: 320,
-      participantAvatars: [
-        "https://i.pravatar.cc/150?img=9",
-        "https://i.pravatar.cc/150?img=10",
-        "https://i.pravatar.cc/150?img=11",
-        "https://i.pravatar.cc/150?img=12",
-      ],
-    },
-  ];
+  // Преобразуем данные из Firebase в формат для EventsCarousel
+  const upcomingEvents = useMemo(() => {
+    return eventsFromFirebase.map((event, index) => {
+      // Приоритет отображения изображений:
+      // 1. Первое изображение из imagesArray
+      // 2. Поле image (для совместимости)
+      // 3. Fallback заглушка
+      let imageUrl = `https://picsum.photos/320/200?random=${index + 10}`;
+
+      if (event.imagesArray && event.imagesArray.length > 0) {
+        imageUrl = event.imagesArray[0];
+      } else if (event.image) {
+        imageUrl = event.image;
+      }
+
+      // Форматируем дату
+      let formattedDate = "";
+      if (event.date) {
+        try {
+          const dateObj =
+            event.date instanceof Date
+              ? event.date
+              : event.date.toDate
+                ? event.date.toDate()
+                : new Date(event.date);
+
+          formattedDate = `${dateObj.getDate()} ${dateObj
+            .toLocaleDateString("ru-RU", { month: "short" })
+            .toUpperCase()
+            .replace(".", "")}`;
+        } catch (e) {
+          console.error("Ошибка форматирования даты:", e);
+        }
+      }
+
+      return {
+        id: event.id,
+        image: imageUrl,
+        date: formattedDate,
+        time: event.time ?? "",
+        title: event.name ?? "",
+        location: event.location ?? "",
+        participants: event.participants ?? 0,
+        participantAvatars: event.participantAvatars ?? [],
+      };
+    });
+  }, [eventsFromFirebase]);
 
   return (
     <Container showLocationHeader paddingTop={92}>
@@ -119,7 +122,20 @@ const Home: FC = () => {
         <MenuButtons items={menuItems} />
 
         {/* Upcoming Events */}
-        <EventsCarousel events={upcomingEvents} />
+        {isLoading ? (
+          <div
+            style={{
+              padding: 16,
+              textAlign: "center",
+              color: c.lightText,
+              backgroundColor: c.background,
+            }}
+          >
+            Загрузка событий...
+          </div>
+        ) : (
+          <EventsCarousel events={upcomingEvents} />
+        )}
       </div>
     </Container>
   );
