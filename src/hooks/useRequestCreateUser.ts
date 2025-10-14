@@ -4,7 +4,7 @@ import { db } from "@/lib/firebase";
 export interface UserData {
   telegramId: number;
   username?: string;
-  firstName: string;
+  firstName?: string; // Теперь опционально - зависит от выбора пользователя
   lastName?: string;
   languageCode?: string;
   allowsWriteToPm?: boolean;

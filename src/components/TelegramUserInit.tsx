@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FC } from "react";
 import { getTelegramUser, isTelegramApp } from "@/lib/telegram";
 import { useRequestCreateUser } from "@/hooks/useRequestCreateUser";
-import AuthModal from "./AuthModal";
+import AuthModal, { type AuthPermissions } from "./AuthModal";
 import LoadingScreen from "./LoadingScreen";
 
 /**
@@ -80,7 +80,7 @@ const TelegramUserInit: FC = () => {
     checkAndInitUser();
   }, [createOrUpdateUser, checkUserExists]);
 
-  const handleAuthConfirm = async () => {
+  const handleAuthConfirm = async (permissions: AuthPermissions) => {
     const { user } = getTelegramUser();
 
     if (!user) {
@@ -89,13 +89,14 @@ const TelegramUserInit: FC = () => {
       return;
     }
 
+    // Создаем объект с данными в зависимости от выбранных разрешений
     const userData = {
       telegramId: user.id,
       username: user.username,
-      firstName: user.first_name,
-      lastName: user.last_name,
+      firstName: permissions.includeFirstName ? user.first_name : undefined,
+      lastName: permissions.includeLastName ? user.last_name : undefined,
       languageCode: user.language_code,
-      photoUrl: user.photo_url,
+      photoUrl: permissions.includePhoto ? user.photo_url : undefined,
     };
 
     const result = await createOrUpdateUser(userData);
@@ -105,6 +106,7 @@ const TelegramUserInit: FC = () => {
         "✅ Новый пользователь зарегистрирован:",
         user.username || user.first_name,
       );
+      console.log("Выбранные разрешения:", permissions);
       setShowAuthModal(false);
     } else {
       console.error("❌ Ошибка при регистрации пользователя:", result.error);

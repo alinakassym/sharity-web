@@ -2,11 +2,17 @@ import { useState } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { Button } from "@mui/material";
+import { Button, Checkbox, FormControlLabel } from "@mui/material";
 import VuesaxIcon from "./icons/VuesaxIcon";
 
+export interface AuthPermissions {
+  includeFirstName: boolean;
+  includeLastName: boolean;
+  includePhoto: boolean;
+}
+
 interface AuthModalProps {
-  onConfirm: () => void;
+  onConfirm: (permissions: AuthPermissions) => void;
   onCancel: () => void;
 }
 
@@ -14,10 +20,17 @@ const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const [isConfirming, setIsConfirming] = useState(false);
+  const [includeFirstName, setIncludeFirstName] = useState(true);
+  const [includeLastName, setIncludeLastName] = useState(true);
+  const [includePhoto, setIncludePhoto] = useState(true);
 
   const handleConfirm = async () => {
     setIsConfirming(true);
-    await onConfirm();
+    await onConfirm({
+      includeFirstName,
+      includeLastName,
+      includePhoto,
+    });
     setIsConfirming(false);
   };
 
@@ -89,38 +102,120 @@ const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
             fontSize: 15,
             color: c.lightText,
             lineHeight: 1.5,
-            margin: "0 0 24px",
+            margin: "0 0 16px",
             textAlign: "center",
           }}
         >
-          Для продолжения работы необходимо авторизоваться. Приложение получит
-          следующие данные из вашего аккаунта Telegram:
+          Для продолжения работы необходимо авторизоваться. Выберите данные,
+          которые готовы предоставить приложению:
         </p>
 
-        {/* Permission list */}
+        {/* Permissions form */}
         <div
           style={{
             backgroundColor: c.surfaceColor,
             borderRadius: 12,
-            padding: 16,
+            padding: "12px 16px",
             marginBottom: 24,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <VuesaxIcon name="user" size={20} color={c.primary} />
-              <span style={{ fontSize: 14, color: c.text }}>Имя и фамилия</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <VuesaxIcon name="profile" size={20} color={c.primary} />
-              <span style={{ fontSize: 14, color: c.text }}>
-                Username (логин)
-              </span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <VuesaxIcon name="camera" size={20} color={c.primary} />
-              <span style={{ fontSize: 14, color: c.text }}>Фото профиля</span>
-            </div>
+          {/* Username - always required */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "8px 0",
+              borderBottom: `1px solid ${c.border}`,
+            }}
+          >
+            <VuesaxIcon name="profile" size={20} color={c.primary} />
+            <span style={{ fontSize: 14, color: c.text, flex: 1 }}>
+              Username (логин)
+            </span>
+            <span
+              style={{
+                fontSize: 12,
+                color: c.primary,
+                fontWeight: 600,
+              }}
+            >
+              Обязательно
+            </span>
+          </div>
+
+          {/* First Name - optional */}
+          <div style={{ padding: "4px 0" }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeFirstName}
+                  onChange={(e) => setIncludeFirstName(e.target.checked)}
+                  sx={{
+                    color: c.lightText,
+                    "&.Mui-checked": {
+                      color: c.primary,
+                    },
+                  }}
+                />
+              }
+              label={
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <VuesaxIcon name="user" size={18} color={c.text} />
+                  <span style={{ fontSize: 14, color: c.text }}>Имя</span>
+                </div>
+              }
+            />
+          </div>
+
+          {/* Last Name - optional */}
+          <div style={{ padding: "4px 0" }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeLastName}
+                  onChange={(e) => setIncludeLastName(e.target.checked)}
+                  sx={{
+                    color: c.lightText,
+                    "&.Mui-checked": {
+                      color: c.primary,
+                    },
+                  }}
+                />
+              }
+              label={
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <VuesaxIcon name="user" size={18} color={c.text} />
+                  <span style={{ fontSize: 14, color: c.text }}>Фамилия</span>
+                </div>
+              }
+            />
+          </div>
+
+          {/* Photo - optional */}
+          <div style={{ padding: "4px 0" }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includePhoto}
+                  onChange={(e) => setIncludePhoto(e.target.checked)}
+                  sx={{
+                    color: c.lightText,
+                    "&.Mui-checked": {
+                      color: c.primary,
+                    },
+                  }}
+                />
+              }
+              label={
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <VuesaxIcon name="camera" size={18} color={c.text} />
+                  <span style={{ fontSize: 14, color: c.text }}>
+                    Фото профиля
+                  </span>
+                </div>
+              }
+            />
           </div>
         </div>
 
