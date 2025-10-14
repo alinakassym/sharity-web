@@ -24,6 +24,7 @@ const CreateEvent: FC = () => {
   const [date, setDate] = useState<Date>();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [eventName, setCourseName] = useState("");
+  const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const scheme = useColorScheme();
   const colors = Colors[scheme];
@@ -236,8 +237,8 @@ const CreateEvent: FC = () => {
               <TextField
                 label="Локация/адрес *"
                 placeholder="Введите локацию/адрес"
-                value={eventName}
-                onChange={(e) => setCourseName(e.target.value)}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 fullWidth
                 variant="outlined"
               />
@@ -265,7 +266,7 @@ const CreateEvent: FC = () => {
                   color: colors.text,
                 }}
               >
-                Добавьте фотографии
+                Добавьте изображение/фото
               </p>
               <p
                 style={{
@@ -274,7 +275,7 @@ const CreateEvent: FC = () => {
                   color: colors.lightText,
                 }}
               >
-                Выберите фотографии
+                Выберите изображение
               </p>
               <Button
                 component="label"
@@ -283,11 +284,10 @@ const CreateEvent: FC = () => {
                   <VuesaxIcon name="camera" color={colors.lighter} size={20} />
                 }
               >
-                Выбрать фото
+                Выбрать
                 <input
                   type="file"
                   accept="image/*"
-                  multiple
                   hidden
                   onChange={handleFileChange}
                 />
