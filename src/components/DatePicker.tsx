@@ -36,14 +36,20 @@ const DatePicker: FC<DatePickerProps> = ({
   };
 
   return (
-    <div style={{}}>
+    <div style={{ position: "relative", overflow: "visible" }}>
       {label && (
         <label
           style={{
+            position: "absolute",
+            top: -16,
+            left: 14,
+            padding: 6,
             fontSize: 12,
             fontWeight: 500,
-            color: colors.lightText,
+            color: colors.text,
             paddingLeft: 4,
+            backgroundColor: colors.background,
+            zIndex: 20,
           }}
         >
           {label}
@@ -60,6 +66,7 @@ const DatePicker: FC<DatePickerProps> = ({
           borderStyle: "solid",
           borderWidth: 1,
           borderRadius: 20,
+          zIndex: 2,
         }}
       >
         <input
