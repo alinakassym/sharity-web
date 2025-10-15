@@ -137,7 +137,7 @@ const Add: FC = () => {
             iconName="calendar"
             btnColor={c.controlColor}
             color={c.text}
-            disabled={!hasAdminAccess}
+            disabled={false}
             onClick={() => handleOptionClick("/create-event")}
           />
         </div>
