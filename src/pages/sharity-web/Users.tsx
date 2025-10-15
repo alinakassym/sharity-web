@@ -4,23 +4,45 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import { useRequestGetUsers } from "@/hooks/useRequestGetUsers";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import UserProfileCard from "@/components/UserProfileCard";
+import UserCardWithRoleEdit from "@/components/UserCardWithRoleEdit";
 import LoadingScreen from "@/components/LoadingScreen";
 import SearchHeader from "@/components/SearchHeader";
+import type { UserData } from "@/hooks/useRequestCreateUser";
 
 const Users: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
   const { users, isLoading, error } = useRequestGetUsers();
+  const { userData: currentUser } = useCurrentUser();
   const [searchValue, setSearchValue] = useState("");
+  const [localUsers, setLocalUsers] = useState<UserData[]>([]);
+
+  // Синхронизируем локальное состояние с загруженными пользователями
+  useMemo(() => {
+    setLocalUsers(users);
+  }, [users]);
+
+  // Проверяем, является ли текущий пользователь администратором
+  const isAdmin = currentUser?.role === "admin";
+
+  // Обработчик обновления роли пользователя
+  const handleRoleUpdate = (telegramId: number, newRole: UserData["role"]) => {
+    setLocalUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.telegramId === telegramId ? { ...user, role: newRole } : user,
+      ),
+    );
+  };
 
   // Фильтрация пользователей по поисковому запросу
   const filteredUsers = useMemo(() => {
     const query = searchValue.trim().toLowerCase();
-    if (!query) return users;
+    if (!query) return localUsers;
 
-    return users.filter((user) => {
+    return localUsers.filter((user) => {
       const fullName = [user.firstName, user.lastName]
         .filter(Boolean)
         .join(" ")
@@ -33,7 +55,7 @@ const Users: FC = () => {
         user.telegramId.toString().includes(query)
       );
     });
-  }, [users, searchValue]);
+  }, [localUsers, searchValue]);
 
   if (isLoading) return <LoadingScreen />;
 
@@ -101,9 +123,17 @@ const Users: FC = () => {
               gap: 12,
             }}
           >
-            {filteredUsers.map((user) => (
-              <UserProfileCard key={user.telegramId} userData={user} />
-            ))}
+            {filteredUsers.map((user) =>
+              isAdmin ? (
+                <UserCardWithRoleEdit
+                  key={user.telegramId}
+                  userData={user}
+                  onRoleUpdate={handleRoleUpdate}
+                />
+              ) : (
+                <UserProfileCard key={user.telegramId} userData={user} />
+              ),
+            )}
           </div>
         )}
       </div>
