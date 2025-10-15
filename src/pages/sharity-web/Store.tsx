@@ -1,6 +1,7 @@
 // src/pages/Store.tsx
 import type { FC } from "react";
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
@@ -28,6 +29,7 @@ const KZT = new Intl.NumberFormat("ru-RU", {
 });
 
 const Store: FC = () => {
+  const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
@@ -35,6 +37,11 @@ const Store: FC = () => {
   const [searchValue, setSearchValue] = useState("");
 
   const { products: rows, isLoading } = useRequestGetProducts();
+
+  const handleClose = () => {
+    // Возвращаемся на предыдущую страницу (Home или Add)
+    navigate(-1);
+  };
 
   // Firestore -> ProductData (для грида)
   const products: ProductData[] = useMemo(
@@ -91,7 +98,11 @@ const Store: FC = () => {
         backgroundColor: c.background,
       }}
     >
-      <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
+      <SearchHeader
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        onClose={handleClose}
+      />
       <div
         style={{
           padding: 16,
