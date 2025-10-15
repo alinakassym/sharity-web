@@ -8,6 +8,7 @@ interface FullWidthButtonProps {
   btnColor?: string;
   color?: string;
   inProgress?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
@@ -18,9 +19,12 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
   color,
   onClick,
   inProgress = false,
+  disabled = false,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
+
+  const isDisabled = inProgress || disabled;
 
   return (
     <div
@@ -33,10 +37,10 @@ const FullWidthButton: FC<FullWidthButtonProps> = ({
         borderRadius: 12,
         gap: 16,
         backgroundColor: btnColor ?? c.primary,
-        opacity: inProgress ? 0.7 : 1,
-        cursor: inProgress ? "not-allowed" : "pointer",
+        opacity: isDisabled ? 0.5 : 1,
+        cursor: isDisabled ? "not-allowed" : "pointer",
       }}
-      onClick={() => !inProgress && onClick && onClick()}
+      onClick={() => !isDisabled && onClick && onClick()}
     >
       <VuesaxIcon name={iconName} size={24} color={color ?? c.lighter} />
       <div

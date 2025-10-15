@@ -4,6 +4,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import Container from "@/components/Container";
 import FullWidthButton from "@/components/FullWidthButton";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface PlacementOption {
   id: string;
@@ -55,10 +56,14 @@ const Add: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const { userData } = useCurrentUser();
 
   const handleOptionClick = (path: string) => {
     navigate(path);
   };
+
+  // Проверяем, имеет ли пользователь доступ к админ-функциям
+  const hasAdminAccess = userData?.role === "admin" || userData?.role === "manager";
 
   return (
     <Container showLocationHeader paddingTop={92}>
@@ -124,6 +129,7 @@ const Add: FC = () => {
             iconName="add"
             btnColor={c.controlColor}
             color={c.text}
+            disabled={!hasAdminAccess}
             onClick={() => handleOptionClick("/create-course")}
           />
           <FullWidthButton
@@ -131,6 +137,7 @@ const Add: FC = () => {
             iconName="calendar"
             btnColor={c.controlColor}
             color={c.text}
+            disabled={!hasAdminAccess}
             onClick={() => handleOptionClick("/create-event")}
           />
         </div>
