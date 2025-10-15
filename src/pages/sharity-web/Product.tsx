@@ -117,7 +117,6 @@ const Product: FC = () => {
           boxSizing: "border-box",
         }}
       >
-        <p>{backTo}</p>
         {/* Изображение */}
         <div style={{}}>
           <img

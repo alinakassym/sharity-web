@@ -18,6 +18,7 @@ type Props = {
   isLiked?: boolean;
   showHeartBtn?: boolean;
   onHeartPress?: (productId: string) => void;
+  fromPage?: string; // Путь страницы, с которой открывается продукт
 };
 
 export const ProductCard: FC<Props> = ({
@@ -25,13 +26,16 @@ export const ProductCard: FC<Props> = ({
   isLiked = false,
   showHeartBtn = true,
   onHeartPress,
+  fromPage,
 }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
   const handleCardClick = () => {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.id}`, {
+      state: fromPage ? { from: fromPage } : undefined,
+    });
   };
 
   return (

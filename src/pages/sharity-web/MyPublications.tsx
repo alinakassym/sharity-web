@@ -114,6 +114,7 @@ const MyPublications: FC = () => {
                   key={product.id}
                   product={productData}
                   showHeartBtn={false}
+                  fromPage="/my-publications"
                 />
               );
             })}
