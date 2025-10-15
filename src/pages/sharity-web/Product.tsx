@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
@@ -16,6 +16,10 @@ const Product: FC = () => {
   const c = Colors[scheme];
 
   const isTelegram = isTelegramApp();
+
+  const location = useLocation();
+
+  const backTo = (location.state as { from?: string })?.from || "/";
 
   const { product: productData, isLoading, error } = useRequestGetProduct(id);
 
@@ -72,7 +76,7 @@ const Product: FC = () => {
           backgroundColor: c.background,
         }}
       >
-        <ProductHeader onGoBack={handleBackClick} />
+        <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
         <div style={{ padding: 16 }}>Загрузка…</div>
       </section>
     );
@@ -88,7 +92,7 @@ const Product: FC = () => {
           backgroundColor: c.background,
         }}
       >
-        <ProductHeader onGoBack={handleBackClick} />
+        <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
         <div style={{ padding: 16, color: c.lightText }}>
           {error || "Продукт не найден"}
         </div>
@@ -99,7 +103,7 @@ const Product: FC = () => {
   return (
     <Container paddingTop={isTelegram ? 112 : 64}>
       {/* Header с кнопкой назад */}
-      <ProductHeader onGoBack={handleBackClick} />
+      <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
 
       {/* Контент продукта */}
       <div
@@ -113,6 +117,7 @@ const Product: FC = () => {
           boxSizing: "border-box",
         }}
       >
+        <p>{backTo}</p>
         {/* Изображение */}
         <div style={{}}>
           <img
