@@ -1,42 +1,68 @@
 import type { FC } from "react";
+import { useState, useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import { useRequestGetUsers } from "@/hooks/useRequestGetUsers";
 import UserProfileCard from "@/components/UserProfileCard";
 import LoadingScreen from "@/components/LoadingScreen";
-import Container from "@/components/Container";
+import SearchHeader from "@/components/SearchHeader";
 
 const Users: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
   const { users, isLoading, error } = useRequestGetUsers();
+  const [searchValue, setSearchValue] = useState("");
+
+  // Фильтрация пользователей по поисковому запросу
+  const filteredUsers = useMemo(() => {
+    const query = searchValue.trim().toLowerCase();
+    if (!query) return users;
+
+    return users.filter((user) => {
+      const fullName = [user.firstName, user.lastName]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      const username = user.username?.toLowerCase() || "";
+
+      return (
+        fullName.includes(query) ||
+        username.includes(query) ||
+        user.telegramId.toString().includes(query)
+      );
+    });
+  }, [users, searchValue]);
 
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <Container showLocationHeader paddingTop={isTelegram ? 92 : 44}>
+    <section
+      style={{
+        paddingTop: isTelegram ? 112 : 64,
+        minHeight: "100vh",
+        paddingBottom: "74px",
+        backgroundColor: c.background,
+      }}
+    >
+      {/* Search Header */}
+      <SearchHeader
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        backTo="/profile"
+      />
+
+      {/* Main Content */}
       <div
         style={{
+          paddingTop: isTelegram ? 156 : 64,
           padding: 16,
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          backgroundColor: c.background,
         }}
       >
-        {/* Заголовок */}
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: c.text,
-            margin: 0,
-          }}
-        >
-          Пользователи
-        </h1>
 
         {/* Ошибка */}
         {error && (
@@ -54,7 +80,7 @@ const Users: FC = () => {
         )}
 
         {/* Пустое состояние */}
-        {!error && users.length === 0 && (
+        {!error && filteredUsers.length === 0 && (
           <div
             style={{
               color: c.lightText,
@@ -62,12 +88,12 @@ const Users: FC = () => {
               padding: 40,
             }}
           >
-            Пользователи не найдены
+            {searchValue ? "Ничего не найдено" : "Пользователи не найдены"}
           </div>
         )}
 
         {/* Список пользователей */}
-        {users.length > 0 && (
+        {filteredUsers.length > 0 && (
           <div
             style={{
               display: "flex",
@@ -75,13 +101,13 @@ const Users: FC = () => {
               gap: 12,
             }}
           >
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <UserProfileCard key={user.telegramId} userData={user} />
             ))}
           </div>
         )}
       </div>
-    </Container>
+    </section>
   );
 };
 
