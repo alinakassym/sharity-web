@@ -3,6 +3,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 import type { UserData } from "@/hooks/useRequestCreateUser";
+import Chip from "@mui/material/Chip";
 
 interface UserProfileCardProps {
   userData: UserData;
@@ -16,6 +17,20 @@ const UserProfileCard: FC<UserProfileCardProps> = ({ userData }) => {
   const fullName = [userData.firstName, userData.lastName]
     .filter(Boolean)
     .join(" ");
+
+  // Определяем label и цвет для Chip в зависимости от роли
+  const getRoleChipProps = (role: UserData["role"]) => {
+    switch (role) {
+      case "admin":
+        return { label: "Админ", color: "accent" as const };
+      case "manager":
+        return { label: "Менеджер", color: "primary" as const };
+      default:
+        return null;
+    }
+  };
+
+  const roleChipProps = getRoleChipProps(userData.role);
 
   return (
     <div
@@ -98,6 +113,26 @@ const UserProfileCard: FC<UserProfileCardProps> = ({ userData }) => {
             }}
           >
             @{userData.username}
+          </div>
+        )}
+
+        {/* Role Chip */}
+        {roleChipProps && (
+          <div style={{ marginTop: 8 }}>
+            <Chip
+              label={roleChipProps.label}
+              size="small"
+              sx={{
+                fontWeight: 600,
+                fontSize: 12,
+                backgroundColor: c[roleChipProps.color],
+                color: roleChipProps.color === "accent" ? c.darken : c.lighter,
+                "&:hover": {
+                  backgroundColor: c[roleChipProps.color],
+                  opacity: 0.8,
+                },
+              }}
+            />
           </div>
         )}
       </div>

@@ -12,6 +12,7 @@ export interface UserData {
   phoneNumber?: string; // Для будущего использования
   createdAt: Date;
   lastLoginAt: Date;
+  role: "admin" | "manager" | "user";
 }
 
 export const useRequestCreateUser = () => {
@@ -27,7 +28,7 @@ export const useRequestCreateUser = () => {
   };
 
   const createOrUpdateUser = async (
-    userData: Omit<UserData, "createdAt" | "lastLoginAt">,
+    userData: Omit<UserData, "createdAt" | "lastLoginAt" | "role">,
   ) => {
     try {
       // Используем telegramId как ID документа
@@ -38,14 +39,17 @@ export const useRequestCreateUser = () => {
 
       if (userSnap.exists()) {
         // Пользователь существует - обновляем только lastLoginAt и другие данные
-        await setDoc(
-          userRef,
-          {
-            // ...userData,
-            lastLoginAt: new Date(),
-          },
-          { merge: true },
-        );
+        const existingData = userSnap.data();
+        const updateData: Record<string, unknown> = {
+          lastLoginAt: new Date(),
+        };
+
+        // Если у существующего пользователя нет роли, устанавливаем "user"
+        if (!existingData.role) {
+          updateData.role = "user";
+        }
+
+        await setDoc(userRef, updateData, { merge: true });
         console.log("Пользователь обновлен:", userData.telegramId);
         return { success: true, isNewUser: false, id: userData.telegramId };
       } else {
@@ -55,6 +59,7 @@ export const useRequestCreateUser = () => {
           firstName: userData?.firstName ?? "",
           lastName: userData?.lastName ?? "",
           photoUrl: userData?.photoUrl ?? "",
+          role: "user", // По умолчанию новый пользователь получает роль "user"
           createdAt: new Date(),
           lastLoginAt: new Date(),
         };

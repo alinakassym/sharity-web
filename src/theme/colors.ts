@@ -1,5 +1,5 @@
 const primaryColor = "#907BE2";
-const accentColor = "#00ECBD";
+const accentColor = "#00ECBE";
 const darkenColor = "#1E1A29";
 const darkColor = "#29243A";
 const darkenGrayColor = "#898989";
