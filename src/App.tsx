@@ -19,6 +19,7 @@ import CreateEvent from "./pages/sharity-web/CreateEvent";
 import Course from "./pages/sharity-web/Course";
 import Add from "./pages/sharity-web/Add";
 import Profile from "./pages/sharity-web/Profile";
+import MyPublications from "./pages/sharity-web/MyPublications";
 import { isTelegramApp } from "./lib/telegram";
 
 const AppContent: FC = () => {
@@ -46,6 +47,7 @@ const AppContent: FC = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="add" element={<Add />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="my-publications" element={<MyPublications />} />
         <Route path="create" element={<Create />} />
         <Route path="create-course" element={<CreateCourse />} />
         <Route path="create-event" element={<CreateEvent />} />
