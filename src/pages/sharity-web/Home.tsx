@@ -140,7 +140,7 @@ const Home: FC = () => {
         <Carousel items={carouselItems} autoPlayInterval={3000} />
 
         {/* Menu Buttons */}
-        <MenuButtons items={menuItems} />
+        <MenuButtons items={menuItems} from="/" />
 
         {/* Upcoming Events */}
         {isLoading ? (

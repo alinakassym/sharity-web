@@ -12,15 +12,17 @@ interface MenuItem {
 
 interface MenuButtonsProps {
   items: MenuItem[];
+  from?: string; // Путь родительской страницы для правильной навигации назад
 }
 
-const MenuButtons: FC<MenuButtonsProps> = ({ items }) => {
+const MenuButtons: FC<MenuButtonsProps> = ({ items, from }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
 
   const handleClick = (path: string) => {
-    navigate(path);
+    // Передаем информацию о текущей странице для правильной навигации назад
+    navigate(path, { state: { from } });
   };
 
   return (

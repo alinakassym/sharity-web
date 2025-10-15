@@ -1,6 +1,5 @@
 import type { FC } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
@@ -10,16 +9,11 @@ import ProductCard from "@/components/ProductCard";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const MyPublications: FC = () => {
-  const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
   const { products, isLoading, error } = useRequestGetUserProducts();
   const [searchValue, setSearchValue] = useState("");
-
-  const handleClose = () => {
-    navigate("/profile");
-  };
 
   // Фильтрация продуктов по поисковому запросу
   const filteredProducts = products?.filter((product) =>
@@ -41,7 +35,7 @@ const MyPublications: FC = () => {
       <SearchHeader
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-        onClose={handleClose}
+        backTo="/profile"
       />
 
       {/* Main Content */}

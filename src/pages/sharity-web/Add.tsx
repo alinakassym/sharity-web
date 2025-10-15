@@ -59,7 +59,8 @@ const Add: FC = () => {
   const { userData } = useCurrentUser();
 
   const handleOptionClick = (path: string) => {
-    navigate(path);
+    // Передаем информацию о текущей странице для правильной навигации назад
+    navigate(path, { state: { from: "/add" } });
   };
 
   // Проверяем, имеет ли пользователь доступ к админ-функциям

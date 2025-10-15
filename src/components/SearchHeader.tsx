@@ -9,13 +9,13 @@ import { isTelegramApp } from "@/lib/telegram";
 interface SearchHeaderProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
-  onClose?: () => void;
+  backTo?: string; // Путь страницы, на которую возвращаемся при закрытии
 }
 
 const SearchHeader: FC<SearchHeaderProps> = ({
   searchValue,
   onSearchChange,
-  onClose,
+  backTo,
 }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
@@ -23,13 +23,8 @@ const SearchHeader: FC<SearchHeaderProps> = ({
   const isTelegram = isTelegramApp();
 
   const handleClose = () => {
-    // Если родитель передал обработчик, вызываем его
-    if (onClose) {
-      onClose();
-    } else {
-      // Иначе используем дефолтное поведение - переход на главную
-      navigate("/");
-    }
+    // Переходим на указанную страницу или на главную по умолчанию
+    navigate(backTo || "/");
   };
 
   return (
