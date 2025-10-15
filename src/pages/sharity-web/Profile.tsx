@@ -22,6 +22,13 @@ const Profile: FC = () => {
     navigate("/my-publications");
   };
 
+  const handleNavigateToUsers = () => {
+    navigate("/users");
+  };
+
+  // Проверяем, является ли пользователь админом
+  const isAdmin = userData?.role === "admin";
+
   return (
     <section
       style={{
@@ -84,6 +91,40 @@ const Profile: FC = () => {
               }}
             >
               Мои публикации
+            </div>
+            <VuesaxIcon name="arrow-right" size={24} color={c.text} />
+          </div>
+        )}
+
+        {/* Кнопка перехода к пользователям (только для админа) */}
+        {userData && isAdmin && (
+          <div
+            onClick={handleNavigateToUsers}
+            style={{
+              backgroundColor: c.surfaceColor,
+              borderRadius: 20,
+              padding: 20,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              transition: "opacity 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "0.8";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+            }}
+          >
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: c.text,
+              }}
+            >
+              Пользователи
             </div>
             <VuesaxIcon name="arrow-right" size={24} color={c.text} />
           </div>
