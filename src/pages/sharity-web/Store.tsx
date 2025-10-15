@@ -121,7 +121,7 @@ const Store: FC = () => {
         {isLoading ? (
           <div style={{ padding: 16 }}>Загрузка…</div>
         ) : (
-          <ProductGrid products={filtered} />
+          <ProductGrid products={filtered} fromPage={backTo} />
         )}
       </div>
     </section>

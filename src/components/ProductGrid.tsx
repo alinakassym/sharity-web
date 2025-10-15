@@ -7,9 +7,10 @@ type Props = {
   products: ProductData[];
   gap?: number;
   minWidth?: number; // минимальная ширина карточки для авто-сетки
+  fromPage?: string; // Путь страницы, с которой открывается продукт
 };
 
-export const ProductGrid: FC<Props> = ({ products, gap = 16 }) => {
+export const ProductGrid: FC<Props> = ({ products, gap = 16, fromPage }) => {
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const { toggleFavorite } = useRequestUpdateProduct();
 
@@ -68,6 +69,7 @@ export const ProductGrid: FC<Props> = ({ products, gap = 16 }) => {
             product={p}
             isLiked={liked.has(p.id)}
             onHeartPress={toggleLike}
+            fromPage={fromPage}
           />
         </div>
       ))}

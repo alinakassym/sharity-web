@@ -116,7 +116,7 @@ const Favorites: FC = () => {
             </div>
           </div>
         ) : (
-          <ProductGrid products={filtered} />
+          <ProductGrid products={filtered} fromPage="/favorites" />
         )}
       </div>
     </section>
