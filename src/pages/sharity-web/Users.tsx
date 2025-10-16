@@ -2,7 +2,6 @@ import type { FC } from "react";
 import { useState, useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
 import { useRequestGetUsers } from "@/hooks/useRequestGetUsers";
 import {
   useSafePaddingTop,
@@ -21,7 +20,6 @@ const Users: FC = () => {
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
   const platformName = useSafePlatform();
-  const isTelegram = isTelegramApp();
   const { users, isLoading, error } = useRequestGetUsers();
   const { userData: currentUser } = useCurrentUser();
   const [searchValue, setSearchValue] = useState("");
