@@ -230,6 +230,7 @@ const Create: FC = () => {
               ]}
               placeholder="Выберите категорию"
               required
+              searchable
             />
           </div>
         )}
