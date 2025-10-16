@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 export interface CreateProductData {
   name: string;
   category: string;
+  subcategory?: string; // Подкатегория гимнастики (если выбрана)
   price: number;
   description?: string;
   condition?: string;

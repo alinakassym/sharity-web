@@ -31,7 +31,7 @@ type StepType = "basic" | "photos" | "details" | "review";
 const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
-  const [gymnasticsSubcategory, setGymnasticsSubcategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
   const [condition, setCondition] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -65,7 +65,7 @@ const Create: FC = () => {
   // Очищаем подкатегорию гимнастики при изменении основной категории
   useEffect(() => {
     if (category !== "Гимнастика") {
-      setGymnasticsSubcategory("");
+      setSubcategory("");
     }
   }, [category]);
 
@@ -74,7 +74,7 @@ const Create: FC = () => {
     setCategory(newCategory);
     // Если выбрана не гимнастика, очищаем подкатегорию
     if (newCategory !== "Гимнастика") {
-      setGymnasticsSubcategory("");
+      setSubcategory("");
     }
   };
 
@@ -152,7 +152,7 @@ const Create: FC = () => {
       const productData = {
         name: productName.trim(),
         category,
-        gymnasticsSubcategory: gymnasticsSubcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
+        subcategory: subcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
         price: Number(price),
         description: description.trim() || undefined,
         condition: condition || undefined,
@@ -281,8 +281,8 @@ const Create: FC = () => {
             {category === "Гимнастика" && (
               <CustomSelect
                 label="Подкатегория"
-                value={gymnasticsSubcategory}
-                onChange={setGymnasticsSubcategory}
+                value={subcategory}
+                onChange={setSubcategory}
                 options={gymnasticsSubcategoryOptions.map((cat) => ({
                   value: cat.name_ru,
                   label: cat.name_ru,
