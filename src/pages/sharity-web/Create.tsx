@@ -2,13 +2,18 @@ import type { FC } from "react";
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp, getTelegramUser } from "@/lib/telegram";
+import { getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
+import Header from "@/components/Header";
 import {
   Stepper,
   Step,
@@ -37,7 +42,8 @@ const Create: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const navigate = useNavigate();
-  const isTelegram = isTelegramApp();
+  const paddingTop = useSafePaddingTop(48, 44);
+  const platformName = useSafePlatform();
 
   const { createProduct } = useRequestCreateProduct();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
@@ -162,82 +168,14 @@ const Create: FC = () => {
     );
   };
 
-  const handleClose = () => {
-    navigate("/");
-  };
-
   return (
-    <Container paddingTop={isTelegram ? 92 : 44}>
+    <Container
+      paddingTop={
+        platformName === "desktop" ? paddingTop + 92 : paddingTop + 44
+      }
+    >
       {/* Header */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          paddingTop: isTelegram ? 92 : 0,
-          paddingRight: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          borderBottom: "1px solid " + c.surfaceColor,
-          backgroundColor: isTelegram ? c.background : c.background,
-          zIndex: 100,
-        }}
-      >
-        <div
-          style={{
-            height: 44,
-            display: "flex",
-            flex: 1,
-            alignItems: "center",
-            padding: "0 16px",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              color: c.text,
-              margin: 0,
-            }}
-          >
-            Размещение: Продажа
-          </h1>
-        </div>
-        {/* Close Button */}
-        {isTelegram && (
-          <button
-            onClick={handleClose}
-            style={{
-              marginLeft: 8,
-              marginRight: 8,
-              padding: 0,
-              width: 20,
-              height: 20,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "none",
-              border: "1px solid " + c.accent,
-              cursor: "pointer",
-              borderRadius: 20,
-              transition: "background-color 0.2s ease",
-              outline: "none",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = c.controlColor;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-            }}
-            aria-label="Закрыть поиск"
-          >
-            <VuesaxIcon name="close" size={8} color={c.accent} />
-          </button>
-        )}
-      </div>
+      <Header title="Размещение: Продажа" showGoBackBtn />
 
       {/* Progress Bar */}
       <div

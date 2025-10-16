@@ -1,7 +1,10 @@
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
 import Container from "@/components/Container";
 import FullWidthButton from "@/components/FullWidthButton";
@@ -58,6 +61,7 @@ const Add: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
   const { userData } = useCurrentUser();
 
   const handleOptionClick = (path: string) => {
@@ -70,7 +74,10 @@ const Add: FC = () => {
     userData?.role === "admin" || userData?.role === "manager";
 
   return (
-    <Container showLocationHeader paddingTop={paddingTop}>
+    <Container
+      showLocationHeader
+      paddingTop={platformName === "desktop" ? 48 : paddingTop}
+    >
       {/* Main Content */}
       <div
         style={{

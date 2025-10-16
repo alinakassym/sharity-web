@@ -2,7 +2,10 @@ import type { FC } from "react";
 import { useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
@@ -17,6 +20,7 @@ const Home: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
 
   const { events: eventsFromFirebase, isLoading } = useRequestGetEvents();
 
@@ -126,7 +130,10 @@ const Home: FC = () => {
   }, [eventsFromFirebase]);
 
   return (
-    <Container showLocationHeader paddingTop={paddingTop}>
+    <Container
+      showLocationHeader
+      paddingTop={platformName === "desktop" ? 48 : paddingTop}
+    >
       {/* Main Content */}
       <div
         style={{

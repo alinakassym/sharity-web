@@ -2,7 +2,10 @@ import type { FC } from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { getTelegramUser } from "@/lib/telegram";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
@@ -32,6 +35,7 @@ const Create: FC = () => {
   const c = Colors[scheme];
 
   const paddingTop = useSafePaddingTop(48, 44);
+  const platformName = useSafePlatform();
 
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
@@ -148,7 +152,11 @@ const Create: FC = () => {
   };
 
   return (
-    <Container paddingTop={paddingTop + 44}>
+    <Container
+      paddingTop={
+        platformName === "desktop" ? paddingTop + 92 : paddingTop + 44
+      }
+    >
       {/* Header */}
       <Header title="Размещение: Классы/Школы" showGoBackBtn />
 

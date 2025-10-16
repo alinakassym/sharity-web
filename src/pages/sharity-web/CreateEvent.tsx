@@ -2,8 +2,12 @@ import type { FC } from "react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp, getTelegramUser } from "@/lib/telegram";
+import { getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { useRequestCreateEvent } from "@/hooks/useRequestCreateEvent";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
@@ -31,8 +35,9 @@ const CreateEvent: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 44);
+  const platformName = useSafePlatform();
 
-  const isTelegram = isTelegramApp();
   const [isPublishing, setIsPublishing] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [date, setDate] = useState<Date>();
@@ -180,7 +185,11 @@ const CreateEvent: FC = () => {
   };
 
   return (
-    <Container paddingTop={isTelegram ? 92 : 44}>
+    <Container
+      paddingTop={
+        platformName === "desktop" ? paddingTop + 92 : paddingTop + 44
+      }
+    >
       {/* Header */}
       <Header title="Размещение: Событие" showGoBackBtn />
 
