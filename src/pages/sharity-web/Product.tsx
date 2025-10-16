@@ -6,6 +6,7 @@ import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
+import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import Container from "@/components/Container";
 
 const Product: FC = () => {
@@ -22,6 +23,7 @@ const Product: FC = () => {
   const backTo = (location.state as { from?: string })?.from || "/";
 
   const { product: productData, isLoading, error } = useRequestGetProduct(id);
+  const { sizes: leotardSizes } = useRequestGetLeotardSizes();
 
   const handleBackClick = () => {
     navigate(-1);
@@ -45,6 +47,12 @@ const Product: FC = () => {
     return Math.abs(hash % 1000) + 1;
   };
 
+  // Функция для поиска роста по размеру купальника
+  const getHeightForSize = (size: number): string | undefined => {
+    const sizeData = leotardSizes.find((s) => s.size === size);
+    return sizeData?.height;
+  };
+
   const product = productData
     ? {
         id: productData.id,
@@ -59,6 +67,8 @@ const Product: FC = () => {
             : productData.image ||
               `https://picsum.photos/600?${getImageIndex(productData.id)}`,
         category: productData.category || "",
+        subcategory: productData.subcategory || "",
+        size: productData.productSize,
         title: productData.name || "",
         price: KZT.format(Number(productData.price) || 0),
         description: productData.description || "",
@@ -66,6 +76,7 @@ const Product: FC = () => {
       }
     : null;
 
+  console.log("product: ", product);
   if (isLoading) {
     return (
       <section
@@ -141,6 +152,7 @@ const Product: FC = () => {
             }}
           >
             {product.category}
+            {product.subcategory ? "/" + product.subcategory : ""}
           </div>
 
           <h2
@@ -163,16 +175,30 @@ const Product: FC = () => {
           >
             {product.price}
           </div>
-
-          <div
-            style={{
-              fontSize: 16,
-              lineHeight: "1.5",
-              color: c.text,
-              marginTop: 16,
-            }}
-          >
-            {product.description}
+          {product.size && (
+            <p
+              style={{
+                fontSize: 16,
+                color: c.text,
+              }}
+            >
+              Размер: {product.size} {/* Размер купальника с ростом */}
+              {product.category === "Гимнастика" &&
+                product.subcategory === "Купальник" &&
+                product.size &&
+                getHeightForSize(product.size) &&
+                ` (рост ${getHeightForSize(product.size)})`}
+            </p>
+          )}
+          <div>
+            <p
+              style={{
+                fontSize: 16,
+                color: c.text,
+              }}
+            >
+              {product.description}
+            </p>
           </div>
         </div>
 
