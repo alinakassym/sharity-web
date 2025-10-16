@@ -8,12 +8,14 @@ interface ThemeProviderProps {
   paddingTop?: number;
   showLocationHeader?: boolean;
   children: ReactNode;
+  onLocationClick?: () => void;
 }
 
 const Container: FC<ThemeProviderProps> = ({
   paddingTop = 48,
   showLocationHeader = false,
   children,
+  onLocationClick,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -29,7 +31,9 @@ const Container: FC<ThemeProviderProps> = ({
         backgroundColor: c.background,
       }}
     >
-      {showLocationHeader && <LocationHeader />}
+      {showLocationHeader && (
+        <LocationHeader onLocationClick={onLocationClick} />
+      )}
 
       {children}
     </section>
