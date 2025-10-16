@@ -31,7 +31,7 @@ const Create: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
-  const paddingTop = useSafePaddingTop();
+  const paddingTop = useSafePaddingTop(48, 44);
 
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");

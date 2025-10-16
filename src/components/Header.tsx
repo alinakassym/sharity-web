@@ -47,7 +47,8 @@ const Header: FC<LocationHeaderProps> = ({
         left: 0,
         right: 0,
         paddingTop: topPadding,
-        // backgroundColor: c.background,
+        borderBottom: "1px solid " + c.surfaceColor,
+        backgroundColor: c.background,
         zIndex: 100,
       }}
     >
