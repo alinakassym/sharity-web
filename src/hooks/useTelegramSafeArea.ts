@@ -53,8 +53,8 @@ export const useTelegramSafeArea = () => {
  * @param defaultPaddingWeb - дефолтный отступ для веба
  */
 export const useSafePaddingTop = (
-  defaultPaddingTelegram = 92,
-  defaultPaddingWeb = 46,
+  defaultPaddingTelegram = 48,
+  defaultPaddingWeb = 0,
 ) => {
   const isTelegram = isTelegramApp();
   const safeArea = useTelegramSafeArea();
@@ -65,5 +65,5 @@ export const useSafePaddingTop = (
 
   // Если safe area доступен, используем его + небольшой базовый отступ
   // Иначе используем дефолтный отступ
-  return safeArea.top > 0 ? defaultPaddingTelegram : safeArea.top + 44;
+  return safeArea.top > 0 ? defaultPaddingTelegram : safeArea.top;
 };

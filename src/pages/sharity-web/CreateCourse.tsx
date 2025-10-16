@@ -2,8 +2,9 @@ import type { FC } from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import { getTelegramUser } from "@/lib/telegram";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp, getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import CourseCard from "@/components/CourseCard";
 import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
@@ -30,7 +31,7 @@ const Create: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
-  const isTelegram = isTelegramApp();
+  const paddingTop = useSafePaddingTop();
 
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
@@ -147,7 +148,7 @@ const Create: FC = () => {
   };
 
   return (
-    <Container paddingTop={isTelegram ? 92 : 44}>
+    <Container paddingTop={paddingTop + 44}>
       {/* Header */}
       <Header title="Размещение: Классы/Школы" showGoBackBtn />
 
