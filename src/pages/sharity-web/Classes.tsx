@@ -8,17 +8,7 @@ import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import CourseGrid from "@/components/CourseGrid";
 import { type CourseData } from "@/components/CourseCard";
 import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
-
-const ALL: Category[] = [
-  { id: "Гимнастика", label: "Гимнастика", icon: "gymnastics" },
-  { id: "Танцы", label: "Танцы", icon: "dance" },
-  { id: "Балет", label: "Балет", icon: "ballet" },
-  { id: "Волейбол", label: "Волейбол", icon: "volleyball" },
-  { id: "Теннис", label: "Теннис", icon: "tennis" },
-  { id: "Футбол", label: "Футбол", icon: "football" },
-  { id: "Хоккей", label: "Хоккей", icon: "hockey" },
-  { id: "Бег", label: "Бег", icon: "run" },
-];
+import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 
 const KZT = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -34,7 +24,20 @@ const Classes: FC = () => {
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
-  const { courses: rows, isLoading } = useRequestGetCourses();
+  const { courses: rows, isLoading: isLoadingCourses } = useRequestGetCourses();
+  const {
+    categories: categoriesFromFirebase,
+    isLoading: isLoadingCategories,
+  } = useRequestGetCategories();
+
+  // Преобразуем категории из Firebase в формат Category для CategoryFilter
+  const categories: Category[] = useMemo(() => {
+    return categoriesFromFirebase.map((cat) => ({
+      id: cat.name_ru, // Используем русское название как ID для фильтрации
+      label: cat.name_ru,
+      icon: cat.icon || "category", // Fallback иконка если не указана
+    }));
+  }, [categoriesFromFirebase]);
 
   // Firestore - CourseData (для грида)
   const courses: CourseData[] = useMemo(
@@ -102,16 +105,20 @@ const Classes: FC = () => {
           backgroundColor: c.background,
         }}
       >
-        <CategoryFilter
-          categories={ALL}
-          selectedIds={selected}
-          onChange={setSelected}
-          multi={true}
-          onOpenFilter={() => console.log("open filter modal")}
-        />
+        {isLoadingCategories ? (
+          <div style={{ padding: 16 }}>Загрузка категорий…</div>
+        ) : (
+          <CategoryFilter
+            categories={categories}
+            selectedIds={selected}
+            onChange={setSelected}
+            multi={true}
+            onOpenFilter={() => console.log("open filter modal")}
+          />
+        )}
 
-        {isLoading ? (
-          <div style={{ padding: 16 }}>Загрузка…</div>
+        {isLoadingCourses ? (
+          <div style={{ padding: 16 }}>Загрузка курсов…</div>
         ) : (
           <CourseGrid courses={filtered} />
         )}

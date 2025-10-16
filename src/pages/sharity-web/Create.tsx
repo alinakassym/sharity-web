@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
@@ -7,6 +7,7 @@ import { isTelegramApp, getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
+import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
   Stepper,
@@ -39,6 +40,13 @@ const Create: FC = () => {
   const isTelegram = isTelegramApp();
 
   const { createProduct } = useRequestCreateProduct();
+  const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
+    useRequestGetCategories();
+
+  // Преобразуем категории из Firebase для использования в Select
+  const categoryOptions = useMemo(() => {
+    return categoriesFromFirebase;
+  }, [categoriesFromFirebase]);
 
   // Тестируем подключение к Minio при загрузке компонента
   useEffect(() => {
@@ -288,7 +296,7 @@ const Create: FC = () => {
               variant="outlined"
             />
 
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={isLoadingCategories}>
               <InputLabel>Категория *</InputLabel>
               <Select
                 value={category}
@@ -296,17 +304,17 @@ const Create: FC = () => {
                 onChange={(e) => setCategory(e.target.value)}
               >
                 <MenuItem value="">
-                  <em>Выберите категорию</em>
+                  <em>
+                    {isLoadingCategories
+                      ? "Загрузка категорий..."
+                      : "Выберите категорию"}
+                  </em>
                 </MenuItem>
-                <MenuItem value="Гимнастика">Гимнастика</MenuItem>
-                <MenuItem value="Танцы">Танцы</MenuItem>
-                <MenuItem value="Балет">Балет</MenuItem>
-                <MenuItem value="Волейбол">Волейбол</MenuItem>
-                <MenuItem value="Теннис">Теннис</MenuItem>
-                <MenuItem value="Футбол">Футбол</MenuItem>
-                <MenuItem value="Хоккей">Хоккей</MenuItem>
-                <MenuItem value="Бег">Бег</MenuItem>
-                <MenuItem value="Бег">Другое</MenuItem>
+                {categoryOptions.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.name_ru}>
+                    {cat.name_ru}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
 

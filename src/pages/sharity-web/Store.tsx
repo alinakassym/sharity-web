@@ -10,17 +10,7 @@ import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import ProductGrid from "@/components/ProductGrid";
 import type { ProductData } from "@/components/ProductCard";
 import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
-
-const ALL: Category[] = [
-  { id: "Гимнастика", label: "Гимнастика", icon: "gymnastics" },
-  { id: "Танцы", label: "Танцы", icon: "dance" },
-  { id: "Балет", label: "Балет", icon: "ballet" },
-  { id: "Волейбол", label: "Волейбол", icon: "volleyball" },
-  { id: "Теннис", label: "Теннис", icon: "tennis" },
-  { id: "Футбол", label: "Футбол", icon: "football" },
-  { id: "Хоккей", label: "Хоккей", icon: "hockey" },
-  { id: "Бег", label: "Бег", icon: "run" },
-];
+import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 
 const KZT = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -36,10 +26,24 @@ const Store: FC = () => {
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
-  const { products: rows, isLoading } = useRequestGetProducts();
+  const { products: rows, isLoading: isLoadingProducts } =
+    useRequestGetProducts();
+  const {
+    categories: categoriesFromFirebase,
+    isLoading: isLoadingCategories,
+  } = useRequestGetCategories();
 
   // Определяем, откуда была открыта страница
   const backTo = (location.state as { from?: string })?.from || "/";
+
+  // Преобразуем категории из Firebase в формат Category для CategoryFilter
+  const categories: Category[] = useMemo(() => {
+    return categoriesFromFirebase.map((cat) => ({
+      id: cat.name_ru, // Используем русское название как ID для фильтрации
+      label: cat.name_ru,
+      icon: cat.icon || "category", // Fallback иконка если не указана
+    }));
+  }, [categoriesFromFirebase]);
 
   // Firestore -> ProductData (для грида)
   const products: ProductData[] = useMemo(
@@ -110,16 +114,20 @@ const Store: FC = () => {
           backgroundColor: c.background,
         }}
       >
-        <CategoryFilter
-          categories={ALL}
-          selectedIds={selected}
-          onChange={setSelected}
-          multi={true}
-          onOpenFilter={() => console.log("open filter modal")}
-        />
+        {isLoadingCategories ? (
+          <div style={{ padding: 16 }}>Загрузка категорий…</div>
+        ) : (
+          <CategoryFilter
+            categories={categories}
+            selectedIds={selected}
+            onChange={setSelected}
+            multi={true}
+            onOpenFilter={() => console.log("open filter modal")}
+          />
+        )}
 
-        {isLoading ? (
-          <div style={{ padding: 16 }}>Загрузка…</div>
+        {isLoadingProducts ? (
+          <div style={{ padding: 16 }}>Загрузка товаров…</div>
         ) : (
           <ProductGrid products={filtered} fromPage={backTo} />
         )}
