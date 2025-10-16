@@ -20,12 +20,8 @@ const Profile: FC = () => {
 
   if (isLoading) return <LoadingScreen />;
 
-  const handleNavigateToPublications = () => {
-    navigate("/my-publications");
-  };
-
-  const handleNavigateToUsers = () => {
-    navigate("/users");
+  const handleNavigateTo = (path: string) => {
+    navigate(path);
   };
 
   // Проверяем, является ли пользователь админом
@@ -68,16 +64,22 @@ const Profile: FC = () => {
         {userData && (
           <NavigationButton
             label="Мои публикации"
-            onClick={handleNavigateToPublications}
+            onClick={() => handleNavigateTo("/my-publications")}
           />
         )}
 
         {/* Кнопка перехода к пользователям (только для админа) */}
         {userData && isAdmin && (
-          <NavigationButton
-            label="Пользователи"
-            onClick={handleNavigateToUsers}
-          />
+          <>
+            <NavigationButton
+              label="Пользователи"
+              onClick={() => handleNavigateTo("/users")}
+            />
+            <NavigationButton
+              label="Справочники"
+              onClick={() => handleNavigateTo("/dictionaries")}
+            />
+          </>
         )}
       </div>
     </section>

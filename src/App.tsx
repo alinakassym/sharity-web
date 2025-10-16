@@ -21,6 +21,7 @@ import Add from "./pages/sharity-web/Add";
 import Profile from "./pages/sharity-web/Profile";
 import MyPublications from "./pages/sharity-web/MyPublications";
 import Users from "./pages/sharity-web/Users";
+import Dictionaries from "./pages/sharity-web/Dictionaries";
 import { isTelegramApp } from "./lib/telegram";
 
 const AppContent: FC = () => {
@@ -50,6 +51,7 @@ const AppContent: FC = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="my-publications" element={<MyPublications />} />
         <Route path="users" element={<Users />} />
+        <Route path="dictionaries" element={<Dictionaries />} />
         <Route path="create" element={<Create />} />
         <Route path="create-course" element={<CreateCourse />} />
         <Route path="create-event" element={<CreateEvent />} />
