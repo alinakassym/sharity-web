@@ -36,7 +36,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
     >
       <div
         style={{
-          height: 48,
+          height: isTelegram ? 48 : 44,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
