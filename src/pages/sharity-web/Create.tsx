@@ -306,6 +306,7 @@ const Create: FC = () => {
                 <MenuItem value="Футбол">Футбол</MenuItem>
                 <MenuItem value="Хоккей">Хоккей</MenuItem>
                 <MenuItem value="Бег">Бег</MenuItem>
+                <MenuItem value="Бег">Другое</MenuItem>
               </Select>
             </FormControl>
 
