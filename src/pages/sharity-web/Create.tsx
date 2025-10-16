@@ -12,6 +12,7 @@ import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
+import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import Header from "@/components/Header";
 import {
@@ -30,6 +31,7 @@ type StepType = "basic" | "photos" | "details" | "review";
 const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
+  const [gymnasticsSubcategory, setGymnasticsSubcategory] = useState("");
   const [condition, setCondition] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -45,11 +47,36 @@ const Create: FC = () => {
   const { createProduct } = useRequestCreateProduct();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
     useRequestGetCategories();
+  const {
+    categories: gymnasticsCategories,
+    isLoading: isLoadingGymnasticsCategories,
+  } = useRequestGetGymnasticsCategories();
 
   // Преобразуем категории из Firebase для использования в Select
   const categoryOptions = useMemo(() => {
     return categoriesFromFirebase;
   }, [categoriesFromFirebase]);
+
+  // Преобразуем подкатегории гимнастики для использования в Select
+  const gymnasticsSubcategoryOptions = useMemo(() => {
+    return gymnasticsCategories;
+  }, [gymnasticsCategories]);
+
+  // Очищаем подкатегорию гимнастики при изменении основной категории
+  useEffect(() => {
+    if (category !== "Гимнастика") {
+      setGymnasticsSubcategory("");
+    }
+  }, [category]);
+
+  // Обработчик изменения категории
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    // Если выбрана не гимнастика, очищаем подкатегорию
+    if (newCategory !== "Гимнастика") {
+      setGymnasticsSubcategory("");
+    }
+  };
 
   // Тестируем подключение к Minio при загрузке компонента
   useEffect(() => {
@@ -125,6 +152,7 @@ const Create: FC = () => {
       const productData = {
         name: productName.trim(),
         category,
+        gymnasticsSubcategory: gymnasticsSubcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
         price: Number(price),
         description: description.trim() || undefined,
         condition: condition || undefined,
@@ -234,7 +262,7 @@ const Create: FC = () => {
             <CustomSelect
               label="Категория"
               value={category}
-              onChange={setCategory}
+              onChange={handleCategoryChange}
               options={categoryOptions.map((cat) => ({
                 value: cat.name_ru,
                 label: cat.name_ru,
@@ -248,6 +276,26 @@ const Create: FC = () => {
               required
               searchable
             />
+
+            {/* Подкатегории гимнастики - показываем только если выбрана Гимнастика */}
+            {category === "Гимнастика" && (
+              <CustomSelect
+                label="Подкатегория"
+                value={gymnasticsSubcategory}
+                onChange={setGymnasticsSubcategory}
+                options={gymnasticsSubcategoryOptions.map((cat) => ({
+                  value: cat.name_ru,
+                  label: cat.name_ru,
+                }))}
+                placeholder={
+                  isLoadingGymnasticsCategories
+                    ? "Загрузка подкатегорий..."
+                    : "Выберите подкатегорию"
+                }
+                disabled={isLoadingGymnasticsCategories}
+                searchable
+              />
+            )}
 
             <TextField
               label="Цена *"
