@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
 import Carousel from "@/components/Carousel";
 import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
@@ -16,7 +16,7 @@ import menuImg3 from "@/assets/menu-img3.png";
 const Home: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const isTelegram = isTelegramApp();
+  const paddingTop = useSafePaddingTop(48, 0);
 
   const { events: eventsFromFirebase, isLoading } = useRequestGetEvents();
 
@@ -126,7 +126,7 @@ const Home: FC = () => {
   }, [eventsFromFirebase]);
 
   return (
-    <Container showLocationHeader paddingTop={isTelegram ? 92 : 46}>
+    <Container showLocationHeader paddingTop={paddingTop}>
       {/* Main Content */}
       <div
         style={{

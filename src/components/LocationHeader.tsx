@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
+import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
 import { isTelegramApp } from "@/lib/telegram";
 
 interface LocationHeaderProps {
@@ -14,8 +15,12 @@ const LocationHeader: FC<LocationHeaderProps> = ({
   onLocationClick,
 }) => {
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
   const isTelegram = isTelegramApp();
+  const safeArea = useTelegramSafeArea();
+
+  // Используем safe area если доступен, иначе дефолтные значения
+  const topPadding = isTelegram ? (safeArea.top > 0 ? safeArea.top + 0 : 0) : 0;
 
   return (
     <header
@@ -24,47 +29,46 @@ const LocationHeader: FC<LocationHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: isTelegram ? 92 : 0,
-        backgroundColor: isTelegram ? colors.background : colors.background,
+        paddingTop: topPadding,
+        // backgroundColor: c.background,
         zIndex: 100,
       }}
     >
       <div
         style={{
-          padding: "12px 16px",
+          height: 48,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           gap: 8,
-          borderTop: "1px solid " + colors.surfaceColor,
-          borderBottom: "1px solid " + colors.surfaceColor,
-          backgroundColor: colors.background,
+          // backgroundColor: c.background,
         }}
       >
-        <VuesaxIcon name="location" size={20} color={colors.primary} />
-        <button
-          onClick={onLocationClick}
+        <div
           style={{
-            background: "none",
-            border: "none",
-            padding: 0,
-            cursor: onLocationClick ? "pointer" : "default",
+            padding: "4px 10px 4px 6px",
             display: "flex",
+            flexDirection: "row",
             alignItems: "center",
-            gap: 4,
+            justifyContent: "center",
+            gap: 6,
+            borderRadius: 22,
+            backgroundColor: c.opacity,
           }}
+          onClick={onLocationClick}
         >
+          <VuesaxIcon name="location" size={20} color={c.primary} />
           <p
             style={{
-              fontSize: 16,
-              fontWeight: 400,
-              color: colors.text,
+              fontSize: 14,
+              fontWeight: 500,
+              color: c.text,
               margin: 0,
             }}
           >
             {location}
           </p>
-        </button>
+        </div>
       </div>
     </header>
   );

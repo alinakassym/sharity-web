@@ -18,6 +18,18 @@ export type TG = {
   enableVerticalSwipes: () => void;
   enableClosingConfirmation: () => void;
   disableClosingConfirmation: () => void;
+  safeAreaInset?: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
+  contentSafeAreaInset?: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
   BackButton: {
     show: () => void;
     hide: () => void;
