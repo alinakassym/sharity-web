@@ -8,7 +8,7 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import UserProfileCard from "@/components/UserProfileCard";
 import LoadingScreen from "@/components/LoadingScreen";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import NavigationButton from "@/components/NavigationButton";
 
 const Profile: FC = () => {
   const navigate = useNavigate();
@@ -66,70 +66,18 @@ const Profile: FC = () => {
 
         {/* Кнопка перехода к публикациям */}
         {userData && (
-          <div
+          <NavigationButton
+            label="Мои публикации"
             onClick={handleNavigateToPublications}
-            style={{
-              backgroundColor: c.surfaceColor,
-              borderRadius: 20,
-              padding: 20,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              cursor: "pointer",
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.8";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-            }}
-          >
-            <div
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: c.text,
-              }}
-            >
-              Мои публикации
-            </div>
-            <VuesaxIcon name="arrow-right" size={24} color={c.text} />
-          </div>
+          />
         )}
 
         {/* Кнопка перехода к пользователям (только для админа) */}
         {userData && isAdmin && (
-          <div
+          <NavigationButton
+            label="Пользователи"
             onClick={handleNavigateToUsers}
-            style={{
-              backgroundColor: c.surfaceColor,
-              borderRadius: 20,
-              padding: 20,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              cursor: "pointer",
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.8";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-            }}
-          >
-            <div
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: c.text,
-              }}
-            >
-              Пользователи
-            </div>
-            <VuesaxIcon name="arrow-right" size={24} color={c.text} />
-          </div>
+          />
         )}
       </div>
     </section>
