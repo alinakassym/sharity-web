@@ -246,6 +246,7 @@ const Create: FC = () => {
               }
               disabled={isLoadingCategories}
               required
+              searchable
             />
 
             <TextField
