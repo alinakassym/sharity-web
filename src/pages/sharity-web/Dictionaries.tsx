@@ -1,8 +1,10 @@
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
-import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import LoadingScreen from "@/components/LoadingScreen";
 import Header from "@/components/Header";
@@ -13,7 +15,7 @@ const Dictionaries: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
-  const isTelegram = isTelegramApp();
+  const platformName = useSafePlatform();
   const { userData, isLoading } = useCurrentUser();
 
   if (isLoading) return <LoadingScreen />;
@@ -24,7 +26,15 @@ const Dictionaries: FC = () => {
   // Если не админ, показываем сообщение об ошибке
   if (!isAdmin) {
     return (
-      <Container paddingTop={paddingTop + 44}>
+      <Container
+        paddingTop={
+          platformName === "desktop"
+            ? paddingTop + 92
+            : platformName === "unknown"
+              ? 88
+              : paddingTop + 44
+        }
+      >
         <Header title="Справочники" showGoBackBtn />
         <div
           style={{
@@ -40,7 +50,15 @@ const Dictionaries: FC = () => {
   }
 
   return (
-    <Container paddingTop={paddingTop + 44}>
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? paddingTop + 92
+          : platformName === "unknown"
+            ? 88
+            : paddingTop + 44
+      }
+    >
       <Header title="Справочники" showGoBackBtn />
 
       <div

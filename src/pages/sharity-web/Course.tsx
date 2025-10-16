@@ -1,28 +1,19 @@
 import type { FC } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
-import ProductHeader from "@/components/ProductHeader";
+import Header from "@/components/Header";
 import { useRequestGetCourse } from "@/hooks/useRequestGetCourse";
 
 const Course: FC = () => {
   const { id } = useParams<{ id: string }>();
-
-  const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
   const isTelegram = isTelegramApp();
 
-  const location = useLocation();
-
   const { course: courseData, isLoading, error } = useRequestGetCourse(id);
-  const backTo = (location.state as { from?: string })?.from || "/";
-
-  const handleBackClick = () => {
-    navigate(-1);
-  };
 
   // Генерируем стабильный индекс для fallback картинки на основе ID
   const getImageIndex = (id: string) => {
@@ -64,7 +55,7 @@ const Course: FC = () => {
           right: 0,
         }}
       >
-        <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
+        <Header title="Назад" showGoBackBtn />
         <div style={{ padding: 16 }}>Загрузка…</div>
       </section>
     );
@@ -74,13 +65,13 @@ const Course: FC = () => {
     return (
       <section
         style={{
-          paddingTop: isTelegram ? 112 : 64,
+          paddingTop: isTelegram ? 92 : 44,
           minHeight: "100vh",
           paddingBottom: "80px",
           backgroundColor: c.background,
         }}
       >
-        <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
+        <Header title="Назад" showGoBackBtn />
         <div style={{ padding: 16, color: c.lightText }}>
           {error || "Не найдено"}
         </div>
@@ -91,14 +82,14 @@ const Course: FC = () => {
   return (
     <section
       style={{
-        paddingTop: isTelegram ? 112 : 64,
+        paddingTop: isTelegram ? 92 : 88,
         minHeight: "100vh",
         paddingBottom: "80px",
         backgroundColor: c.background,
       }}
     >
       {/* Header с кнопкой назад */}
-      <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
+      <Header title="Назад" showGoBackBtn />
 
       {/* Контент продукта */}
       <div

@@ -4,16 +4,23 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import { useRequestGetUsers } from "@/hooks/useRequestGetUsers";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import UserProfileCard from "@/components/UserProfileCard";
 import UserCardWithRoleEdit from "@/components/UserCardWithRoleEdit";
 import LoadingScreen from "@/components/LoadingScreen";
 import SearchHeader from "@/components/SearchHeader";
 import type { UserData } from "@/hooks/useRequestCreateUser";
+import Container from "@/components/Container";
 
 const Users: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
   const isTelegram = isTelegramApp();
   const { users, isLoading, error } = useRequestGetUsers();
   const { userData: currentUser } = useCurrentUser();
@@ -60,13 +67,14 @@ const Users: FC = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 112 : 64,
-        minHeight: "100vh",
-        paddingBottom: "74px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
       {/* Search Header */}
       <SearchHeader
@@ -78,14 +86,12 @@ const Users: FC = () => {
       {/* Main Content */}
       <div
         style={{
-          paddingTop: isTelegram ? 156 : 64,
           padding: 16,
           display: "flex",
           flexDirection: "column",
           gap: 16,
         }}
       >
-
         {/* Ошибка */}
         {error && (
           <div
@@ -137,7 +143,7 @@ const Users: FC = () => {
           </div>
         )}
       </div>
-    </section>
+    </Container>
   );
 };
 

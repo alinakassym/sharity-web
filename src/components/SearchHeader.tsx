@@ -5,7 +5,7 @@ import { Colors } from "../theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 import { CloseWebViewButton } from "./CloseWebViewButton";
 import { isTelegramApp } from "@/lib/telegram";
-import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
+import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
 
 interface SearchHeaderProps {
   searchValue: string;
@@ -22,12 +22,9 @@ const SearchHeader: FC<SearchHeaderProps> = ({
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
-  const safeArea = useTelegramSafeArea();
 
   // Используем safe area если доступен, иначе дефолтные значения
-  const topPadding = isTelegram
-    ? (safeArea.top > 0 ? safeArea.top + 48 : 92)
-    : 0;
+  const paddingTop = useSafePaddingTop(88, 0);
 
   const handleClose = () => {
     // Переходим на указанную страницу или на главную по умолчанию
@@ -41,7 +38,7 @@ const SearchHeader: FC<SearchHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: topPadding,
+        paddingTop: paddingTop,
         borderBottom: "1px solid " + c.surfaceColor,
         backgroundColor: c.background,
         zIndex: 100,

@@ -4,13 +4,20 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import { useRequestGetUserProducts } from "@/hooks/useRequestGetUserProducts";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import SearchHeader from "@/components/SearchHeader";
 import ProductCard from "@/components/ProductCard";
 import LoadingScreen from "@/components/LoadingScreen";
+import Container from "@/components/Container";
 
 const MyPublications: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
   const isTelegram = isTelegramApp();
   const { products, isLoading, error } = useRequestGetUserProducts();
   const [searchValue, setSearchValue] = useState("");
@@ -23,13 +30,14 @@ const MyPublications: FC = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 112 : 64,
-        minHeight: "100vh",
-        paddingBottom: "74px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
       {/* Search Header */}
       <SearchHeader
@@ -121,7 +129,7 @@ const MyPublications: FC = () => {
           </div>
         )}
       </div>
-    </section>
+    </Container>
   );
 };
 

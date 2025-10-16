@@ -34,7 +34,7 @@ const Header: FC<LocationHeaderProps> = ({
   };
 
   const onClose = () => {
-    navigate("/add");
+    navigate(-1);
   };
 
   const topPadding = isTelegram ? (safeArea.top > 0 ? safeArea.top + 0 : 0) : 0;
