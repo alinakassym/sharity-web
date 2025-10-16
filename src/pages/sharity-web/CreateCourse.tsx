@@ -18,14 +18,11 @@ import {
   StepLabel,
   Button,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   IconButton,
 } from "@mui/material";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
+import CustomSelect from "@/components/CustomSelect";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
@@ -217,26 +214,23 @@ const Create: FC = () => {
               variant="outlined"
             />
 
-            <FormControl fullWidth>
-              <InputLabel>Категория *</InputLabel>
-              <Select
-                value={category}
-                label="Категория *"
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>Выберите категорию</em>
-                </MenuItem>
-                <MenuItem value="Гимнастика">Гимнастика</MenuItem>
-                <MenuItem value="Танцы">Танцы</MenuItem>
-                <MenuItem value="Балет">Балет</MenuItem>
-                <MenuItem value="Волейбол">Волейбол</MenuItem>
-                <MenuItem value="Теннис">Теннис</MenuItem>
-                <MenuItem value="Футбол">Футбол</MenuItem>
-                <MenuItem value="Хоккей">Хоккей</MenuItem>
-                <MenuItem value="Бег">Бег</MenuItem>
-              </Select>
-            </FormControl>
+            <CustomSelect
+              label="Категория"
+              value={category}
+              onChange={setCategory}
+              options={[
+                { value: "Гимнастика", label: "Гимнастика" },
+                { value: "Танцы", label: "Танцы" },
+                { value: "Балет", label: "Балет" },
+                { value: "Волейбол", label: "Волейбол" },
+                { value: "Теннис", label: "Теннис" },
+                { value: "Футбол", label: "Футбол" },
+                { value: "Хоккей", label: "Хоккей" },
+                { value: "Бег", label: "Бег" },
+              ]}
+              placeholder="Выберите категорию"
+              required
+            />
           </div>
         )}
 

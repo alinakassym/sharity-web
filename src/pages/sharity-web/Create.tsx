@@ -20,13 +20,10 @@ import {
   StepLabel,
   Button,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   IconButton,
 } from "@mui/material";
 import Container from "@/components/Container";
+import CustomSelect from "@/components/CustomSelect";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
@@ -234,27 +231,22 @@ const Create: FC = () => {
               variant="outlined"
             />
 
-            <FormControl fullWidth disabled={isLoadingCategories}>
-              <InputLabel>Категория *</InputLabel>
-              <Select
-                value={category}
-                label="Категория *"
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>
-                    {isLoadingCategories
-                      ? "Загрузка категорий..."
-                      : "Выберите категорию"}
-                  </em>
-                </MenuItem>
-                {categoryOptions.map((cat) => (
-                  <MenuItem key={cat.id} value={cat.name_ru}>
-                    {cat.name_ru}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <CustomSelect
+              label="Категория"
+              value={category}
+              onChange={setCategory}
+              options={categoryOptions.map((cat) => ({
+                value: cat.name_ru,
+                label: cat.name_ru,
+              }))}
+              placeholder={
+                isLoadingCategories
+                  ? "Загрузка категорий..."
+                  : "Выберите категорию"
+              }
+              disabled={isLoadingCategories}
+              required
+            />
 
             <TextField
               label="Цена *"
@@ -396,24 +388,18 @@ const Create: FC = () => {
               variant="outlined"
             />
 
-            <FormControl fullWidth>
-              <InputLabel>Состояние</InputLabel>
-              <Select
-                value={condition}
-                label="Состояние"
-                onChange={(e) => setCondition(e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>Выберите состояние</em>
-                </MenuItem>
-                <MenuItem value="Новое">Новое</MenuItem>
-                <MenuItem value="Отличное">Отличное</MenuItem>
-                <MenuItem value="Хорошее">Хорошее</MenuItem>
-                <MenuItem value="Удовлетворительное">
-                  Удовлетворительное
-                </MenuItem>
-              </Select>
-            </FormControl>
+            <CustomSelect
+              label="Состояние"
+              value={condition}
+              onChange={setCondition}
+              options={[
+                { value: "Новое", label: "Новое" },
+                { value: "Отличное", label: "Отличное" },
+                { value: "Хорошее", label: "Хорошее" },
+                { value: "Удовлетворительное", label: "Удовлетворительное" },
+              ]}
+              placeholder="Выберите состояние"
+            />
           </div>
         )}
 
