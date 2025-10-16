@@ -653,16 +653,17 @@ const Create: FC = () => {
       <div
         style={{
           position: "fixed",
-          bottom: 8,
+          bottom: 0,
           left: 0,
           right: 0,
-          padding: 16,
+          padding: "16px 16px 32px",
           backgroundColor: c.background,
           borderTop: `1px solid ${c.surfaceColor}`,
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
           gap: 8,
+          zIndex: 99,
         }}
       >
         {currentStepIndex > 0 && (
