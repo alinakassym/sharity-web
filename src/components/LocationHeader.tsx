@@ -54,8 +54,8 @@ const LocationHeader: FC<LocationHeaderProps> = ({
             gap: 6,
             borderRadius: 22,
             backgroundColor: c.opacity,
-            backdropFilter: "blur(90px)",
-            WebkitBackdropFilter: "blur(220px)", // Для Safari
+            backdropFilter: "blur(90px) saturate(180%)",
+            WebkitBackdropFilter: "blur(220px) saturate(180%)", // Для Safari
           }}
           onClick={onLocationClick}
         >

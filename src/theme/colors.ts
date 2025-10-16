@@ -38,7 +38,7 @@ export const Colors = {
     lightText: darkGrayColor,
     background: darkenColor,
     surfaceColor: darkColor,
-    opacity: "rgba(255, 255, 255, 0.15)",
+    opacity: "rgba(255, 255, 255, 0.12)",
     tint: primaryColor,
     icon: grayColor,
     tabIconDefault: grayColor,
