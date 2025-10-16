@@ -6,6 +6,7 @@ export interface CreateProductData {
   name: string;
   category: string;
   subcategory?: string; // Подкатегория гимнастики (если выбрана)
+  size?: number; // Размер купальника (если выбран)
   price: number;
   description?: string;
   condition?: string;

@@ -13,6 +13,7 @@ import ProductCard from "@/components/ProductCard";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
+import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import Header from "@/components/Header";
 import {
@@ -32,6 +33,7 @@ const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
+  const [productSize, setProductSize] = useState("");
   const [condition, setCondition] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -51,6 +53,8 @@ const Create: FC = () => {
     categories: gymnasticsCategories,
     isLoading: isLoadingGymnasticsCategories,
   } = useRequestGetGymnasticsCategories();
+  const { sizes: leotardSizes, isLoading: isLoadingLeotardSizes } =
+    useRequestGetLeotardSizes();
 
   // Преобразуем категории из Firebase для использования в Select
   const categoryOptions = useMemo(() => {
@@ -62,19 +66,45 @@ const Create: FC = () => {
     return gymnasticsCategories;
   }, [gymnasticsCategories]);
 
+  // Преобразуем размеры купальников для использования в Select
+  const leotardSizeOptions = useMemo(() => {
+    return leotardSizes.map((size) => ({
+      value: `${size.size}`,
+      label: `${size.size} (${size.height})`,
+    }));
+  }, [leotardSizes]);
+
   // Очищаем подкатегорию гимнастики при изменении основной категории
   useEffect(() => {
     if (category !== "Гимнастика") {
       setSubcategory("");
+      setProductSize("");
     }
   }, [category]);
+
+  // Очищаем размер купальника при изменении подкатегории
+  useEffect(() => {
+    if (subcategory !== "Купальник") {
+      setProductSize("");
+    }
+  }, [subcategory]);
 
   // Обработчик изменения категории
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
-    // Если выбрана не гимнастика, очищаем подкатегорию
+    // Если выбрана не гимнастика, очищаем подкатегорию и размер
     if (newCategory !== "Гимнастика") {
       setSubcategory("");
+      setProductSize("");
+    }
+  };
+
+  // Обработчик изменения подкатегории
+  const handleSubcategoryChange = (newSubcategory: string) => {
+    setSubcategory(newSubcategory);
+    // Если выбрана не купальник, очищаем размер
+    if (newSubcategory !== "Купальник") {
+      setProductSize("");
     }
   };
 
@@ -153,6 +183,7 @@ const Create: FC = () => {
         name: productName.trim(),
         category,
         subcategory: subcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
+        productSize: productSize ? Number(productSize) : undefined, // Добавляем размер купальника, если выбран
         price: Number(price),
         description: description.trim() || undefined,
         condition: condition || undefined,
@@ -282,7 +313,7 @@ const Create: FC = () => {
               <CustomSelect
                 label="Подкатегория"
                 value={subcategory}
-                onChange={setSubcategory}
+                onChange={handleSubcategoryChange}
                 options={gymnasticsSubcategoryOptions.map((cat) => ({
                   value: cat.name_ru,
                   label: cat.name_ru,
@@ -293,6 +324,23 @@ const Create: FC = () => {
                     : "Выберите подкатегорию"
                 }
                 disabled={isLoadingGymnasticsCategories}
+                searchable
+              />
+            )}
+
+            {/* Размеры купальников - показываем только если выбрана Гимнастика и Купальник */}
+            {category === "Гимнастика" && subcategory === "Купальник" && (
+              <CustomSelect
+                label="Размер"
+                value={productSize}
+                onChange={setProductSize}
+                options={leotardSizeOptions}
+                placeholder={
+                  isLoadingLeotardSizes
+                    ? "Загрузка размеров..."
+                    : "Выберите размер"
+                }
+                disabled={isLoadingLeotardSizes}
                 searchable
               />
             )}
