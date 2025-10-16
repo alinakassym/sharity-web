@@ -2,9 +2,10 @@
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import UserProfileCard from "@/components/UserProfileCard";
 import LoadingScreen from "@/components/LoadingScreen";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
@@ -13,6 +14,7 @@ const Profile: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 0);
   const isTelegram = isTelegramApp();
   const { userData, isLoading, error } = useCurrentUser();
 
@@ -32,7 +34,7 @@ const Profile: FC = () => {
   return (
     <section
       style={{
-        paddingTop: isTelegram ? 48 : 44,
+        paddingTop: isTelegram ? paddingTop : 0,
         minHeight: "100vh",
         paddingBottom: "74px",
         backgroundColor: c.background,

@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
 import Container from "@/components/Container";
 import FullWidthButton from "@/components/FullWidthButton";
@@ -56,6 +57,7 @@ const Add: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 0);
   const { userData } = useCurrentUser();
 
   const handleOptionClick = (path: string) => {
@@ -64,10 +66,11 @@ const Add: FC = () => {
   };
 
   // Проверяем, имеет ли пользователь доступ к админ-функциям
-  const hasAdminAccess = userData?.role === "admin" || userData?.role === "manager";
+  const hasAdminAccess =
+    userData?.role === "admin" || userData?.role === "manager";
 
   return (
-    <Container showLocationHeader paddingTop={92}>
+    <Container showLocationHeader paddingTop={paddingTop}>
       {/* Main Content */}
       <div
         style={{
