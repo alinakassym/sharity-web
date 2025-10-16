@@ -18,6 +18,7 @@ export type TG = {
   enableVerticalSwipes: () => void;
   enableClosingConfirmation: () => void;
   disableClosingConfirmation: () => void;
+  platform?: string; // "android", "ios", "macos", "tdesktop", "unigram", "web", "weba", "webk", "unknown"
   safeAreaInset?: {
     top: number;
     bottom: number;
