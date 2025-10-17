@@ -1,7 +1,8 @@
 import type { FC } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
 import {
   useSafePaddingTop,
   useSafePlatform,
@@ -10,7 +11,7 @@ import { getTelegramUser } from "@/lib/telegram";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import CourseCard from "@/components/CourseCard";
-import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
+import YandexMap from "@/components/YandexMap";
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
   Stepper,
@@ -24,7 +25,7 @@ import Container from "@/components/Container";
 import Header from "@/components/Header";
 import CustomSelect from "@/components/CustomSelect";
 
-type StepType = "basic" | "photos" | "details" | "review";
+type StepType = "basic" | "location" | "photos" | "details" | "review";
 
 const Create: FC = () => {
   const navigate = useNavigate();
@@ -34,13 +35,19 @@ const Create: FC = () => {
   const paddingTop = useSafePaddingTop(48, 44);
   const platformName = useSafePlatform();
 
+  const [isPublishing, setIsPublishing] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [category, setCategory] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [locationCoordinates, setLocationCoordinates] = useState<
+    [number, number] | undefined
+  >();
+  const locationInputRef = useRef<HTMLDivElement>(null);
 
-  const { createCourse, isLoading: isCreating } = useRequestCreateCourse();
+  const { createCourse } = useRequestCreateCourse();
 
   // Тестируем подключение к Minio при загрузке компонента
   useEffect(() => {
@@ -57,6 +64,11 @@ const Create: FC = () => {
       id: "basic",
       title: "Основная информация",
       description: "Название, категория",
+    },
+    {
+      id: "location",
+      title: "Локация",
+      description: "Адрес",
     },
     { id: "photos", title: "Фотографии", description: "Добавьте фото товара" },
     {
@@ -85,7 +97,8 @@ const Create: FC = () => {
     if (currentStepIndex < steps.length - 1) {
       setCurrentStep(steps[currentStepIndex + 1].id);
     } else {
-      // Публикация товара
+      // Публикация
+      setIsPublishing(true);
       handlePublish();
     }
   };
@@ -114,6 +127,8 @@ const Create: FC = () => {
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
+        location: location.trim() || "string",
+        locationCoordinates: locationCoordinates || undefined, // Координаты [lat, lng]
       };
 
       const result = await createCourse(courseData);
@@ -231,6 +246,38 @@ const Create: FC = () => {
               placeholder="Выберите категорию"
               required
               searchable
+            />
+          </div>
+        )}
+
+        {currentStep === "location" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <div style={{ width: "80%", alignSelf: "center" }}>
+              <YandexMap
+                apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
+                height={300}
+                onLocationSelect={(address, coordinates) => {
+                  setLocation(address);
+                  setLocationCoordinates(coordinates);
+                }}
+              />
+            </div>
+            <TextField
+              ref={locationInputRef}
+              label="Локация/адрес *"
+              placeholder="Введите локацию/адрес"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              onFocus={() => {
+                setTimeout(() => {
+                  locationInputRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }, 400);
+              }}
+              fullWidth
+              variant="outlined"
             />
           </div>
         )}
@@ -510,10 +557,10 @@ const Create: FC = () => {
           fullWidth
           variant="contained"
           onClick={handleNext}
-          disabled={isCreating}
+          disabled={isPublishing}
         >
           {currentStepIndex === steps.length - 1
-            ? isCreating
+            ? isPublishing
               ? "Публикуем..."
               : "Опубликовать"
             : "Далее"}
