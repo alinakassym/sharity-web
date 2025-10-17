@@ -43,10 +43,6 @@ export const CourseCard: FC<Props> = ({
         style={{
           position: "relative",
           marginBottom: 8,
-          borderRadius: "12px",
-          border: `1px solid ${c.border}`,
-          backgroundColor: c.lighter,
-          overflow: "hidden",
         }}
       >
         <img
@@ -58,6 +54,9 @@ export const CourseCard: FC<Props> = ({
             objectFit: "cover",
             borderRadius: 12,
             display: "block",
+            border: `1px solid ${c.border}`,
+            backgroundColor: c.lighter,
+            overflow: "hidden",
           }}
         />
         {showHeartBtn && (

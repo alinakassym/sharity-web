@@ -103,14 +103,7 @@ const Course: FC = () => {
         }}
       >
         {/* Изображение */}
-        <div
-          style={{
-            borderRadius: "12px",
-            border: `1px solid ${c.border}`,
-            backgroundColor: c.lighter,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{}}>
           <img
             src={course.image}
             alt={course.title}
@@ -118,6 +111,10 @@ const Course: FC = () => {
               width: "100%",
               aspectRatio: "1 / 1",
               objectFit: "cover",
+              borderRadius: "12px",
+              border: `1px solid ${c.border}`,
+              backgroundColor: c.lighter,
+              overflow: "hidden",
             }}
           />
         </div>
