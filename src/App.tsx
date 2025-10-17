@@ -6,7 +6,7 @@ import StoreTabBar from "./components/StoreTabBar";
 import MainTabBar from "./components/MainTabBar";
 import TelegramUserInit from "./components/TelegramUserInit";
 import Home from "./pages/sharity-web/Home";
-import Classes from "./pages/sharity-web/Classes";
+import Courses from "./pages/sharity-web/Courses";
 import Events from "./pages/sharity-web/Events";
 import Store from "./pages/sharity-web/Store";
 import Product from "./pages/sharity-web/Product";
@@ -40,7 +40,7 @@ const AppContent: FC = () => {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="classes" element={<Classes />} />
+        <Route path="classes" element={<Courses />} />
         <Route path="events" element={<Events />} />
         <Route path="store" element={<Store />} />
         <Route path="product/:id" element={<Product />} />

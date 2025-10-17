@@ -2,10 +2,23 @@ import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+interface CourseFromDB {
+  id: string;
+  name?: string;
+  category?: string;
+  price?: number;
+  description?: string;
+  image?: string;
+  imagesArray?: string[];
+  isFavorite?: boolean;
+  isDeleted?: boolean;
+  createdBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export const useRequestGetCourse = (courseId: string | undefined) => {
-  const [course, setCourse] =
-    useState<// eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { id: string; [k: string]: any } | null>(null);
+  const [course, setCourse] = useState<CourseFromDB | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,15 +38,22 @@ export const useRequestGetCourse = (courseId: string | undefined) => {
       courseRef,
       (docSnap) => {
         if (docSnap.exists()) {
-          setCourse({ id: docSnap.id, ...docSnap.data() });
+          const courseData = { id: docSnap.id, ...docSnap.data() } as CourseFromDB;
+          // Проверяем, не удален ли курс
+          if (courseData.isDeleted) {
+            setCourse(null);
+            setError("Курс удален");
+          } else {
+            setCourse(courseData);
+          }
         } else {
           setCourse(null);
-          setError("Продукт не найден");
+          setError("Курс не найден");
         }
         setIsLoading(false);
       },
       (err) => {
-        setError(err.message || "Ошибка при загрузке продукта");
+        setError(err.message || "Ошибка при загрузке курса");
         setIsLoading(false);
       },
     );

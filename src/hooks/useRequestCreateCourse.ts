@@ -7,6 +7,7 @@ export interface CreateCourseData {
   category: string;
   description?: string;
   isFavorite?: boolean;
+  isDeleted?: boolean; // Флаг удаления курса
   imagesArray?: string[];
   createdBy?: string; // Telegram username пользователя
   createdAt?: Date;

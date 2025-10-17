@@ -16,7 +16,7 @@ const KZT = new Intl.NumberFormat("ru-RU", {
   maximumFractionDigits: 0,
 });
 
-const Classes: FC = () => {
+const Courses: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
@@ -25,10 +25,8 @@ const Classes: FC = () => {
   const [searchValue, setSearchValue] = useState("");
 
   const { courses: rows, isLoading: isLoadingCourses } = useRequestGetCourses();
-  const {
-    categories: categoriesFromFirebase,
-    isLoading: isLoadingCategories,
-  } = useRequestGetCategories();
+  const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
+    useRequestGetCategories();
 
   // Преобразуем категории из Firebase в формат Category для CategoryFilter
   const categories: Category[] = useMemo(() => {
@@ -127,4 +125,4 @@ const Classes: FC = () => {
   );
 };
 
-export default Classes;
+export default Courses;
