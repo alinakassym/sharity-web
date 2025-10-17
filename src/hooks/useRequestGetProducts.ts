@@ -5,11 +5,26 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+interface ProductFromDB {
+  id: string;
+  name?: string;
+  category?: string;
+  subcategory?: string;
+  productSize?: number;
+  price?: number;
+  description?: string;
+  condition?: string;
+  image?: string;
+  imagesArray?: string[];
+  isFavorite?: boolean;
+  isDeleted?: boolean;
+  createdBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export const useRequestGetProducts = () => {
-  const [products, setProducts] = useState<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Array<{ id: string; [k: string]: any }>
-  >([]);
+  const [products, setProducts] = useState<ProductFromDB[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +33,7 @@ export const useRequestGetProducts = () => {
       col,
       (snap) => {
         const arr = snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
+          .map((d) => ({ id: d.id, ...d.data() } as ProductFromDB))
           .filter((product) => !product.isDeleted); // Фильтрация удаленных продуктов
         setProducts(arr);
         setIsLoading(false);
