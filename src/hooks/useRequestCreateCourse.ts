@@ -11,6 +11,7 @@ export interface CreateCourseData {
   imagesArray?: string[];
   createdBy?: string; // Telegram username пользователя
   createdAt?: Date;
+  locations?: Array<{ location: string; locationCoordinates: [number, number] }>; // Массив локаций
 }
 
 export const useRequestCreateCourse = () => {

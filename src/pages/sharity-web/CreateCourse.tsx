@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
@@ -20,6 +20,10 @@ import {
   Button,
   TextField,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
@@ -27,7 +31,7 @@ import CustomSelect from "@/components/CustomSelect";
 
 type StepType = "basic" | "location" | "photos" | "details" | "review";
 
-const Create: FC = () => {
+const CreateCourse: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -41,11 +45,18 @@ const Create: FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [locationCoordinates, setLocationCoordinates] = useState<
+
+  // Новая структура данных для локаций
+  const [locations, setLocations] = useState<
+    Array<{ location: string; locationCoordinates: [number, number] }>
+  >([]);
+
+  // Состояние для модального окна
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [tempLocation, setTempLocation] = useState("");
+  const [tempLocationCoordinates, setTempLocationCoordinates] = useState<
     [number, number] | undefined
   >();
-  const locationInputRef = useRef<HTMLDivElement>(null);
 
   const { createCourse } = useRequestCreateCourse();
 
@@ -127,8 +138,7 @@ const Create: FC = () => {
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
-        location: location.trim() || "string",
-        locationCoordinates: locationCoordinates || undefined, // Координаты [lat, lng]
+        locations: locations.length > 0 ? locations : undefined, // Массив локаций
       };
 
       const result = await createCourse(courseData);
@@ -161,6 +171,36 @@ const Create: FC = () => {
     setSelectedFiles(
       selectedFiles.filter((_, index) => index !== indexToRemove),
     );
+  };
+
+  // Обработчики для модального окна локации
+  const handleOpenLocationModal = () => {
+    setTempLocation("");
+    setTempLocationCoordinates(undefined);
+    setIsLocationModalOpen(true);
+  };
+
+  const handleCloseLocationModal = () => {
+    setIsLocationModalOpen(false);
+    setTempLocation("");
+    setTempLocationCoordinates(undefined);
+  };
+
+  const handleAddLocation = () => {
+    if (tempLocation.trim() && tempLocationCoordinates) {
+      setLocations([
+        ...locations,
+        {
+          location: tempLocation.trim(),
+          locationCoordinates: tempLocationCoordinates,
+        },
+      ]);
+      handleCloseLocationModal();
+    }
+  };
+
+  const handleRemoveLocation = (indexToRemove: number) => {
+    setLocations(locations.filter((_, index) => index !== indexToRemove));
   };
 
   return (
@@ -251,34 +291,70 @@ const Create: FC = () => {
         )}
 
         {currentStep === "location" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <div style={{ width: "80%", alignSelf: "center" }}>
-              <YandexMap
-                apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
-                height={300}
-                onLocationSelect={(address, coordinates) => {
-                  setLocation(address);
-                  setLocationCoordinates(coordinates);
-                }}
-              />
-            </div>
-            <TextField
-              ref={locationInputRef}
-              label="Локация/адрес *"
-              placeholder="Введите локацию/адрес"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onFocus={() => {
-                setTimeout(() => {
-                  locationInputRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                  });
-                }, 400);
-              }}
-              fullWidth
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Список добавленных адресов */}
+            {locations.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {locations.map((loc, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: 16,
+                      backgroundColor: c.surfaceColor,
+                      borderRadius: 12,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 14,
+                          fontWeight: 600,
+                          color: c.text,
+                        }}
+                      >
+                        {loc.location}
+                      </p>
+                      <p
+                        style={{
+                          margin: "4px 0 0",
+                          fontSize: 12,
+                          color: c.lightText,
+                        }}
+                      >
+                        {loc.locationCoordinates[0].toFixed(6)},{" "}
+                        {loc.locationCoordinates[1].toFixed(6)}
+                      </p>
+                    </div>
+                    <IconButton
+                      onClick={() => handleRemoveLocation(index)}
+                      size="small"
+                      sx={{
+                        borderColor: c.error,
+                        borderWidth: 1,
+                        borderStyle: "solid",
+                        backgroundColor: `${c.error}20`,
+                      }}
+                    >
+                      <VuesaxIcon name="close" size={16} color={c.error} />
+                    </IconButton>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Кнопка добавить адрес */}
+            <Button
               variant="outlined"
-            />
+              fullWidth
+              onClick={handleOpenLocationModal}
+              startIcon={<VuesaxIcon name="location" size={20} color={c.primary} />}
+            >
+              Добавить адрес
+            </Button>
           </div>
         )}
 
@@ -566,8 +642,48 @@ const Create: FC = () => {
             : "Далее"}
         </Button>
       </div>
+
+      {/* Модальное окно для добавления локации */}
+      <Dialog
+        open={isLocationModalOpen}
+        onClose={handleCloseLocationModal}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Добавить адрес</DialogTitle>
+        <DialogContent>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, paddingTop: 8 }}>
+            <YandexMap
+              apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
+              height={300}
+              onLocationSelect={(address, coordinates) => {
+                setTempLocation(address);
+                setTempLocationCoordinates(coordinates);
+              }}
+            />
+            <TextField
+              label="Адрес"
+              placeholder="Выберите адрес на карте"
+              value={tempLocation}
+              onChange={(e) => setTempLocation(e.target.value)}
+              fullWidth
+              variant="outlined"
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseLocationModal}>Отмена</Button>
+          <Button
+            onClick={handleAddLocation}
+            variant="contained"
+            disabled={!tempLocation.trim() || !tempLocationCoordinates}
+          >
+            Добавить
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 
-export default Create;
+export default CreateCourse;
