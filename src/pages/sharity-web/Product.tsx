@@ -105,7 +105,7 @@ const Product: FC = () => {
       >
         <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
         <div style={{ padding: 16, color: c.lightText }}>
-          {error || "Продукт не найден"}
+          {error || "Товар не найден"}
         </div>
       </section>
     );

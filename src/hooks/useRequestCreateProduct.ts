@@ -11,6 +11,7 @@ export interface CreateProductData {
   description?: string;
   condition?: string;
   isFavorite?: boolean;
+  isDeleted?: boolean; // Флаг удаления продукта
   imagesArray?: string[];
   createdBy?: string; // Telegram username пользователя
   createdAt?: Date;

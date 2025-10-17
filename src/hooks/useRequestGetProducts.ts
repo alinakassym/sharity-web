@@ -17,7 +17,9 @@ export const useRequestGetProducts = () => {
     const unsub = onSnapshot(
       col,
       (snap) => {
-        const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const arr = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .filter((product) => !product.isDeleted); // Фильтрация удаленных продуктов
         setProducts(arr);
         setIsLoading(false);
       },
