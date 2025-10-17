@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
@@ -45,6 +45,11 @@ const Create: FC = () => {
   const navigate = useNavigate();
   const paddingTop = useSafePaddingTop(48, 44);
   const platformName = useSafePlatform();
+
+  // Refs для автофокуса
+  const subcategoryInputRef = useRef<HTMLInputElement>(null);
+  const sizeInputRef = useRef<HTMLInputElement>(null);
+  const priceInputRef = useRef<HTMLInputElement>(null);
 
   const { createProduct } = useRequestCreateProduct();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
@@ -97,6 +102,17 @@ const Create: FC = () => {
       setSubcategory("");
       setProductSize("");
     }
+
+    // Автофокус на следующий инпут
+    setTimeout(() => {
+      if (newCategory === "Гимнастика") {
+        // Если есть подкатегория → фокус на подкатегорию
+        subcategoryInputRef.current?.focus();
+      } else {
+        // Иначе → фокус на цену
+        priceInputRef.current?.focus();
+      }
+    }, 300);
   };
 
   // Обработчик изменения подкатегории
@@ -106,6 +122,17 @@ const Create: FC = () => {
     if (newSubcategory !== "Купальник") {
       setProductSize("");
     }
+
+    // Автофокус на следующий инпут
+    setTimeout(() => {
+      if (newSubcategory === "Купальник") {
+        // Если есть размер → фокус на размер
+        sizeInputRef.current?.focus();
+      } else {
+        // Иначе → фокус на цену
+        priceInputRef.current?.focus();
+      }
+    }, 300);
   };
 
   // Тестируем подключение к Minio при загрузке компонента
@@ -333,7 +360,13 @@ const Create: FC = () => {
               <CustomSelect
                 label="Размер"
                 value={productSize}
-                onChange={setProductSize}
+                onChange={(value) => {
+                  setProductSize(value);
+                  // Автофокус на цену после выбора размера
+                  setTimeout(() => {
+                    priceInputRef.current?.focus();
+                  }, 300);
+                }}
                 options={leotardSizeOptions}
                 placeholder={
                   isLoadingLeotardSizes
@@ -356,6 +389,7 @@ const Create: FC = () => {
               fullWidth
               variant="outlined"
               helperText="Укажите цену в тенге"
+              inputRef={priceInputRef}
             />
           </div>
         )}
