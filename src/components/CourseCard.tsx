@@ -27,7 +27,7 @@ export const CourseCard: FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
-  const colors = Colors[scheme];
+  const c = Colors[scheme];
 
   const handleCardClick = () => {
     navigate(`/course/${course.id}`);
@@ -39,7 +39,16 @@ export const CourseCard: FC<Props> = ({
       onClick={handleCardClick}
     >
       {/* изображение + сердце */}
-      <div style={{ position: "relative", marginBottom: 8 }}>
+      <div
+        style={{
+          position: "relative",
+          marginBottom: 8,
+          borderRadius: "12px",
+          border: `1px solid ${c.border}`,
+          backgroundColor: c.lighter,
+          overflow: "hidden",
+        }}
+      >
         <img
           src={course.image}
           alt={course.title}
@@ -48,7 +57,6 @@ export const CourseCard: FC<Props> = ({
             aspectRatio: "1 / 1",
             objectFit: "cover",
             borderRadius: 12,
-            border: `1px solid ${colors.border}`,
             display: "block",
           }}
         />
@@ -86,10 +94,10 @@ export const CourseCard: FC<Props> = ({
 
       {/* текст */}
       <div style={{ display: "grid", gap: 4 }}>
-        <div style={{ fontSize: 12, color: colors.lightText }}>
+        <div style={{ fontSize: 12, color: c.lightText }}>
           {course.category}
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: colors.text }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: c.text }}>
           {course.title}
         </div>
       </div>

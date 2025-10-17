@@ -100,11 +100,17 @@ const Course: FC = () => {
           gap: 8,
           height: "calc(100vh - 90px)",
           overflowY: "auto",
-          boxSizing: "border-box",
         }}
       >
         {/* Изображение */}
-        <div style={{}}>
+        <div
+          style={{
+            borderRadius: "12px",
+            border: `1px solid ${c.border}`,
+            backgroundColor: c.lighter,
+            overflow: "hidden",
+          }}
+        >
           <img
             src={course.image}
             alt={course.title}
@@ -112,8 +118,6 @@ const Course: FC = () => {
               width: "100%",
               aspectRatio: "1 / 1",
               objectFit: "cover",
-              borderRadius: "12px",
-              border: `1px solid ${c.border}`,
             }}
           />
         </div>
