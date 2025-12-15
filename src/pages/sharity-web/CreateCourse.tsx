@@ -294,7 +294,9 @@ const CreateCourse: FC = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {/* Список добавленных адресов */}
             {locations.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
                 {locations.map((loc, index) => (
                   <div
                     key={index}
@@ -351,7 +353,9 @@ const CreateCourse: FC = () => {
               variant="outlined"
               fullWidth
               onClick={handleOpenLocationModal}
-              startIcon={<VuesaxIcon name="location" size={20} color={c.primary} />}
+              startIcon={
+                <VuesaxIcon name="location" size={20} color={c.primary} />
+              }
             >
               Добавить адрес
             </Button>
@@ -647,12 +651,20 @@ const CreateCourse: FC = () => {
       <Dialog
         open={isLocationModalOpen}
         onClose={handleCloseLocationModal}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
+        sx={{ "& .MuiPaper-root": { background: c.surfaceColor } }}
       >
         <DialogTitle>Добавить адрес</DialogTitle>
         <DialogContent>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, paddingTop: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+              paddingTop: 8,
+            }}
+          >
             <YandexMap
               apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
               height={300}
@@ -661,17 +673,31 @@ const CreateCourse: FC = () => {
                 setTempLocationCoordinates(coordinates);
               }}
             />
-            <TextField
-              label="Адрес"
-              placeholder="Выберите адрес на карте"
-              value={tempLocation}
-              onChange={(e) => setTempLocation(e.target.value)}
-              fullWidth
-              variant="outlined"
-            />
+            <div style={{ width: "100%" }}>
+              <TextField
+                label="Адрес"
+                placeholder="Выберите адрес на карте"
+                value={tempLocation}
+                onChange={(e) => setTempLocation(e.target.value)}
+                fullWidth
+                aria-readonly
+                sx={{
+                  "& .MuiFormLabel-root": {
+                    backgroundColor: c.surfaceColor,
+                  },
+                }}
+              />
+            </div>
           </div>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{
+            padding: "24px",
+            borderTopWidth: 1,
+            borderTopColor: c.background,
+            borderTopStyle: "solid",
+          }}
+        >
           <Button onClick={handleCloseLocationModal}>Отмена</Button>
           <Button
             onClick={handleAddLocation}

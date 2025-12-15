@@ -13,7 +13,7 @@ export interface AuthPermissions {
 
 interface AuthModalProps {
   onConfirm: (permissions: AuthPermissions) => void;
-  onCancel: () => void;
+  onCancel: (permissions: AuthPermissions) => void;
 }
 
 const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
@@ -27,6 +27,16 @@ const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
   const handleConfirm = async () => {
     setIsConfirming(true);
     await onConfirm({
+      includeFirstName,
+      includeLastName,
+      includePhoto,
+    });
+    setIsConfirming(false);
+  };
+
+  const handleCancel = async () => {
+    setIsConfirming(true);
+    await onCancel({
       includeFirstName,
       includeLastName,
       includePhoto,
@@ -240,7 +250,7 @@ const AuthModal: FC<AuthModalProps> = ({ onConfirm, onCancel }) => {
             size="large"
             fullWidth
             variant="outlined"
-            onClick={onCancel}
+            onClick={handleCancel}
             disabled={isConfirming}
           >
             Отмена

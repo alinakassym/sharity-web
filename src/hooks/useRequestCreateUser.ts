@@ -10,6 +10,7 @@ export interface UserData {
   allowsWriteToPm?: boolean;
   photoUrl?: string;
   phoneNumber?: string; // Для будущего использования
+  isConfirmed?: boolean; // Флаг подтверждения авторизации (true - согласен, false - отмена)
   createdAt: Date;
   lastLoginAt: Date;
   role: "admin" | "manager" | "user";
@@ -59,6 +60,7 @@ export const useRequestCreateUser = () => {
           firstName: userData?.firstName ?? "",
           lastName: userData?.lastName ?? "",
           photoUrl: userData?.photoUrl ?? "",
+          isConfirmed: userData?.isConfirmed ?? true, // По умолчанию true для обратной совместимости
           role: "user", // По умолчанию новый пользователь получает роль "user"
           createdAt: new Date(),
           lastLoginAt: new Date(),

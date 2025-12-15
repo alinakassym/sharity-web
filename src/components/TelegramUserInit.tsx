@@ -97,6 +97,7 @@ const TelegramUserInit: FC = () => {
       lastName: permissions.includeLastName ? user.last_name : undefined,
       languageCode: user.language_code,
       photoUrl: permissions.includePhoto ? user.photo_url : undefined,
+      isConfirmed: true, // Пользователь согласился с авторизацией
     };
 
     const result = await createOrUpdateUser(userData);
@@ -114,10 +115,38 @@ const TelegramUserInit: FC = () => {
     }
   };
 
-  const handleAuthCancel = () => {
-    console.log("❌ Пользователь отменил авторизацию");
-    setShowAuthModal(false);
-    // Можно добавить редирект или показать сообщение
+  const handleAuthCancel = async (permissions: AuthPermissions) => {
+    const { user } = getTelegramUser();
+
+    if (!user) {
+      console.error("Не удалось получить данные пользователя");
+      setShowAuthModal(false);
+      return;
+    }
+
+    // Создаем пользователя с минимальными данными и флагом isConfirmed: false
+    const userData = {
+      telegramId: user.id,
+      username: user.username,
+      firstName: permissions.includeFirstName ? user.first_name : undefined,
+      lastName: permissions.includeLastName ? user.last_name : undefined,
+      languageCode: user.language_code,
+      photoUrl: permissions.includePhoto ? user.photo_url : undefined,
+      isConfirmed: false, // Пользователь отменил полную авторизацию
+    };
+
+    const result = await createOrUpdateUser(userData);
+
+    if (result.success) {
+      console.log(
+        "⚠️ Пользователь создан с ограничениями (isConfirmed: false):",
+        user.username || user.first_name,
+      );
+      setShowAuthModal(false);
+    } else {
+      console.error("❌ Ошибка при создании пользователя:", result.error);
+      setShowAuthModal(false);
+    }
   };
 
   // Показываем экран загрузки во время проверки пользователя
