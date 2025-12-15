@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -62,7 +63,14 @@ const Add: FC = () => {
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
   const platformName = useSafePlatform();
-  const { userData } = useCurrentUser();
+  const { userData, isLoading } = useCurrentUser();
+
+  // Защита: перенаправляем на /auth-required если isConfirmed === false
+  useEffect(() => {
+    if (!isLoading && userData && userData.isConfirmed === false) {
+      navigate("/auth-required", { replace: true });
+    }
+  }, [isLoading, userData, navigate]);
 
   const handleOptionClick = (path: string) => {
     // Передаем информацию о текущей странице для правильной навигации назад

@@ -22,6 +22,7 @@ import Profile from "./pages/sharity-web/Profile";
 import MyPublications from "./pages/sharity-web/MyPublications";
 import Users from "./pages/sharity-web/Users";
 import Dictionaries from "./pages/sharity-web/Dictionaries";
+import AuthRequired from "./pages/sharity-web/AuthRequired";
 import { isTelegramApp } from "./lib/telegram";
 
 const AppContent: FC = () => {
@@ -56,6 +57,7 @@ const AppContent: FC = () => {
         <Route path="create-course" element={<CreateCourse />} />
         <Route path="create-event" element={<CreateEvent />} />
         <Route path="course/:id" element={<Course />} />
+        <Route path="auth-required" element={<AuthRequired />} />
       </Routes>
       {showMainTabBar && <MainTabBar />}
       {showStoreTabBar && <StoreTabBar />}

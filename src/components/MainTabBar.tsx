@@ -44,8 +44,9 @@ const MainTabBar: FC = () => {
   const isUserConfirmed = userData?.isConfirmed ?? true;
 
   const handleTabPress = (path: string, tabId: string) => {
-    // Блокируем переход на disabled табы
+    // Если пользователь не подтвердил авторизацию и пытается перейти на ограниченный таб
     if (!isUserConfirmed && (tabId === "create" || tabId === "profile")) {
+      navigate("/auth-required");
       return;
     }
     navigate(path);
@@ -69,14 +70,11 @@ const MainTabBar: FC = () => {
     >
       {tabs.map((tab) => {
         const isActive = location.pathname === tab.path;
-        const isDisabled =
-          !isUserConfirmed && (tab.id === "create" || tab.id === "profile");
 
         return (
           <button
             key={tab.id}
             onClick={() => handleTabPress(tab.path, tab.id)}
-            disabled={isDisabled}
             style={{
               flex: 1,
               display: "flex",
@@ -87,9 +85,8 @@ const MainTabBar: FC = () => {
               padding: "8px 4px",
               background: "none",
               border: "none",
-              cursor: isDisabled ? "not-allowed" : "pointer",
+              cursor: "pointer",
               color: isActive ? colors.primary : colors.text,
-              opacity: isDisabled ? 0.4 : 1,
               transition: "color 0.2s ease, opacity 0.2s ease",
               outline: "none",
             }}

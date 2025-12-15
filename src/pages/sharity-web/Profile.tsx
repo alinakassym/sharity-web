@@ -1,4 +1,5 @@
 // src/pages/sharity-web/Profile.tsx
+import { useEffect } from "react";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -17,6 +18,13 @@ const Profile: FC = () => {
   const paddingTop = useSafePaddingTop(48, 0);
   const isTelegram = isTelegramApp();
   const { userData, isLoading, error } = useCurrentUser();
+
+  // Защита: перенаправляем на /auth-required если isConfirmed === false
+  useEffect(() => {
+    if (!isLoading && userData && userData.isConfirmed === false) {
+      navigate("/auth-required", { replace: true });
+    }
+  }, [isLoading, userData, navigate]);
 
   if (isLoading) return <LoadingScreen />;
 
