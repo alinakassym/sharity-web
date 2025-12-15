@@ -39,9 +39,10 @@ export const useRequestCreateUser = () => {
       const userSnap = await getDoc(userRef);
 
       if (userSnap.exists()) {
-        // Пользователь существует - обновляем только lastLoginAt и другие данные
+        // Пользователь существует - обновляем переданные данные и lastLoginAt
         const existingData = userSnap.data();
         const updateData: Record<string, unknown> = {
+          ...userData, // Включаем все переданные поля (username, firstName, lastName, photoUrl, isConfirmed и т.д.)
           lastLoginAt: new Date(),
         };
 
