@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPAY Payment Widget Demo</title>
+  <style>
+    :root {
+      font-family: Arial, sans-serif;
+      color: #0f172a;
+    }
+    body {
+      margin: 0;
+      background: #f8fafc;
+    }
+    header {
+      background: linear-gradient(90deg, #2aa65c 0%, #00805f 100%);
+      color: #fff;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.2px;
+    }
+    main {
+      max-width: 960px;
+      margin: 24px auto 64px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    fieldset {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    legend {
+      padding: 0 8px;
+      font-weight: 600;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #475569;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: linear-gradient(90deg, #2aa65c 0%, #00805f 100%);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+    }
+    #log {
+      background: #0b1224;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 140px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) {
+      main {
+        margin: 12px;
+      }
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>EPAY Widget · Test OAuth + Payment Form</header>
+  <main>
+    <p>
+      This page fetches a test OAuth token using the provided credentials and then opens the EPAY payment widget with the received token.
+    </p>
+
+    <fieldset>
+      <legend>Step 1: Get OAuth Token (test)</legend>
+      <div class="two-col">
+        <div>
+          <label for="clientId">Client ID</label>
+          <input id="clientId" type="text" value="test" />
+        </div>
+        <div>
+          <label for="clientSecret">Client Secret</label>
+          <input id="clientSecret" type="text" value="yF587AV9Ms94qN2QShFzVR3vFnWkhjbAK3sG" />
+        </div>
+      </div>
+      <div class="two-col">
+        <div>
+          <label for="terminal">Terminal ID</label>
+          <input id="terminal" type="text" value="67e34d63-102f-4bd1-898e-370781d0074d" />
+        </div>
+        <div>
+          <label for="invoiceId">Invoice ID</label>
+          <input id="invoiceId" type="text" value="" placeholder="Auto-filled with timestamp" />
+        </div>
+      </div>
+      <div class="two-col">
+        <div>
+          <label for="amount">Amount (KZT)</label>
+          <input id="amount" type="number" min="1" value="100" />
+        </div>
+        <div>
+          <label for="secretHash">Secret hash (echoed back on postLink)</label>
+          <input id="secretHash" type="text" value="DEMO_HASH" />
+        </div>
+      </div>
+      <button id="getTokenBtn" type="button">Request token</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Step 2: Show Payment Widget</legend>
+      <label for="description">Description</label>
+      <input id="description" type="text" value="Оплата в интернет магазине" />
+
+      <label for="backLink">Back link (success)</label>
+      <input id="backLink" type="url" value="https://example.kz/success.html" />
+
+      <label for="failureBackLink">Back link (failure)</label>
+      <input id="failureBackLink" type="url" value="https://example.kz/failure.html" />
+
+      <label for="postLink">PostLink (notification URL)</label>
+      <input id="postLink" type="url" value="https://example.kz/" />
+
+      <label for="failurePostLink">Failure PostLink</label>
+      <input id="failurePostLink" type="url" value="https://example.kz/order/1123/fail" />
+
+      <div class="two-col">
+        <div>
+          <label for="accountId">Account ID (optional)</label>
+          <input id="accountId" type="text" value="testuser1" />
+        </div>
+        <div>
+          <label for="payerName">Payer name</label>
+          <input id="payerName" type="text" value="Tester Petrov" />
+        </div>
+      </div>
+
+      <button id="showWidgetBtn" type="button" disabled>Show payment widget</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Log</legend>
+      <div id="log"></div>
+    </fieldset>
+  </main>
+
+  <script>
+    const tokenEndpoint = "https://test-epay-oauth.epayment.kz/oauth2/token";
+    const scopeValue = "webapi usermanagement email_send verification statement statistics payment";
+    const paymentLibUrl = "https://test-epay.epayment.kz/payform/payment-api.js";
+
+    const logEl = document.getElementById("log");
+    const getTokenBtn = document.getElementById("getTokenBtn");
+    const showWidgetBtn = document.getElementById("showWidgetBtn");
+
+    let currentToken = null;
+
+    function log(message) {
+      const timestamp = new Date().toISOString();
+      logEl.textContent += `[${timestamp}] ${message}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function fillInvoiceDefault() {
+      const invoiceInput = document.getElementById("invoiceId");
+      if (!invoiceInput.value) {
+        const uniqueId = `${Date.now()}`.slice(-12);
+        invoiceInput.value = uniqueId;
+        log(`Invoice ID auto-filled: ${uniqueId}`);
+      }
+    }
+
+    function ensurePaymentLibLoaded() {
+      return new Promise((resolve, reject) => {
+        if (window.halyk && window.halyk.showPaymentWidget) {
+          resolve();
+          return;
+        }
+        const existing = document.getElementById("payment-lib");
+        if (existing) {
+          existing.addEventListener("load", resolve, { once: true });
+          existing.addEventListener("error", () => reject(new Error("Failed to load payment library")), { once: true });
+          return;
+        }
+        const script = document.createElement("script");
+        script.id = "payment-lib";
+        script.src = paymentLibUrl;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error("Failed to load payment library"));
+        document.body.appendChild(script);
+      });
+    }
+
+    async function requestToken() {
+      fillInvoiceDefault();
+      const invoiceId = document.getElementById("invoiceId").value.trim();
+      const amount = document.getElementById("amount").value.trim();
+      const secretHash = document.getElementById("secretHash").value.trim();
+      const clientId = document.getElementById("clientId").value.trim();
+      const clientSecret = document.getElementById("clientSecret").value.trim();
+
+      const formData = new URLSearchParams();
+      formData.set("grant_type", "client_credentials");
+      formData.set("scope", scopeValue);
+      formData.set("client_id", clientId);
+      formData.set("client_secret", clientSecret);
+      formData.set("invoiceID", invoiceId);
+      formData.set("secret_hash", secretHash || "DEMO_HASH");
+      formData.set("amount", amount || "100");
+      formData.set("currency", "KZT");
+      formData.set("terminal", document.getElementById("terminal").value.trim());
+
+      log("Requesting token...");
+      getTokenBtn.disabled = true;
+
+      try {
+        const response = await fetch(tokenEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData.toString(),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          log(`Token request failed: ${response.status} ${response.statusText}`);
+          log(JSON.stringify(data, null, 2));
+          return;
+        }
+
+        currentToken = data;
+        log("Token received:");
+        log(JSON.stringify(data, null, 2));
+        showWidgetBtn.disabled = false;
+      } catch (err) {
+        log(`Token request error: ${err.message}`);
+      } finally {
+        getTokenBtn.disabled = false;
+      }
+    }
+
+    function buildPaymentObject(auth) {
+      const invoiceId = document.getElementById("invoiceId").value.trim();
+      const amount = Number(document.getElementById("amount").value.trim() || "100");
+
+      return {
+        invoiceId,
+        invoiceIdAlt: invoiceId,
+        backLink: document.getElementById("backLink").value.trim(),
+        failureBackLink: document.getElementById("failureBackLink").value.trim(),
+        postLink: document.getElementById("postLink").value.trim(),
+        failurePostLink: document.getElementById("failurePostLink").value.trim(),
+        language: "RUS",
+        description: document.getElementById("description").value.trim(),
+        accountId: document.getElementById("accountId").value.trim(),
+        terminal: document.getElementById("terminal").value.trim(),
+        amount,
+        name: document.getElementById("payerName").value.trim(),
+        currency: "KZT",
+        data: JSON.stringify({
+          statement: {
+            name: document.getElementById("payerName").value.trim(),
+            invoiceID: invoiceId,
+          },
+        }),
+        recurrent: true,
+        auth,
+      };
+    }
+
+    async function showPaymentWidget() {
+      if (!currentToken) {
+        log("No token yet. Request a token first.");
+        return;
+      }
+      try {
+        await ensurePaymentLibLoaded();
+      } catch (err) {
+        log(err.message);
+        return;
+      }
+      const paymentObject = buildPaymentObject(currentToken);
+      log("Opening payment widget with payload:");
+      log(JSON.stringify(paymentObject, null, 2));
+
+      window.halyk.showPaymentWidget(paymentObject, (result) => {
+        log("Widget callback:");
+        log(JSON.stringify(result, null, 2));
+      });
+    }
+
+    getTokenBtn.addEventListener("click", requestToken);
+    showWidgetBtn.addEventListener("click", showPaymentWidget);
+
+    // Pre-fill invoice id on load so the token request is immediately usable.
+    fillInvoiceDefault();
+  </script>
+</body>
+</html>

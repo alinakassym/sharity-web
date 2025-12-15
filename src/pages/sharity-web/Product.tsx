@@ -7,6 +7,8 @@ import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useEpayPayment } from "@/hooks/useEpayPayment";
 import Container from "@/components/Container";
 
 const Product: FC = () => {
@@ -24,9 +26,30 @@ const Product: FC = () => {
 
   const { product: productData, isLoading, error } = useRequestGetProduct(id);
   const { sizes: leotardSizes } = useRequestGetLeotardSizes();
+  const { userData } = useCurrentUser();
+  const { initiatePayment, isLoading: isPaymentLoading } = useEpayPayment();
 
   const handleBackClick = () => {
     navigate(-1);
+  };
+
+  const handleBuyClick = async () => {
+    if (!productData) return;
+
+    const paymentResult = await initiatePayment({
+      amount: Number(productData.price) || 0,
+      description: `Покупка: ${productData.name || "Товар"}`,
+      accountId: userData?.telegramId?.toString() || "guest",
+      payerName:
+        `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim() ||
+        "Покупатель",
+    });
+
+    if (paymentResult.success) {
+      console.log("Payment initiated successfully");
+    } else {
+      alert(`Ошибка оплаты: ${paymentResult.message}`);
+    }
   };
 
   // Форматирование цены
@@ -206,42 +229,74 @@ const Product: FC = () => {
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             gap: 8,
             marginTop: 16,
             paddingBottom: 48,
           }}
         >
+          {/* Кнопка покупки */}
           <button
+            onClick={handleBuyClick}
+            disabled={isPaymentLoading}
             style={{
-              flex: 1,
+              width: "100%",
               padding: "16px",
-              backgroundColor: c.primary,
+              backgroundColor: isPaymentLoading ? c.controlColor : c.primary,
               color: c.lighter,
               border: "none",
               borderRadius: "12px",
               fontSize: "16px",
               fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Связаться с продавцом
-          </button>
-
-          <button
-            style={{
-              padding: "16px",
-              backgroundColor: c.controlColor,
-              color: c.text,
-              border: "none",
-              borderRadius: "12px",
-              cursor: "pointer",
+              cursor: isPaymentLoading ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              gap: 8,
             }}
           >
-            <VuesaxIcon name="search" size={20} color={c.text} />
+            <VuesaxIcon
+              name={isPaymentLoading ? "clock" : "wallet-3"}
+              size={20}
+              color={c.lighter}
+            />
+            {isPaymentLoading ? "Загрузка..." : "Купить"}
           </button>
+
+          {/* Другие кнопки */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              style={{
+                flex: 1,
+                padding: "16px",
+                backgroundColor: c.controlColor,
+                color: c.text,
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "16px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Связаться с продавцом
+            </button>
+
+            <button
+              style={{
+                padding: "16px",
+                backgroundColor: c.controlColor,
+                color: c.text,
+                border: "none",
+                borderRadius: "12px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <VuesaxIcon name="search" size={20} color={c.text} />
+            </button>
+          </div>
         </div>
       </div>
     </Container>

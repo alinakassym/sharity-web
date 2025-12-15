@@ -23,6 +23,8 @@ import MyPublications from "./pages/sharity-web/MyPublications";
 import Users from "./pages/sharity-web/Users";
 import Dictionaries from "./pages/sharity-web/Dictionaries";
 import AuthRequired from "./pages/sharity-web/AuthRequired";
+import PaymentSuccess from "./pages/sharity-web/PaymentSuccess";
+import PaymentFailure from "./pages/sharity-web/PaymentFailure";
 import { isTelegramApp } from "./lib/telegram";
 
 const AppContent: FC = () => {
@@ -58,6 +60,8 @@ const AppContent: FC = () => {
         <Route path="create-event" element={<CreateEvent />} />
         <Route path="course/:id" element={<Course />} />
         <Route path="auth-required" element={<AuthRequired />} />
+        <Route path="payment/success" element={<PaymentSuccess />} />
+        <Route path="payment/failure" element={<PaymentFailure />} />
       </Routes>
       {showMainTabBar && <MainTabBar />}
       {showStoreTabBar && <StoreTabBar />}
