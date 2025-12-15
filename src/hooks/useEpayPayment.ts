@@ -1,3 +1,5 @@
+// sharity-web/src/hooks/useEpayPayment.ts
+
 import { useState, useCallback } from "react";
 
 // EPAY Configuration (тестовая среда)
@@ -57,7 +59,9 @@ export const useEpayPayment = () => {
 
       const existingScript = document.getElementById("epay-payment-lib");
       if (existingScript) {
-        existingScript.addEventListener("load", () => resolve(), { once: true });
+        existingScript.addEventListener("load", () => resolve(), {
+          once: true,
+        });
         existingScript.addEventListener(
           "error",
           () => reject(new Error("Failed to load EPAY library")),
@@ -69,11 +73,61 @@ export const useEpayPayment = () => {
       const script = document.createElement("script");
       script.id = "epay-payment-lib";
       script.src = EPAY_CONFIG.paymentLibUrl;
-      script.onload = () => resolve();
+      script.onload = () => {
+        // Добавляем стили для виджета после загрузки
+        injectWidgetStyles();
+        resolve();
+      };
       script.onerror = () => reject(new Error("Failed to load EPAY library"));
       document.body.appendChild(script);
     });
   }, []);
+
+  // Функция для добавления кастомных стилей виджета
+  const injectWidgetStyles = () => {
+    const existingStyle = document.getElementById("epay-widget-styles");
+    if (existingStyle) return;
+
+    const style = document.createElement("style");
+    style.id = "epay-widget-styles";
+    style.textContent = `
+      /* Стили для EPAY виджета */
+      #epay-widget-container,
+      #halyk-payment-widget {
+        max-width: 500px !important;
+        max-height: 70vh !important;
+        margin-top: 12px !important;
+      }
+
+      /* Если виджет использует iframe */
+      iframe[src*="epay"],
+      iframe[src*="halyk"] {
+        max-width: 500px !important;
+        max-height: 70vh !important;
+        margin-top: 12px !important;
+        border-radius: 12px !important;
+      }
+
+      /* Overlay/backdrop */
+      .epay-overlay,
+      .halyk-overlay {
+        background: rgba(0, 0, 0, 0.7) !important;
+      }
+
+      /* Адаптивность для мобильных */
+      @media (max-width: 768px) {
+        #epay-widget-container,
+        #halyk-payment-widget,
+        iframe[src*="epay"],
+        iframe[src*="halyk"] {
+          margin-top: 10px !important;
+          max-width: 95vw !important;
+          max-height: 80vh !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  };
 
   // Получение OAuth токена
   const getToken = useCallback(
@@ -118,10 +172,9 @@ export const useEpayPayment = () => {
       setError(null);
 
       try {
-        // Генерируем уникальный invoiceId
-        const invoiceId =
-          params.invoiceId || `INV-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-        const secretHash = `HASH-${invoiceId}`;
+        // Генерируем уникальный invoiceId (такой же формат как в демо)
+        const invoiceId = params.invoiceId || `${Date.now()}`.slice(-12);
+        const secretHash = "DEMO_HASH";
 
         console.log("Requesting EPAY token...");
         // Получаем токен
@@ -153,9 +206,11 @@ export const useEpayPayment = () => {
               invoiceID: invoiceId,
             },
           }),
-          recurrent: false,
+          recurrent: true,
           auth: token,
         };
+
+        console.log("Payment object:", JSON.stringify(paymentObject, null, 2));
 
         // Открываем виджет
         return new Promise((resolve) => {
