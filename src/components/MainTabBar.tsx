@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useColorScheme } from "../hooks/useColorScheme";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 import { Colors } from "../theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 
@@ -37,8 +38,16 @@ const MainTabBar: FC = () => {
   const location = useLocation();
   const scheme = useColorScheme();
   const colors = Colors[scheme];
+  const { userData } = useCurrentUser();
 
-  const handleTabPress = (path: string) => {
+  // Проверяем, подтвердил ли пользователь авторизацию
+  const isUserConfirmed = userData?.isConfirmed ?? true;
+
+  const handleTabPress = (path: string, tabId: string) => {
+    // Блокируем переход на disabled табы
+    if (!isUserConfirmed && (tabId === "create" || tabId === "profile")) {
+      return;
+    }
     navigate(path);
   };
 
@@ -60,11 +69,14 @@ const MainTabBar: FC = () => {
     >
       {tabs.map((tab) => {
         const isActive = location.pathname === tab.path;
+        const isDisabled =
+          !isUserConfirmed && (tab.id === "create" || tab.id === "profile");
 
         return (
           <button
             key={tab.id}
-            onClick={() => handleTabPress(tab.path)}
+            onClick={() => handleTabPress(tab.path, tab.id)}
+            disabled={isDisabled}
             style={{
               flex: 1,
               display: "flex",
@@ -75,9 +87,10 @@ const MainTabBar: FC = () => {
               padding: "8px 4px",
               background: "none",
               border: "none",
-              cursor: "pointer",
+              cursor: isDisabled ? "not-allowed" : "pointer",
               color: isActive ? colors.primary : colors.text,
-              transition: "color 0.2s ease",
+              opacity: isDisabled ? 0.4 : 1,
+              transition: "color 0.2s ease, opacity 0.2s ease",
               outline: "none",
             }}
           >
