@@ -1,3 +1,5 @@
+// sharity-web/src/pages/sharity-web/Home.tsx
+
 import type { FC } from "react";
 import { useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";

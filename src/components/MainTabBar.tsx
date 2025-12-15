@@ -46,7 +46,8 @@ const MainTabBar: FC = () => {
   const handleTabPress = (path: string, tabId: string) => {
     // Если пользователь не подтвердил авторизацию и пытается перейти на ограниченный таб
     if (!isUserConfirmed && (tabId === "create" || tabId === "profile")) {
-      navigate("/auth-required");
+      // Передаем целевую страницу в state, чтобы после авторизации перенаправить туда
+      navigate("/auth-required", { state: { redirectTo: path } });
       return;
     }
     navigate(path);

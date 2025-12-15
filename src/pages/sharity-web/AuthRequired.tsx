@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AuthModal, { type AuthPermissions } from "@/components/AuthModal";
 import { getTelegramUser } from "@/lib/telegram";
 import { useRequestCreateUser } from "@/hooks/useRequestCreateUser";
@@ -11,8 +11,12 @@ import { useRequestCreateUser } from "@/hooks/useRequestCreateUser";
  */
 const AuthRequired: FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { createOrUpdateUser } = useRequestCreateUser();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Читаем целевую страницу из state (куда перенаправить после авторизации)
+  const redirectTo = (location.state as { redirectTo?: string })?.redirectTo || "/";
 
   const handleAuthConfirm = async (permissions: AuthPermissions) => {
     if (isProcessing) return;
@@ -44,8 +48,8 @@ const AuthRequired: FC = () => {
         "✅ Пользователь обновлен (isConfirmed: true):",
         user.username || user.first_name,
       );
-      // Перенаправляем на главную страницу
-      navigate("/");
+      // Перенаправляем на целевую страницу
+      navigate(redirectTo);
     } else {
       console.error("❌ Ошибка при обновлении пользователя:", result.error);
       alert(`Ошибка авторизации: ${result.error}`);
