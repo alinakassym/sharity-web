@@ -176,15 +176,12 @@ export const useEpayPayment = () => {
         const invoiceId = params.invoiceId || `${Date.now()}`.slice(-12);
         const secretHash = "DEMO_HASH";
 
-        console.log("Requesting EPAY token...");
         // Получаем токен
         const token = await getToken(invoiceId, params.amount, secretHash);
 
-        console.log("Loading EPAY library...");
         // Загружаем библиотеку
         await loadPaymentLib();
 
-        console.log("Opening payment widget...");
         // Формируем параметры для виджета
         const paymentObject = {
           invoiceId,
@@ -210,8 +207,6 @@ export const useEpayPayment = () => {
           auth: token,
         };
 
-        console.log("Payment object:", JSON.stringify(paymentObject, null, 2));
-
         // Открываем виджет
         return new Promise((resolve) => {
           if (!window.halyk) {
@@ -223,7 +218,7 @@ export const useEpayPayment = () => {
           }
 
           window.halyk.showPaymentWidget(paymentObject, (result) => {
-            console.log("Payment widget result:", result);
+            console.log("Payment completed:", result);
             setIsLoading(false);
             resolve({
               success: true,

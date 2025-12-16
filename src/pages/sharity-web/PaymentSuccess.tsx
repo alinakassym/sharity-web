@@ -19,15 +19,17 @@ const PaymentSuccess: FC = () => {
 
   // Получаем параметры из URL (переданные от EPAY)
   const invoiceId = searchParams.get("invoiceId");
-  const orderId = searchParams.get("orderId");
 
   useEffect(() => {
     const saveOrder = async () => {
       // Проверяем, что заказ еще не был сохранен
-      if (orderSaved || isSavingOrder) return;
+      if (orderSaved || isSavingOrder) {
+        return;
+      }
 
       // Получаем данные заказа из sessionStorage
       const pendingOrderData = sessionStorage.getItem("pendingOrder");
+
       if (!pendingOrderData || !invoiceId) {
         console.warn("No pending order data or invoiceId found");
         return;
@@ -41,7 +43,7 @@ const PaymentSuccess: FC = () => {
         const result = await createOrder({
           ...orderData,
           invoiceId, // Добавляем invoiceId от EPAY
-          status: "paid", // Статус "оплачен"
+          status: "paid" as const, // Статус "оплачен"
         });
 
         if (result.success) {
