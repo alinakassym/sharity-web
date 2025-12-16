@@ -44,6 +44,9 @@ export interface OrderFromDB {
     | "delivered"
     | "cancelled";
 
+  // Флаг удаления (для soft delete)
+  isDeleted?: boolean;
+
   // Временные метки
   createdAt?: Date | Timestamp;
   updatedAt?: Date | Timestamp;
@@ -64,6 +67,7 @@ export const useRequestGetOrders = (buyerId?: string) => {
     const q = query(
       col,
       where("buyerId", "==", buyerId),
+      where("isDeleted", "==", false), // Показываем только не удалённые заказы
       orderBy("createdAt", "desc"), // Сортировка по дате создания (новые сверху)
     );
 

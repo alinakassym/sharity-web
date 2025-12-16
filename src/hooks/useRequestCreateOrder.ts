@@ -37,6 +37,9 @@ export interface CreateOrderData {
   // Статус заказа
   status: "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled";
 
+  // Флаг удаления (для soft delete)
+  isDeleted?: boolean;
+
   // Временные метки
   createdAt?: Date;
   updatedAt?: Date;
@@ -53,9 +56,10 @@ export const useRequestCreateOrder = () => {
       setError(null);
       setSuccess(false);
 
-      // Добавляем timestamp создания
+      // Добавляем timestamp создания и устанавливаем isDeleted = false
       const dataToSave = {
         ...orderData,
+        isDeleted: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
