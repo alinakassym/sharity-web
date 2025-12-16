@@ -97,6 +97,8 @@ const Checkout: FC = () => {
       deliveryFee,
       totalAmount,
       buyerId: userData?.telegramId?.toString() || "guest",
+      buyerTelegramId: userData?.telegramId,
+      buyerUsername: userData?.username,
       buyerName:
         `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim() ||
         "Покупатель",

@@ -28,8 +28,10 @@ export interface OrderFromDB {
   totalAmount: number;
 
   // Информация о покупателе
-  buyerId: string;
-  buyerName?: string;
+  buyerId: string; // ID пользователя в Firebase (users collection)
+  buyerTelegramId?: number; // Telegram ID пользователя
+  buyerUsername?: string; // Telegram username
+  buyerName?: string; // Имя покупателя
 
   // Статус заказа
   status:

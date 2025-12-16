@@ -28,8 +28,10 @@ export interface CreateOrderData {
   totalAmount: number; // amount + deliveryFee
 
   // Информация о покупателе
-  buyerId: string; // telegramId покупателя
-  buyerName?: string;
+  buyerId: string; // ID пользователя в Firebase (users collection)
+  buyerTelegramId?: number; // Telegram ID пользователя
+  buyerUsername?: string; // Telegram username
+  buyerName?: string; // Имя покупателя
 
   // Статус заказа
   status: "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled";
