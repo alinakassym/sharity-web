@@ -4,7 +4,7 @@ import {
   query,
   where,
   onSnapshot,
-  orderBy,
+  // orderBy,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -68,7 +68,7 @@ export const useRequestGetOrders = (buyerId?: string) => {
       col,
       where("buyerId", "==", buyerId),
       where("isDeleted", "==", false), // Показываем только не удалённые заказы
-      orderBy("createdAt", "desc"), // Сортировка по дате создания (новые сверху)
+      // orderBy("createdAt", "desc"), // Сортировка по дате создания (новые сверху)
     );
 
     const unsub = onSnapshot(
