@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 export interface UpdateProductData {
   isFavorite?: boolean;
   isDeleted?: boolean; // Флаг удаления продукта
+  status?: "available" | "sold" | "reserved" | "draft"; // Статус товара
   // Можно добавить другие поля для обновления в будущем
   name?: string;
   category?: string;

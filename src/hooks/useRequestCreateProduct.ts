@@ -10,6 +10,7 @@ export interface CreateProductData {
   price: number;
   description?: string;
   condition?: string;
+  status?: "available" | "sold" | "reserved" | "draft"; // Статус товара
   isFavorite?: boolean;
   isDeleted?: boolean; // Флаг удаления продукта
   imagesArray?: string[];
@@ -28,9 +29,10 @@ export const useRequestCreateProduct = () => {
       setError(null);
       setSuccess(false);
 
-      // Добавляем timestamp создания
+      // Добавляем timestamp создания и устанавливаем статус "available" по умолчанию
       const dataToSave = {
         ...productData,
+        status: productData.status || "available", // По умолчанию товар доступен
         createdAt: new Date(),
         updatedAt: new Date(),
       };

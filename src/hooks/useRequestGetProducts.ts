@@ -14,6 +14,7 @@ interface ProductFromDB {
   price?: number;
   description?: string;
   condition?: string;
+  status?: "available" | "sold" | "reserved" | "draft"; // Статус товара
   image?: string;
   imagesArray?: string[];
   isFavorite?: boolean;
@@ -34,7 +35,11 @@ export const useRequestGetProducts = () => {
       (snap) => {
         const arr = snap.docs
           .map((d) => ({ id: d.id, ...d.data() } as ProductFromDB))
-          .filter((product) => !product.isDeleted); // Фильтрация удаленных продуктов
+          .filter(
+            (product) =>
+              !product.isDeleted && // Фильтрация удаленных продуктов
+              (product.status === "available" || !product.status), // Показываем только доступные (или без статуса для старых товаров)
+          );
         setProducts(arr);
         setIsLoading(false);
       },

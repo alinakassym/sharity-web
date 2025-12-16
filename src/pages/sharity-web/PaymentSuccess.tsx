@@ -6,6 +6,7 @@ import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import Container from "@/components/Container";
 import { useRequestCreateOrder } from "@/hooks/useRequestCreateOrder";
+import { useRequestUpdateProduct } from "@/hooks/useRequestUpdateProduct";
 
 const PaymentSuccess: FC = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const PaymentSuccess: FC = () => {
   const c = Colors[scheme];
   const [searchParams] = useSearchParams();
   const { createOrder } = useRequestCreateOrder();
+  const { updateProduct } = useRequestUpdateProduct();
 
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [orderSaved, setOrderSaved] = useState(false);
@@ -62,6 +64,13 @@ const PaymentSuccess: FC = () => {
         if (result.success) {
           console.log("Order saved successfully:", result.id);
           setOrderSaved(true);
+
+          // Обновляем статус товара на "sold"
+          if (orderData.productId) {
+            await updateProduct(orderData.productId, { status: "sold" });
+            console.log("Product status updated to 'sold'");
+          }
+
           // Очищаем данные из sessionStorage после успешного сохранения
           sessionStorage.removeItem("pendingOrder");
         } else {
@@ -79,7 +88,7 @@ const PaymentSuccess: FC = () => {
     };
 
     saveOrder();
-  }, [invoiceId, createOrder]);
+  }, [invoiceId, createOrder, updateProduct]);
 
   return (
     <Container paddingTop={64}>
