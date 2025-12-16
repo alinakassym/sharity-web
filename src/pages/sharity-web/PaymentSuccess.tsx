@@ -1,25 +1,66 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { FC } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import Container from "@/components/Container";
+import { useRequestCreateOrder } from "@/hooks/useRequestCreateOrder";
 
 const PaymentSuccess: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const [searchParams] = useSearchParams();
+  const { createOrder } = useRequestCreateOrder();
+
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const [orderSaved, setOrderSaved] = useState(false);
 
   // Получаем параметры из URL (переданные от EPAY)
   const invoiceId = searchParams.get("invoiceId");
   const orderId = searchParams.get("orderId");
 
   useEffect(() => {
-    // Здесь можно сохранить информацию о транзакции в Firebase
-    console.log("Payment successful:", { invoiceId, orderId });
-  }, [invoiceId, orderId]);
+    const saveOrder = async () => {
+      // Проверяем, что заказ еще не был сохранен
+      if (orderSaved || isSavingOrder) return;
+
+      // Получаем данные заказа из sessionStorage
+      const pendingOrderData = sessionStorage.getItem("pendingOrder");
+      if (!pendingOrderData || !invoiceId) {
+        console.warn("No pending order data or invoiceId found");
+        return;
+      }
+
+      try {
+        setIsSavingOrder(true);
+        const orderData = JSON.parse(pendingOrderData);
+
+        // Создаем заказ в Firebase
+        const result = await createOrder({
+          ...orderData,
+          invoiceId, // Добавляем invoiceId от EPAY
+          status: "paid", // Статус "оплачен"
+        });
+
+        if (result.success) {
+          console.log("Order saved successfully:", result.id);
+          setOrderSaved(true);
+          // Очищаем данные из sessionStorage после успешного сохранения
+          sessionStorage.removeItem("pendingOrder");
+        } else {
+          console.error("Failed to save order:", result.error);
+        }
+      } catch (err) {
+        console.error("Error saving order:", err);
+      } finally {
+        setIsSavingOrder(false);
+      }
+    };
+
+    saveOrder();
+  }, [invoiceId, createOrder, orderSaved, isSavingOrder]);
 
   return (
     <Container paddingTop={64}>
