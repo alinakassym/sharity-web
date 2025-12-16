@@ -79,6 +79,31 @@ const Checkout: FC = () => {
       return;
     }
 
+    // Сохраняем данные заказа в sessionStorage для использования на странице PaymentSuccess
+    const orderData = {
+      productId: product.id,
+      productName: product.name,
+      productPrice: product.price,
+      productImage: product.image,
+      productCategory: product.category,
+      deliveryAddress: {
+        city: deliveryAddress.city,
+        street: deliveryAddress.street,
+        building: deliveryAddress.building,
+        apartment: deliveryAddress.apartment,
+        phone,
+      },
+      amount: product.price,
+      deliveryFee,
+      totalAmount,
+      buyerId: userData?.telegramId?.toString() || "guest",
+      buyerName:
+        `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim() ||
+        "Покупатель",
+    };
+
+    sessionStorage.setItem("pendingOrder", JSON.stringify(orderData));
+
     const paymentResult = await initiatePayment({
       amount: totalAmount,
       description: `Покупка: ${product.name}`,
@@ -93,6 +118,8 @@ const Checkout: FC = () => {
       // После успешной оплаты создастся order на странице PaymentSuccess
     } else {
       alert(`Ошибка оплаты: ${paymentResult.message}`);
+      // Очищаем данные заказа при ошибке
+      sessionStorage.removeItem("pendingOrder");
     }
   };
 
