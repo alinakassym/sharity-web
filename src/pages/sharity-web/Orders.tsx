@@ -5,6 +5,7 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRequestGetOrders } from "@/hooks/useRequestGetOrders";
+import { useProcessPendingOrders } from "@/hooks/useProcessPendingOrders";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 
 const Orders: FC = () => {
@@ -15,6 +16,9 @@ const Orders: FC = () => {
   const { orders, isLoading } = useRequestGetOrders(
     userData?.telegramId?.toString(),
   );
+
+  // Обрабатываем незавершённые заказы при открытии страницы
+  useProcessPendingOrders(userData?.telegramId?.toString());
 
   // Форматирование цены
   const KZT = new Intl.NumberFormat("ru-RU", {
