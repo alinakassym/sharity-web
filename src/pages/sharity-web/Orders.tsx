@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { Timestamp } from "firebase/firestore";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
@@ -23,9 +24,20 @@ const Orders: FC = () => {
   });
 
   // Форматирование даты
-  const formatDate = (date?: Date) => {
+  const formatDate = (date?: Date | Timestamp) => {
     if (!date) return "";
-    const d = date instanceof Date ? date : new Date(date);
+
+    // Если это Firestore Timestamp, конвертируем в Date
+    let d: Date;
+    if (date instanceof Timestamp) {
+      d = date.toDate();
+    } else if (date instanceof Date) {
+      d = date;
+    } else {
+      // Если это что-то другое (например, объект с секундами)
+      d = new Date(date as unknown as string);
+    }
+
     return d.toLocaleDateString("ru-RU", {
       day: "2-digit",
       month: "2-digit",

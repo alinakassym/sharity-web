@@ -5,6 +5,7 @@ import {
   where,
   onSnapshot,
   orderBy,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { type DeliveryAddress } from "./useRequestCreateOrder";
@@ -44,8 +45,8 @@ export interface OrderFromDB {
     | "cancelled";
 
   // Временные метки
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
 }
 
 export const useRequestGetOrders = (buyerId?: string) => {
