@@ -102,10 +102,7 @@ const Checkout: FC = () => {
         "Покупатель",
     };
 
-    console.log("=== Checkout: Saving order data to sessionStorage ===");
-    console.log("Order data:", orderData);
     sessionStorage.setItem("pendingOrder", JSON.stringify(orderData));
-    console.log("Saved to sessionStorage:", sessionStorage.getItem("pendingOrder"));
 
     const paymentResult = await initiatePayment({
       amount: totalAmount,
@@ -116,15 +113,10 @@ const Checkout: FC = () => {
         "Покупатель",
     });
 
-    console.log("Payment result:", paymentResult);
-
     if (paymentResult.success) {
-      console.log("Payment initiated successfully");
-      console.log("Payment widget closed, result data:", paymentResult.data);
-
       // После закрытия виджета перенаправляем на страницу успеха
-      // Передаем invoiceId через URL параметры
-      const invoiceId = orderData.productId + "-" + Date.now(); // Временный ID пока не знаем настоящий от EPAY
+      // Генерируем временный invoiceId (productId + timestamp)
+      const invoiceId = orderData.productId + "-" + Date.now();
       navigate(`/payment/success?invoiceId=${invoiceId}`);
     } else {
       alert(`Ошибка оплаты: ${paymentResult.message}`);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { FC } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -17,13 +17,17 @@ const PaymentSuccess: FC = () => {
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [orderSaved, setOrderSaved] = useState(false);
 
+  // Используем ref чтобы предотвратить двойное сохранение
+  const saveAttempted = useRef(false);
+
   // Получаем параметры из URL (переданные от EPAY)
   const invoiceId = searchParams.get("invoiceId");
 
   useEffect(() => {
     const saveOrder = async () => {
-      // Проверяем, что заказ еще не был сохранен
-      if (orderSaved || isSavingOrder) {
+      // Проверяем, что сохранение еще не началось
+      if (saveAttempted.current) {
+        console.log("Save already attempted, skipping");
         return;
       }
 
@@ -36,7 +40,10 @@ const PaymentSuccess: FC = () => {
       }
 
       try {
+        // Устанавливаем флаг что уже начали сохранение
+        saveAttempted.current = true;
         setIsSavingOrder(true);
+
         const orderData = JSON.parse(pendingOrderData);
 
         // Создаем заказ в Firebase
@@ -53,16 +60,20 @@ const PaymentSuccess: FC = () => {
           sessionStorage.removeItem("pendingOrder");
         } else {
           console.error("Failed to save order:", result.error);
+          // Сбрасываем флаг при ошибке, чтобы можно было попробовать снова
+          saveAttempted.current = false;
         }
       } catch (err) {
         console.error("Error saving order:", err);
+        // Сбрасываем флаг при ошибке
+        saveAttempted.current = false;
       } finally {
         setIsSavingOrder(false);
       }
     };
 
     saveOrder();
-  }, [invoiceId, createOrder, orderSaved, isSavingOrder]);
+  }, [invoiceId, createOrder]);
 
   return (
     <Container paddingTop={64}>
@@ -120,12 +131,35 @@ const PaymentSuccess: FC = () => {
             style={{
               fontSize: 14,
               color: c.lightText,
-              margin: "8px 0 32px",
+              margin: "8px 0 16px",
             }}
           >
             Номер транзакции: {invoiceId}
           </p>
         )}
+
+        {/* Debug info */}
+        <div
+          style={{
+            fontSize: 12,
+            color: c.lightText,
+            margin: "8px 0 16px",
+            padding: 12,
+            backgroundColor: c.surfaceColor,
+            borderRadius: 8,
+            textAlign: "left",
+            maxWidth: 400,
+          }}
+        >
+          <div>Debug info:</div>
+          <div>- invoiceId: {invoiceId || "null"}</div>
+          <div>
+            - sessionStorage has data:{" "}
+            {sessionStorage.getItem("pendingOrder") ? "YES" : "NO"}
+          </div>
+          <div>- Order saved: {orderSaved ? "YES" : "NO"}</div>
+          <div>- Saving in progress: {isSavingOrder ? "YES" : "NO"}</div>
+        </div>
 
         <div
           style={{
