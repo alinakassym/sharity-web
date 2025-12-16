@@ -7,8 +7,6 @@ import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useEpayPayment } from "@/hooks/useEpayPayment";
 import Container from "@/components/Container";
 
 const Product: FC = () => {
@@ -26,30 +24,30 @@ const Product: FC = () => {
 
   const { product: productData, isLoading, error } = useRequestGetProduct(id);
   const { sizes: leotardSizes } = useRequestGetLeotardSizes();
-  const { userData } = useCurrentUser();
-  const { initiatePayment, isLoading: isPaymentLoading } = useEpayPayment();
 
   const handleBackClick = () => {
     navigate(-1);
   };
 
-  const handleBuyClick = async () => {
+  const handleBuyClick = () => {
     if (!productData) return;
 
-    const paymentResult = await initiatePayment({
-      amount: Number(productData.price) || 0,
-      description: `Покупка: ${productData.name || "Товар"}`,
-      accountId: userData?.telegramId?.toString() || "guest",
-      payerName:
-        `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim() ||
-        "Покупатель",
+    // Переходим на страницу оформления заказа
+    navigate("/checkout", {
+      state: {
+        product: {
+          id: productData.id,
+          name: productData.name,
+          price: Number(productData.price),
+          image:
+            productData.imagesArray && productData.imagesArray.length > 0
+              ? productData.imagesArray[0]
+              : productData.image ||
+                `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+          category: productData.category || "",
+        },
+      },
     });
-
-    if (paymentResult.success) {
-      console.log("Payment initiated successfully");
-    } else {
-      alert(`Ошибка оплаты: ${paymentResult.message}`);
-    }
   };
 
   // Форматирование цены
@@ -238,29 +236,24 @@ const Product: FC = () => {
           {/* Кнопка покупки */}
           <button
             onClick={handleBuyClick}
-            disabled={isPaymentLoading}
             style={{
               width: "100%",
               padding: "16px",
-              backgroundColor: isPaymentLoading ? c.controlColor : c.primary,
+              backgroundColor: c.primary,
               color: c.lighter,
               border: "none",
               borderRadius: "12px",
               fontSize: "16px",
               fontWeight: 600,
-              cursor: isPaymentLoading ? "not-allowed" : "pointer",
+              cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
             }}
           >
-            <VuesaxIcon
-              name={isPaymentLoading ? "clock" : "wallet-3"}
-              size={20}
-              color={c.lighter}
-            />
-            {isPaymentLoading ? "Загрузка..." : "Купить"}
+            <VuesaxIcon name="shopping-cart" size={20} color={c.lighter} />
+            Купить
           </button>
 
           {/* Другие кнопки */}
