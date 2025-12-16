@@ -135,12 +135,15 @@ const Checkout: FC = () => {
         "Покупатель",
     });
 
+    // Проверяем результат оплаты
     if (paymentResult.success) {
-      // После закрытия виджета перенаправляем на страницу успеха
+      // Оплата прошла успешно - переходим на страницу успеха
+      console.log("Payment successful, navigating to success page");
       navigate(`/payment/success?invoiceId=${invoiceId}`);
     } else {
-      alert(`Ошибка оплаты: ${paymentResult.message}`);
-      // Очищаем данные заказа при ошибке
+      // Оплата не прошла или виджет закрыт - остаёмся на этой странице
+      console.log("Payment was not successful or widget closed");
+      // Очищаем данные заказа
       sessionStorage.removeItem("pendingOrder");
     }
   };

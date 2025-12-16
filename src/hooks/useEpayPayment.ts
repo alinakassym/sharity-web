@@ -223,10 +223,23 @@ export const useEpayPayment = () => {
             console.log("Payment widget callback:", result);
 
             // Проверяем результат оплаты
-            const paymentSuccess =
-              result &&
-              typeof result === "object" &&
-              ("success" in result || "status" in result);
+            // EPAY виджет может вернуть разные форматы результата:
+            // - { success: true } или { success: false }
+            // - { status: "success" } или { status: "error" }
+            let paymentSuccess = false;
+
+            if (result && typeof result === "object") {
+              const resultObj = result as Record<string, unknown>;
+
+              // Проверяем поле success
+              if ("success" in resultObj) {
+                paymentSuccess = resultObj.success === true;
+              }
+              // Или проверяем поле status
+              else if ("status" in resultObj) {
+                paymentSuccess = resultObj.status === "success" || resultObj.status === "APPROVED";
+              }
+            }
 
             if (paymentSuccess) {
               // Оплата прошла успешно - создаём заказ СРАЗУ
@@ -247,7 +260,7 @@ export const useEpayPayment = () => {
 
             setIsLoading(false);
             resolve({
-              success: Boolean(paymentSuccess),
+              success: paymentSuccess,
               data: result,
               invoiceId,
             });
