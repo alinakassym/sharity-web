@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 /**
@@ -61,6 +61,10 @@ export const completeOrderFromPending = async (invoiceId: string) => {
       });
       console.log(`Product ${orderData.productId} marked as sold`);
     }
+
+    // Удаляем pendingOrder после успешного создания заказа
+    await deleteDoc(pendingOrderRef);
+    console.log(`Pending order ${invoiceId} deleted`);
 
     return { success: true, orderId: orderRef.id };
   } catch (error) {

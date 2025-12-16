@@ -222,25 +222,34 @@ export const useEpayPayment = () => {
           window.halyk.showPaymentWidget(paymentObject, async (result) => {
             console.log("Payment widget callback:", result);
 
-            // ВАЖНО: Создаём заказ сразу при получении ответа от виджета
-            try {
-              console.log("Creating order immediately from widget callback...");
-              const orderResult = await completeOrderFromPending(invoiceId);
+            // Проверяем результат оплаты
+            const paymentSuccess =
+              result &&
+              typeof result === "object" &&
+              ("success" in result || "status" in result);
 
-              if (orderResult.success) {
-                console.log("Order created successfully from callback:", orderResult.orderId);
-              } else {
-                console.error("Failed to create order from callback:", orderResult.error);
+            if (paymentSuccess) {
+              // Оплата прошла успешно - создаём заказ СРАЗУ
+              console.log("Payment successful, creating order immediately...");
+              try {
+                const orderResult = await completeOrderFromPending(invoiceId);
+                if (orderResult.success) {
+                  console.log(`Order created successfully: ${orderResult.orderId}`);
+                } else {
+                  console.error(`Failed to create order: ${orderResult.error}`);
+                }
+              } catch (err) {
+                console.error("Error creating order:", err);
               }
-            } catch (err) {
-              console.error("Error in widget callback:", err);
+            } else {
+              console.log("Payment was not successful, order not created");
             }
 
             setIsLoading(false);
             resolve({
-              success: true,
+              success: Boolean(paymentSuccess),
               data: result,
-              invoiceId, // Возвращаем invoiceId для дальнейшего использования
+              invoiceId,
             });
           });
         });

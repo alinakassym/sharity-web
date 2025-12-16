@@ -1,108 +1,35 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import type { FC } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import Container from "@/components/Container";
-import { useRequestCreateOrder } from "@/hooks/useRequestCreateOrder";
-import { useRequestUpdateProduct } from "@/hooks/useRequestUpdateProduct";
 
 const PaymentSuccess: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const [searchParams] = useSearchParams();
-  const { createOrder } = useRequestCreateOrder();
-  const { updateProduct } = useRequestUpdateProduct();
 
-  const [isSavingOrder, setIsSavingOrder] = useState(false);
-  const [orderSaved, setOrderSaved] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
-
-  // Используем ref чтобы предотвратить двойное сохранение
-  const saveAttempted = useRef(false);
 
   // Получаем параметры из URL (переданные от EPAY)
   const invoiceId = searchParams.get("invoiceId");
 
   useEffect(() => {
-    const saveOrder = async () => {
-      // Проверяем, что сохранение еще не началось
-      if (saveAttempted.current) {
-        console.log("Save already attempted, skipping");
-        return;
+    // Просто получаем orderNumber из sessionStorage для отображения
+    const pendingOrderData = sessionStorage.getItem("pendingOrder");
+    if (pendingOrderData) {
+      const orderData = JSON.parse(pendingOrderData);
+      if (orderData.orderNumber) {
+        setOrderNumber(orderData.orderNumber);
       }
+    }
 
-      if (!invoiceId) {
-        console.warn("No invoiceId found");
-        return;
-      }
-
-      try {
-        // Устанавливаем флаг что уже начали сохранение
-        saveAttempted.current = true;
-        setIsSavingOrder(true);
-
-        // Ждём 2 секунды, чтобы дать время Cloud Function создать заказ
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Проверяем, создан ли уже заказ Cloud Function
-        // (В реальной реализации здесь можно сделать запрос к Firestore)
-
-        // Получаем данные заказа из sessionStorage как fallback
-        const pendingOrderData = sessionStorage.getItem("pendingOrder");
-
-        if (!pendingOrderData) {
-          console.warn("No pending order data found, assuming Cloud Function created order");
-          setOrderSaved(true);
-          setIsSavingOrder(false);
-          return;
-        }
-
-        const orderData = JSON.parse(pendingOrderData);
-
-        // Сохраняем orderNumber для отображения
-        if (orderData.orderNumber) {
-          setOrderNumber(orderData.orderNumber);
-        }
-
-        // Создаем заказ в Firebase как fallback (если Cloud Function не сработала)
-        console.log("Creating order as fallback...");
-        const result = await createOrder({
-          ...orderData,
-          invoiceId, // Добавляем invoiceId от EPAY
-          status: "paid" as const, // Статус "оплачен"
-        });
-
-        if (result.success) {
-          console.log("Order saved successfully (fallback):", result.id);
-          setOrderSaved(true);
-
-          // Обновляем статус товара на "sold"
-          if (orderData.productId) {
-            await updateProduct(orderData.productId, { status: "sold" });
-            console.log("Product status updated to 'sold'");
-          }
-
-          // Очищаем данные из sessionStorage после успешного сохранения
-          sessionStorage.removeItem("pendingOrder");
-        } else {
-          console.error("Failed to save order:", result.error);
-          // Сбрасываем флаг при ошибке, чтобы можно было попробовать снова
-          saveAttempted.current = false;
-        }
-      } catch (err) {
-        console.error("Error saving order:", err);
-        // Сбрасываем флаг при ошибке
-        saveAttempted.current = false;
-      } finally {
-        setIsSavingOrder(false);
-      }
-    };
-
-    saveOrder();
-  }, [invoiceId, createOrder, updateProduct]);
+    // НЕ создаём заказ здесь - заказ будет создан автоматически через 30 секунд после открытия виджета
+    // Эта страница теперь только показывает успешный результат
+  }, []);
 
   return (
     <Container paddingTop={64}>
@@ -185,11 +112,8 @@ const PaymentSuccess: FC = () => {
           <div>- Order number: {orderNumber || "null"}</div>
           <div>- Invoice ID: {invoiceId || "null"}</div>
           <div>
-            - sessionStorage has data:{" "}
-            {sessionStorage.getItem("pendingOrder") ? "YES" : "NO"}
+            Заказ будет автоматически создан через 30 секунд после оплаты
           </div>
-          <div>- Order saved: {orderSaved ? "YES" : "NO"}</div>
-          <div>- Saving in progress: {isSavingOrder ? "YES" : "NO"}</div>
         </div>
 
         <div
