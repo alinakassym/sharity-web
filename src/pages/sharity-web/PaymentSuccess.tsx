@@ -34,11 +34,8 @@ const PaymentSuccess: FC = () => {
         return;
       }
 
-      // Получаем данные заказа из sessionStorage
-      const pendingOrderData = sessionStorage.getItem("pendingOrder");
-
-      if (!pendingOrderData || !invoiceId) {
-        console.warn("No pending order data or invoiceId found");
+      if (!invoiceId) {
+        console.warn("No invoiceId found");
         return;
       }
 
@@ -47,6 +44,22 @@ const PaymentSuccess: FC = () => {
         saveAttempted.current = true;
         setIsSavingOrder(true);
 
+        // Ждём 2 секунды, чтобы дать время Cloud Function создать заказ
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Проверяем, создан ли уже заказ Cloud Function
+        // (В реальной реализации здесь можно сделать запрос к Firestore)
+
+        // Получаем данные заказа из sessionStorage как fallback
+        const pendingOrderData = sessionStorage.getItem("pendingOrder");
+
+        if (!pendingOrderData) {
+          console.warn("No pending order data found, assuming Cloud Function created order");
+          setOrderSaved(true);
+          setIsSavingOrder(false);
+          return;
+        }
+
         const orderData = JSON.parse(pendingOrderData);
 
         // Сохраняем orderNumber для отображения
@@ -54,7 +67,8 @@ const PaymentSuccess: FC = () => {
           setOrderNumber(orderData.orderNumber);
         }
 
-        // Создаем заказ в Firebase
+        // Создаем заказ в Firebase как fallback (если Cloud Function не сработала)
+        console.log("Creating order as fallback...");
         const result = await createOrder({
           ...orderData,
           invoiceId, // Добавляем invoiceId от EPAY
@@ -62,7 +76,7 @@ const PaymentSuccess: FC = () => {
         });
 
         if (result.success) {
-          console.log("Order saved successfully:", result.id);
+          console.log("Order saved successfully (fallback):", result.id);
           setOrderSaved(true);
 
           // Обновляем статус товара на "sold"

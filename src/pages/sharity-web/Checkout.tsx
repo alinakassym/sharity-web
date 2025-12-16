@@ -5,6 +5,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEpayPayment } from "@/hooks/useEpayPayment";
+import { useRequestSavePendingOrder } from "@/hooks/useRequestSavePendingOrder";
 import Container from "@/components/Container";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { isTelegramApp } from "@/lib/telegram";
@@ -27,6 +28,7 @@ const Checkout: FC = () => {
   const c = Colors[scheme];
   const { userData } = useCurrentUser();
   const { initiatePayment, isLoading: isPaymentLoading } = useEpayPayment();
+  const { savePendingOrder } = useRequestSavePendingOrder();
 
   const handleBackClick = () => {
     navigate(-1);
@@ -80,7 +82,10 @@ const Checkout: FC = () => {
       return;
     }
 
-    // Сохраняем данные заказа в sessionStorage для использования на странице PaymentSuccess
+    // Генерируем уникальный invoiceId
+    const invoiceId = `${Date.now()}`.slice(-12);
+
+    // Подготавливаем данные заказа
     const orderData = {
       productId: product.id,
       productName: product.name,
@@ -106,11 +111,24 @@ const Checkout: FC = () => {
         "Покупатель",
     };
 
-    sessionStorage.setItem("pendingOrder", JSON.stringify(orderData));
+    // Сохраняем данные заказа в Firestore (вместо sessionStorage)
+    const saveResult = await savePendingOrder(invoiceId, orderData);
+
+    if (!saveResult.success) {
+      alert("Ошибка при сохранении данных заказа");
+      return;
+    }
+
+    // Также сохраняем в sessionStorage для обратной совместимости
+    sessionStorage.setItem("pendingOrder", JSON.stringify({
+      ...orderData,
+      invoiceId,
+    }));
 
     const paymentResult = await initiatePayment({
       amount: totalAmount,
       description: `Покупка: ${product.name}`,
+      invoiceId, // Передаём invoiceId в платёжную систему
       accountId: userData?.telegramId?.toString() || "guest",
       payerName:
         `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim() ||
@@ -119,8 +137,6 @@ const Checkout: FC = () => {
 
     if (paymentResult.success) {
       // После закрытия виджета перенаправляем на страницу успеха
-      // Генерируем временный invoiceId (productId + timestamp)
-      const invoiceId = orderData.productId + "-" + Date.now();
       navigate(`/payment/success?invoiceId=${invoiceId}`);
     } else {
       alert(`Ошибка оплаты: ${paymentResult.message}`);

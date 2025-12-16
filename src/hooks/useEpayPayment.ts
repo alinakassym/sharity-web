@@ -188,8 +188,8 @@ export const useEpayPayment = () => {
           invoiceIdAlt: invoiceId,
           backLink: `${window.location.origin}/payment/success`,
           failureBackLink: `${window.location.origin}/payment/failure`,
-          postLink: `${window.location.origin}/api/payment/callback`,
-          failurePostLink: `${window.location.origin}/api/payment/failure-callback`,
+          postLink: `${window.location.origin}/api/payment/callback`, // Webhook для успешной оплаты
+          failurePostLink: `${window.location.origin}/api/payment/callback`, // Тот же endpoint обработает ошибки
           language: "RUS",
           description: params.description,
           accountId: params.accountId || "guest",
