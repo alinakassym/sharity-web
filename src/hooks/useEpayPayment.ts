@@ -1,6 +1,7 @@
 // sharity-web/src/hooks/useEpayPayment.ts
 
 import { useState, useCallback } from "react";
+import { completeOrderFromPending } from "@/lib/orders";
 
 // EPAY Configuration (тестовая среда)
 const EPAY_CONFIG = {
@@ -26,6 +27,7 @@ interface PaymentResult {
   success: boolean;
   message?: string;
   data?: unknown;
+  invoiceId?: string; // Added invoiceId as an optional property
 }
 
 interface EpayToken {
@@ -217,12 +219,28 @@ export const useEpayPayment = () => {
             return;
           }
 
-          window.halyk.showPaymentWidget(paymentObject, (result) => {
-            console.log("Payment completed:", result);
+          window.halyk.showPaymentWidget(paymentObject, async (result) => {
+            console.log("Payment widget callback:", result);
+
+            // ВАЖНО: Создаём заказ сразу при получении ответа от виджета
+            try {
+              console.log("Creating order immediately from widget callback...");
+              const orderResult = await completeOrderFromPending(invoiceId);
+
+              if (orderResult.success) {
+                console.log("Order created successfully from callback:", orderResult.orderId);
+              } else {
+                console.error("Failed to create order from callback:", orderResult.error);
+              }
+            } catch (err) {
+              console.error("Error in widget callback:", err);
+            }
+
             setIsLoading(false);
             resolve({
               success: true,
               data: result,
+              invoiceId, // Возвращаем invoiceId для дальнейшего использования
             });
           });
         });

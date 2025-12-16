@@ -52,9 +52,22 @@ export const useProcessPendingOrders = (userId?: string) => {
           console.log(`Processing pending order ${invoiceId}...`);
 
           try {
-            // Создаём заказ
+            // Создаём заказ (приводим orderData к правильному типу)
             const result = await createOrder({
-              ...orderData,
+              productId: orderData.productId,
+              productName: orderData.productName,
+              productPrice: orderData.productPrice,
+              productImage: orderData.productImage,
+              productCategory: orderData.productCategory,
+              deliveryAddress: orderData.deliveryAddress,
+              orderNumber: orderData.orderNumber,
+              amount: orderData.amount,
+              deliveryFee: orderData.deliveryFee,
+              totalAmount: orderData.totalAmount,
+              buyerId: orderData.buyerId,
+              buyerTelegramId: orderData.buyerTelegramId,
+              buyerUsername: orderData.buyerUsername,
+              buyerName: orderData.buyerName,
               invoiceId,
               status: "paid" as const,
             });

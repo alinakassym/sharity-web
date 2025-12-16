@@ -1,3 +1,6 @@
+import { collection, addDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
 /**
  * Генерирует читаемый номер заказа в формате YYMMDD-XXXXX
  * Например: 251216-88799
@@ -14,4 +17,57 @@ export const generateOrderNumber = (): string => {
   const uniqueId = timestamp.slice(-5); // последние 5 цифр timestamp
 
   return `${year}${month}${day}-${uniqueId}`;
+};
+
+/**
+ * Создаёт заказ из pending order и обновляет статус товара
+ * Можно вызывать откуда угодно (не требует React hooks)
+ */
+export const completeOrderFromPending = async (invoiceId: string) => {
+  try {
+    console.log(`Completing order for invoiceId: ${invoiceId}`);
+
+    // Получаем данные из pendingOrders
+    const pendingOrderRef = doc(db, "pendingOrders", invoiceId);
+    const pendingOrderSnap = await getDoc(pendingOrderRef);
+
+    if (!pendingOrderSnap.exists()) {
+      console.error(`Pending order not found: ${invoiceId}`);
+      return { success: false, error: "Pending order not found" };
+    }
+
+    const orderData = pendingOrderSnap.data();
+
+    // Создаём заказ в orders
+    const ordersRef = collection(db, "orders");
+    const newOrder = {
+      ...orderData,
+      invoiceId,
+      status: "paid",
+      isDeleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const orderRef = await addDoc(ordersRef, newOrder);
+    console.log(`Order created: ${orderRef.id}`);
+
+    // Обновляем статус товара на "sold"
+    if (orderData.productId) {
+      const productRef = doc(db, "products", orderData.productId);
+      await updateDoc(productRef, {
+        status: "sold",
+        updatedAt: new Date(),
+      });
+      console.log(`Product ${orderData.productId} marked as sold`);
+    }
+
+    return { success: true, orderId: orderRef.id };
+  } catch (error) {
+    console.error("Error completing order:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 };
