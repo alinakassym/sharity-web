@@ -16,6 +16,7 @@ const PaymentSuccess: FC = () => {
 
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [orderSaved, setOrderSaved] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
   // Используем ref чтобы предотвратить двойное сохранение
   const saveAttempted = useRef(false);
@@ -45,6 +46,11 @@ const PaymentSuccess: FC = () => {
         setIsSavingOrder(true);
 
         const orderData = JSON.parse(pendingOrderData);
+
+        // Сохраняем orderNumber для отображения
+        if (orderData.orderNumber) {
+          setOrderNumber(orderData.orderNumber);
+        }
 
         // Создаем заказ в Firebase
         const result = await createOrder({
@@ -126,15 +132,16 @@ const PaymentSuccess: FC = () => {
           Спасибо за покупку! Ваш платеж успешно обработан.
         </p>
 
-        {invoiceId && (
+        {orderNumber && (
           <p
             style={{
-              fontSize: 14,
-              color: c.lightText,
+              fontSize: 18,
+              fontWeight: 600,
+              color: c.primary,
               margin: "8px 0 16px",
             }}
           >
-            Номер транзакции: {invoiceId}
+            Номер заказа: {orderNumber}
           </p>
         )}
 
@@ -152,7 +159,8 @@ const PaymentSuccess: FC = () => {
           }}
         >
           <div>Debug info:</div>
-          <div>- invoiceId: {invoiceId || "null"}</div>
+          <div>- Order number: {orderNumber || "null"}</div>
+          <div>- Invoice ID: {invoiceId || "null"}</div>
           <div>
             - sessionStorage has data:{" "}
             {sessionStorage.getItem("pendingOrder") ? "YES" : "NO"}

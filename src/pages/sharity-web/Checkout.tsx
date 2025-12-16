@@ -9,6 +9,7 @@ import Container from "@/components/Container";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { isTelegramApp } from "@/lib/telegram";
 import ProductHeader from "@/components/ProductHeader";
+import { generateOrderNumber } from "@/lib/orders";
 
 interface CheckoutProduct {
   id: string;
@@ -93,6 +94,7 @@ const Checkout: FC = () => {
         apartment: deliveryAddress.apartment,
         phone,
       },
+      orderNumber: generateOrderNumber(), // Генерируем читаемый номер заказа
       amount: product.price,
       deliveryFee,
       totalAmount,
@@ -380,7 +382,7 @@ const Checkout: FC = () => {
             padding: "16px",
             backgroundColor:
               !isFormValid || isPaymentLoading ? c.controlColor : c.primary,
-            color: !isFormValid || isPaymentLoading ? c.darken : c.lighter,
+            color: !isFormValid || isPaymentLoading ? c.lightText : c.lighter,
             border: "none",
             borderRadius: "12px",
             fontSize: "16px",

@@ -22,7 +22,8 @@ export interface CreateOrderData {
   deliveryAddress: DeliveryAddress;
 
   // Информация об оплате
-  invoiceId: string;
+  orderNumber: string; // Читаемый номер заказа (например: 251216-88799)
+  invoiceId: string; // ID транзакции от платежной системы
   amount: number; // Цена товара
   deliveryFee: number;
   totalAmount: number; // amount + deliveryFee

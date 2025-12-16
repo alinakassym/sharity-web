@@ -109,12 +109,7 @@ const Orders: FC = () => {
               textAlign: "center",
             }}
           >
-            <VuesaxIcon
-              name="shopping-bag"
-              size={64}
-              color={c.lightText}
-              style={{ marginBottom: 16 }}
-            />
+            <VuesaxIcon name="shopping-bag" size={64} color={c.lightText} />
             <p
               style={{
                 fontSize: 16,
@@ -214,19 +209,25 @@ const Orders: FC = () => {
                     fontSize: 14,
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: c.lightText }}>Номер транзакции</span>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <span style={{ color: c.lightText }}>Номер заказа</span>
                     <span style={{ color: c.text, fontWeight: 500 }}>
-                      {order.invoiceId}
+                      {order.orderNumber}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <span style={{ color: c.lightText }}>Дата заказа</span>
                     <span style={{ color: c.text }}>
                       {formatDate(order.createdAt)}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <span style={{ color: c.lightText }}>Адрес доставки</span>
                     <span
                       style={{
@@ -242,7 +243,9 @@ const Orders: FC = () => {
                         `, кв. ${order.deliveryAddress.apartment}`}
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <span style={{ color: c.lightText }}>Телефон</span>
                     <span style={{ color: c.text }}>
                       {order.deliveryAddress.phone}
