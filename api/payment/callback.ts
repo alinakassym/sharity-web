@@ -1,3 +1,5 @@
+// sharity-web/api/payment/callback.ts
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
@@ -33,10 +35,7 @@ interface EpayCallbackData {
   // Добавьте другие поля согласно документации EPAY
 }
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Разрешаем только POST запросы
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -49,7 +48,18 @@ export default async function handler(
     console.log("Request headers:", JSON.stringify(req.headers, null, 2));
 
     const callbackData = req.body as EpayCallbackData;
-    const { invoiceId, status, code, cardId, cardMask, cardType, card_id, card_mask, card_type, accountId } = callbackData;
+    const {
+      invoiceId,
+      status,
+      code,
+      cardId,
+      cardMask,
+      cardType,
+      card_id,
+      card_mask,
+      card_type,
+      accountId,
+    } = callbackData;
 
     console.log("Card data in webhook:", {
       cardId: cardId || card_id,
@@ -67,15 +77,21 @@ export default async function handler(
     const isCardVerificationSuccess = code === "ok";
 
     if (!isPaymentSuccess && !isCardVerificationSuccess) {
-      console.log(`❌ Operation not successful. Status: ${status}, Code: ${code}`);
+      console.log(
+        `❌ Operation not successful. Status: ${status}, Code: ${code}`,
+      );
       return res.status(200).json({ message: "Operation not successful" });
     }
 
     console.log(`✅ Operation successful. Status: ${status}, Code: ${code}`);
 
     // Получаем данные из pendingOrders (если есть invoiceId)
-    const pendingOrderRef = invoiceId ? db.collection("pendingOrders").doc(invoiceId) : null;
-    const pendingOrderDoc = pendingOrderRef ? await pendingOrderRef.get() : null;
+    const pendingOrderRef = invoiceId
+      ? db.collection("pendingOrders").doc(invoiceId)
+      : null;
+    const pendingOrderDoc = pendingOrderRef
+      ? await pendingOrderRef.get()
+      : null;
 
     // Если нет pendingOrder - это верификация карты
     if (!pendingOrderDoc || !pendingOrderDoc.exists) {
@@ -118,7 +134,9 @@ export default async function handler(
         isDeleted: false,
       });
 
-      console.log(`✅ Card ${cardDocId} saved successfully for user ${accountId}`);
+      console.log(
+        `✅ Card ${cardDocId} saved successfully for user ${accountId}`,
+      );
       console.log("=== EPAY CALLBACK END (Card Verification) ===");
 
       return res.status(200).json({
@@ -155,8 +173,10 @@ export default async function handler(
     }
 
     // Удаляем запись из pendingOrders
-    await pendingOrderRef.delete();
-    console.log(`Pending order ${invoiceId} deleted`);
+    if (pendingOrderRef) {
+      await pendingOrderRef.delete();
+      console.log(`Pending order ${invoiceId} deleted`);
+    }
 
     return res.status(200).json({
       success: true,
