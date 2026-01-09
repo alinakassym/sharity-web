@@ -1,0 +1,204 @@
+// sharity-web/src/pages/sharity-web/PaymentMethods.tsx
+
+import { useState } from "react";
+import type { FC } from "react";
+import { useNavigate } from "react-router-dom";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useRequestGetSavedCards } from "@/hooks/useRequestGetSavedCards";
+import { useRequestDeleteCard } from "@/hooks/useRequestDeleteCard";
+import { useRequestSetDefaultCard } from "@/hooks/useRequestSetDefaultCard";
+import { isTelegramApp } from "@/lib/telegram";
+import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import SavedCardItem from "@/components/SavedCardItem";
+import LoadingScreen from "@/components/LoadingScreen";
+
+const PaymentMethods: FC = () => {
+  const navigate = useNavigate();
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 0);
+  const isTelegram = isTelegramApp();
+
+  const { userData } = useCurrentUser();
+  const { cards, isLoading } = useRequestGetSavedCards(
+    userData?.telegramId?.toString()
+  );
+  const { deleteCard } = useRequestDeleteCard();
+  const { setDefaultCard } = useRequestSetDefaultCard();
+
+  const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
+
+  const handleBack = () => {
+    navigate("/profile");
+  };
+
+  const handleAddCard = () => {
+    navigate("/add-card");
+  };
+
+  const handleDeleteCard = async (cardId: string) => {
+    if (!confirm("Вы уверены, что хотите удалить эту карту?")) return;
+
+    setDeletingCardId(cardId);
+    const result = await deleteCard(cardId);
+    setDeletingCardId(null);
+
+    if (!result.success) {
+      alert(`Ошибка: ${result.error}`);
+    }
+  };
+
+  const handleSetDefaultCard = async (cardId: string) => {
+    if (!userData?.telegramId) return;
+
+    const result = await setDefaultCard(
+      userData.telegramId.toString(),
+      cardId
+    );
+
+    if (!result.success) {
+      alert(`Ошибка: ${result.error}`);
+    }
+  };
+
+  if (isLoading) return <LoadingScreen />;
+
+  return (
+    <section
+      style={{
+        paddingTop: isTelegram ? paddingTop : 0,
+        minHeight: "100vh",
+        paddingBottom: "74px",
+        backgroundColor: c.background,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 64,
+          backgroundColor: c.background,
+          borderBottom: `1px solid ${c.border}`,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 16px",
+          zIndex: 10,
+        }}
+      >
+        <button
+          onClick={handleBack}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 8,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <VuesaxIcon name="arrow-left" size={24} color={c.text} />
+        </button>
+        <h1
+          style={{
+            fontSize: 20,
+            fontWeight: 700,
+            color: c.text,
+            margin: "0 0 0 12px",
+          }}
+        >
+          Способы оплаты
+        </h1>
+      </div>
+
+      {/* Content */}
+      <div
+        style={{
+          marginTop: 64,
+          padding: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        {/* Заголовок секции */}
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 600,
+            color: c.text,
+            margin: "8px 0 0",
+          }}
+        >
+          Платёжные карты
+        </h2>
+
+        {/* Список карт */}
+        {cards.length === 0 ? (
+          <div
+            style={{
+              backgroundColor: c.surfaceColor,
+              borderRadius: 12,
+              padding: 40,
+              textAlign: "center",
+            }}
+          >
+            <VuesaxIcon name="card" size={48} color={c.lightText} />
+            <p
+              style={{
+                fontSize: 16,
+                color: c.lightText,
+                margin: "16px 0 0",
+              }}
+            >
+              У вас пока нет сохранённых карт
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {cards.map((card) => (
+              <SavedCardItem
+                key={card.id}
+                card={card}
+                onDelete={handleDeleteCard}
+                onSetDefault={handleSetDefaultCard}
+                isDeleting={deletingCardId === card.id}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Кнопка добавления новой карты */}
+        <button
+          onClick={handleAddCard}
+          style={{
+            width: "100%",
+            padding: 16,
+            backgroundColor: c.primary,
+            color: c.lighter,
+            border: "none",
+            borderRadius: 12,
+            fontSize: 16,
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+          }}
+        >
+          <VuesaxIcon name="add" size={20} color={c.lighter} />
+          Добавить новую карту
+        </button>
+      </div>
+    </section>
+  );
+};
+
+export default PaymentMethods;

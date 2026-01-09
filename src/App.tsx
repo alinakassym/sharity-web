@@ -26,6 +26,8 @@ import AuthRequired from "./pages/sharity-web/AuthRequired";
 import PaymentSuccess from "./pages/sharity-web/PaymentSuccess";
 import PaymentFailure from "./pages/sharity-web/PaymentFailure";
 import Checkout from "./pages/sharity-web/Checkout";
+import PaymentMethods from "./pages/sharity-web/PaymentMethods";
+import AddCard from "./pages/sharity-web/AddCard";
 import { isTelegramApp } from "./lib/telegram";
 
 const AppContent: FC = () => {
@@ -64,6 +66,8 @@ const AppContent: FC = () => {
         <Route path="checkout" element={<Checkout />} />
         <Route path="payment/success" element={<PaymentSuccess />} />
         <Route path="payment/failure" element={<PaymentFailure />} />
+        <Route path="payment-methods" element={<PaymentMethods />} />
+        <Route path="add-card" element={<AddCard />} />
       </Routes>
       {showMainTabBar && <MainTabBar />}
       {showStoreTabBar && <StoreTabBar />}

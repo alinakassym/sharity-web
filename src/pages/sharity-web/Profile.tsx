@@ -76,6 +76,14 @@ const Profile: FC = () => {
           />
         )}
 
+        {/* Кнопка перехода к способам оплаты */}
+        {userData && (
+          <NavigationButton
+            label="Способы оплаты"
+            onClick={() => handleNavigateTo("/payment-methods")}
+          />
+        )}
+
         {/* Кнопка перехода к пользователям (только для админа) */}
         {userData && isAdmin && (
           <>

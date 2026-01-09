@@ -21,6 +21,13 @@ interface EpayCallbackData {
   currency: string;
   terminal: string;
   status: string;
+  // Поля для сохранённой карты (Card Verification)
+  cardId?: string;
+  cardMask?: string;
+  cardType?: string;
+  card_id?: string; // Альтернативные названия полей
+  card_mask?: string;
+  card_type?: string;
   // Добавьте другие поля согласно документации EPAY
 }
 
@@ -34,10 +41,17 @@ export default async function handler(
   }
 
   try {
-    console.log("EPAY callback received:", JSON.stringify(req.body));
+    console.log("EPAY callback received:", JSON.stringify(req.body, null, 2));
+    console.log("EPAY callback - all keys:", Object.keys(req.body));
 
     const callbackData = req.body as EpayCallbackData;
-    const { invoiceId, status } = callbackData;
+    const { invoiceId, status, cardId, cardMask, cardType, card_id, card_mask, card_type } = callbackData;
+
+    console.log("Card data in webhook:", {
+      cardId: cardId || card_id,
+      cardMask: cardMask || card_mask,
+      cardType: cardType || card_type,
+    });
 
     // Проверяем, что платёж успешен
     if (status !== "success" && status !== "APPROVED") {
