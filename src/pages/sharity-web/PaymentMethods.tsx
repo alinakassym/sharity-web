@@ -9,22 +9,26 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRequestGetSavedCards } from "@/hooks/useRequestGetSavedCards";
 import { useRequestDeleteCard } from "@/hooks/useRequestDeleteCard";
 import { useRequestSetDefaultCard } from "@/hooks/useRequestSetDefaultCard";
-import { isTelegramApp } from "@/lib/telegram";
-import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import SavedCardItem from "@/components/SavedCardItem";
 import LoadingScreen from "@/components/LoadingScreen";
+import Container from "@/components/Container";
 
 const PaymentMethods: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
-  const isTelegram = isTelegramApp();
+
+  const platformName = useSafePlatform();
 
   const { userData } = useCurrentUser();
   const { cards, isLoading } = useRequestGetSavedCards(
-    userData?.telegramId?.toString()
+    userData?.telegramId?.toString(),
   );
   const { deleteCard } = useRequestDeleteCard();
   const { setDefaultCard } = useRequestSetDefaultCard();
@@ -54,10 +58,7 @@ const PaymentMethods: FC = () => {
   const handleSetDefaultCard = async (cardId: string) => {
     if (!userData?.telegramId) return;
 
-    const result = await setDefaultCard(
-      userData.telegramId.toString(),
-      cardId
-    );
+    const result = await setDefaultCard(userData.telegramId.toString(), cardId);
 
     if (!result.success) {
       alert(`Ошибка: ${result.error}`);
@@ -67,13 +68,14 @@ const PaymentMethods: FC = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? paddingTop : 0,
-        minHeight: "100vh",
-        paddingBottom: "74px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
       {/* Header */}
       <div
@@ -197,7 +199,7 @@ const PaymentMethods: FC = () => {
           Добавить новую карту
         </button>
       </div>
-    </section>
+    </Container>
   );
 };
 
