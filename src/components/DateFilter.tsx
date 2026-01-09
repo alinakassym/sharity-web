@@ -46,7 +46,7 @@ const DateFilter: FC<DateFilterProps> = ({ selected, onChange }) => {
         display: "flex",
         gap: 8,
         overflowX: "auto",
-        padding: "16px 16px 0",
+        padding: "16px 16px 4px",
         scrollbarWidth: "none",
         msOverflowStyle: "none",
       }}
@@ -132,7 +132,7 @@ function getDateLabel(option: DateFilterOption): string {
     case "weekend": {
       // Находим ближайшую субботу и воскресенье
       let saturday = new Date(today);
-      let sunday = new Date(today);
+      const sunday = new Date(today);
 
       if (dayOfWeek === 0) {
         // Сегодня воскресенье - показываем следующие выходные
