@@ -17,8 +17,10 @@ import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import SavedCardItem from "@/components/SavedCardItem";
 import LoadingScreen from "@/components/LoadingScreen";
 import Container from "@/components/Container";
+import { isTelegramApp } from "@/lib/telegram";
 
 const PaymentMethods: FC = () => {
+  const isTelegram = isTelegramApp();
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -90,6 +92,7 @@ const PaymentMethods: FC = () => {
           display: "flex",
           alignItems: "center",
           padding: "0 16px",
+          paddingTop: paddingTop,
           zIndex: 10,
         }}
       >
@@ -122,7 +125,7 @@ const PaymentMethods: FC = () => {
       {/* Content */}
       <div
         style={{
-          marginTop: 64,
+          marginTop: isTelegram ? 64 : 0,
           padding: 16,
           display: "flex",
           flexDirection: "column",
