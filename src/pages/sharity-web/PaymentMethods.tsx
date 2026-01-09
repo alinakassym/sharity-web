@@ -86,14 +86,10 @@ const PaymentMethods: FC = () => {
           top: 0,
           left: 0,
           right: 0,
-          height: 64,
-          backgroundColor: c.background,
-          borderBottom: `1px solid ${c.border}`,
-          display: "flex",
-          alignItems: "center",
-          padding: "0 16px",
           paddingTop: paddingTop,
-          zIndex: 10,
+          borderBottom: "1px solid " + c.surfaceColor,
+          backgroundColor: c.background,
+          zIndex: 100,
         }}
       >
         <button
@@ -125,7 +121,7 @@ const PaymentMethods: FC = () => {
       {/* Content */}
       <div
         style={{
-          marginTop: isTelegram ? 64 : 0,
+          paddingTop: isTelegram ? 156 : 64,
           padding: 16,
           display: "flex",
           flexDirection: "column",
