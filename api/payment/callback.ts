@@ -16,11 +16,12 @@ if (!getApps().length) {
 const db = getFirestore();
 
 interface EpayCallbackData {
-  invoiceId: string;
-  amount: number;
-  currency: string;
-  terminal: string;
-  status: string;
+  invoiceId?: string;
+  amount?: number;
+  currency?: string;
+  terminal?: string;
+  status?: string; // Для платежей
+  code?: string; // Для Card Verification (ok/error)
   accountId?: string; // Account ID для верификации карт
   // Поля для сохранённой карты (Card Verification)
   cardId?: string;
@@ -42,31 +43,42 @@ export default async function handler(
   }
 
   try {
+    console.log("=== EPAY CALLBACK START ===");
     console.log("EPAY callback received:", JSON.stringify(req.body, null, 2));
     console.log("EPAY callback - all keys:", Object.keys(req.body));
+    console.log("Request headers:", JSON.stringify(req.headers, null, 2));
 
     const callbackData = req.body as EpayCallbackData;
-    const { invoiceId, status, cardId, cardMask, cardType, card_id, card_mask, card_type, accountId } = callbackData;
+    const { invoiceId, status, code, cardId, cardMask, cardType, card_id, card_mask, card_type, accountId } = callbackData;
 
     console.log("Card data in webhook:", {
       cardId: cardId || card_id,
       cardMask: cardMask || card_mask,
       cardType: cardType || card_type,
       accountId,
+      status,
+      code,
     });
 
-    // Проверяем, что платёж успешен
-    if (status !== "success" && status !== "APPROVED") {
-      console.log(`Payment not successful. Status: ${status}`);
-      return res.status(200).json({ message: "Payment not successful" });
+    // Проверяем успешность:
+    // - Для платежей: status === "success" или "APPROVED"
+    // - Для Card Verification: code === "ok"
+    const isPaymentSuccess = status === "success" || status === "APPROVED";
+    const isCardVerificationSuccess = code === "ok";
+
+    if (!isPaymentSuccess && !isCardVerificationSuccess) {
+      console.log(`❌ Operation not successful. Status: ${status}, Code: ${code}`);
+      return res.status(200).json({ message: "Operation not successful" });
     }
 
-    // Получаем данные из pendingOrders
-    const pendingOrderRef = db.collection("pendingOrders").doc(invoiceId);
-    const pendingOrderDoc = await pendingOrderRef.get();
+    console.log(`✅ Operation successful. Status: ${status}, Code: ${code}`);
+
+    // Получаем данные из pendingOrders (если есть invoiceId)
+    const pendingOrderRef = invoiceId ? db.collection("pendingOrders").doc(invoiceId) : null;
+    const pendingOrderDoc = pendingOrderRef ? await pendingOrderRef.get() : null;
 
     // Если нет pendingOrder - это верификация карты
-    if (!pendingOrderDoc.exists) {
+    if (!pendingOrderDoc || !pendingOrderDoc.exists) {
       console.log("No pending order found - treating as card verification");
 
       // Проверяем что есть данные карты
@@ -106,7 +118,8 @@ export default async function handler(
         isDeleted: false,
       });
 
-      console.log(`Card ${cardDocId} saved successfully for user ${accountId}`);
+      console.log(`✅ Card ${cardDocId} saved successfully for user ${accountId}`);
+      console.log("=== EPAY CALLBACK END (Card Verification) ===");
 
       return res.status(200).json({
         success: true,
@@ -128,7 +141,8 @@ export default async function handler(
     };
 
     const orderRef = await ordersRef.add(newOrder);
-    console.log(`Order created successfully: ${orderRef.id}`);
+    console.log(`✅ Order created successfully: ${orderRef.id}`);
+    console.log("=== EPAY CALLBACK END (Order Payment) ===");
 
     // Обновляем статус товара на "sold"
     if (orderData?.productId) {
