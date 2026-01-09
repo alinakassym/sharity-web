@@ -1,9 +1,9 @@
+// sharity-web/src/components/LocationHeader.tsx
+
 import type { FC } from "react";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/theme/colors";
-import VuesaxIcon from "./icons/VuesaxIcon";
 import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
 import { isTelegramApp } from "@/lib/telegram";
+import LocationButton from "./LocationButton";
 
 interface LocationHeaderProps {
   location?: string;
@@ -14,8 +14,6 @@ const LocationHeader: FC<LocationHeaderProps> = ({
   location = "Астана",
   onLocationClick,
 }) => {
-  const scheme = useColorScheme();
-  const c = Colors[scheme];
   const isTelegram = isTelegramApp();
   const safeArea = useTelegramSafeArea();
 
@@ -44,33 +42,7 @@ const LocationHeader: FC<LocationHeaderProps> = ({
           // backgroundColor: c.background,
         }}
       >
-        <div
-          style={{
-            padding: "4px 10px 4px 6px",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            borderRadius: 22,
-            backgroundColor: c.opacity,
-            backdropFilter: "blur(90px) saturate(180%)",
-            WebkitBackdropFilter: "blur(220px) saturate(180%)", // Для Safari
-          }}
-          onClick={onLocationClick}
-        >
-          <VuesaxIcon name="location" size={20} color={c.primary} />
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 500,
-              color: c.text,
-              margin: 0,
-            }}
-          >
-            {location}
-          </p>
-        </div>
+        <LocationButton location={location} onClick={onLocationClick} />
       </div>
     </header>
   );

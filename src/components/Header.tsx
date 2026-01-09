@@ -1,3 +1,5 @@
+// sharity-web/src/components/Header.tsx
+
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -6,6 +8,7 @@ import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 import { isTelegramApp } from "@/lib/telegram";
 import { CloseWebViewButton } from "./CloseWebViewButton";
+import LocationButton from "./LocationButton";
 
 interface LocationHeaderProps {
   location?: string;
@@ -62,33 +65,7 @@ const Header: FC<LocationHeaderProps> = ({
           // backgroundColor: c.background,
         }}
       >
-        <div
-          style={{
-            padding: "4px 10px 4px 6px",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            borderRadius: 22,
-            backgroundColor: c.opacity,
-            backdropFilter: "blur(90px) saturate(180%)",
-            WebkitBackdropFilter: "blur(220px) saturate(180%)", // Для Safari
-          }}
-          onClick={onLocationClick}
-        >
-          <VuesaxIcon name="location" size={20} color={c.primary} />
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 500,
-              color: c.text,
-              margin: 0,
-            }}
-          >
-            {location}
-          </p>
-        </div>
+        <LocationButton location={location} onClick={onLocationClick} />
       </div>
       <div
         style={{
