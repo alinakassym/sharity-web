@@ -74,13 +74,6 @@ export const useTelegramSafeArea = () => {
       platform,
       platformRaw,
     });
-
-    // Логируем для отладки
-    console.log("Telegram Safe Area & Platform:", {
-      platform,
-      platformRaw,
-      safeArea: insets,
-    });
   }, []);
 
   return safeAreaData;
@@ -104,8 +97,6 @@ export const useSafePaddingTop = (
 ) => {
   const isTelegram = isTelegramApp();
   const safeAreaData = useTelegramSafeArea();
-  console.log("safeAreaData: ", safeAreaData);
-
   if (!isTelegram) {
     return defaultPaddingWeb;
   }

@@ -6,7 +6,6 @@ import {
   query,
   where,
   onSnapshot,
-  orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { SavedCard } from "@/types/cards";
@@ -26,8 +25,7 @@ export const useRequestGetSavedCards = (userId?: string) => {
     const q = query(
       cardsRef,
       where("userId", "==", userId),
-      where("isDeleted", "==", false),
-      orderBy("createdAt", "desc")
+      where("isDeleted", "==", false)
     );
 
     const unsubscribe = onSnapshot(
@@ -37,6 +35,13 @@ export const useRequestGetSavedCards = (userId?: string) => {
           id: doc.id,
           ...doc.data(),
         })) as SavedCard[];
+
+        // Сортируем на клиенте по дате создания (новые сначала)
+        cardsData.sort((a, b) => {
+          const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+          const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+          return dateB - dateA;
+        });
 
         setCards(cardsData);
         setIsLoading(false);

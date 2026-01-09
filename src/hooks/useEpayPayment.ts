@@ -340,7 +340,7 @@ export const useEpayPayment = () => {
         const invoiceId = `${Date.now()}`.slice(-12);
         const secretHash = "DEMO_HASH";
         const amount = 0;
-        const currency = "USD";
+        const currency = "USD"; // Для Card Verification всегда USD согласно документации ePay
 
         // Получаем токен для верификации
         const token = await getToken(invoiceId, amount, secretHash, currency);
@@ -352,7 +352,7 @@ export const useEpayPayment = () => {
         const verificationObject = {
           invoiceId,
           invoiceIdAlt: invoiceId,
-          backLink: `${window.location.origin}/payment-methods`,
+          backLink: window.location.origin + window.location.pathname.replace(/\/add-card.*/, '/payment-methods'),
           postLink: `${window.location.origin}/api/payment/callback`,
           failurePostLink: `${window.location.origin}/api/payment/callback`,
           language: "RUS",

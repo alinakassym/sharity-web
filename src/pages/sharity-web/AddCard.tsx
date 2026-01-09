@@ -7,7 +7,6 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEpayPayment } from "@/hooks/useEpayPayment";
-import { useRequestSaveCard } from "@/hooks/useRequestSaveCard";
 import { isTelegramApp } from "@/lib/telegram";
 import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
@@ -22,7 +21,6 @@ const AddCard: FC = () => {
 
   const { userData, isLoading: isUserLoading } = useCurrentUser();
   const { verifyCard, isLoading: isVerifying } = useEpayPayment();
-  const { saveCard, isLoading: isSaving } = useRequestSaveCard();
 
   const [error, setError] = useState<string | null>(null);
 
@@ -40,44 +38,16 @@ const AddCard: FC = () => {
 
     try {
       // Инициируем верификацию карты через halyk.cardverification()
-      const verificationResult = await verifyCard({
+      // Сохранение карты произойдет автоматически через webhook на сервере
+      await verifyCard({
         accountId: userData.telegramId.toString(),
         payerName:
           `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
           "Пользователь",
       });
 
-      if (!verificationResult.success) {
-        alert(verificationResult.message || "Верификация карты не прошла");
-        return;
-      }
-
-      // Проверяем что получили все необходимые данные карты
-      if (!verificationResult.cardId || !verificationResult.cardMask || !verificationResult.cardType) {
-        alert("Не удалось получить данные карты. Попробуйте снова.");
-        return;
-      }
-
-      console.log("Saving card with data:", {
-        cardId: verificationResult.cardId,
-        cardMask: verificationResult.cardMask,
-        cardType: verificationResult.cardType,
-      });
-
-      // Сохраняем карту в Firestore
-      const saveResult = await saveCard(
-        userData.telegramId.toString(),
-        verificationResult.cardId,
-        verificationResult.cardMask,
-        verificationResult.cardType
-      );
-
-      if (!saveResult.success) {
-        alert(`Ошибка сохранения: ${saveResult.error}`);
-        return;
-      }
-
-      // Успех - возвращаемся к списку карт
+      // После верификации возвращаемся к списку карт
+      // Карта будет видна благодаря real-time обновлению
       navigate("/payment-methods");
     } catch (err) {
       console.error("Card verification error:", err);
@@ -89,7 +59,7 @@ const AddCard: FC = () => {
 
   if (isUserLoading) return <LoadingScreen />;
 
-  const isProcessing = isVerifying || isSaving;
+  const isProcessing = isVerifying;
 
   return (
     <section
@@ -278,7 +248,7 @@ const AddCard: FC = () => {
           {isProcessing ? (
             <>
               <VuesaxIcon name="clock" size={20} color={c.lightText} />
-              {isVerifying ? "Верификация..." : "Сохранение..."}
+              Верификация...
             </>
           ) : (
             <>

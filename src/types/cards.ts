@@ -16,7 +16,7 @@ export interface SavedCard {
 
 export interface CardVerificationParams {
   amount: number; // Всегда 0 для верификации
-  currency: string; // "USD" для верификации
+  currency: string; // "KZT" для верификации
   cardSave: boolean; // Всегда true для сохранения
   accountId: string; // userId (обязательный)
   description: string;

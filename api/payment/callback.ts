@@ -21,6 +21,7 @@ interface EpayCallbackData {
   currency: string;
   terminal: string;
   status: string;
+  accountId?: string; // Account ID для верификации карт
   // Поля для сохранённой карты (Card Verification)
   cardId?: string;
   cardMask?: string;
@@ -45,12 +46,13 @@ export default async function handler(
     console.log("EPAY callback - all keys:", Object.keys(req.body));
 
     const callbackData = req.body as EpayCallbackData;
-    const { invoiceId, status, cardId, cardMask, cardType, card_id, card_mask, card_type } = callbackData;
+    const { invoiceId, status, cardId, cardMask, cardType, card_id, card_mask, card_type, accountId } = callbackData;
 
     console.log("Card data in webhook:", {
       cardId: cardId || card_id,
       cardMask: cardMask || card_mask,
       cardType: cardType || card_type,
+      accountId,
     });
 
     // Проверяем, что платёж успешен
@@ -63,9 +65,53 @@ export default async function handler(
     const pendingOrderRef = db.collection("pendingOrders").doc(invoiceId);
     const pendingOrderDoc = await pendingOrderRef.get();
 
+    // Если нет pendingOrder - это верификация карты
     if (!pendingOrderDoc.exists) {
-      console.error(`Pending order not found for invoiceId: ${invoiceId}`);
-      return res.status(404).json({ error: "Pending order not found" });
+      console.log("No pending order found - treating as card verification");
+
+      // Проверяем что есть данные карты
+      const finalCardId = cardId || card_id;
+      const finalCardMask = cardMask || card_mask;
+      const finalCardType = cardType || card_type;
+
+      if (!finalCardId || !finalCardMask || !finalCardType) {
+        console.error("Card data missing in webhook");
+        return res.status(400).json({ error: "Card data missing" });
+      }
+
+      if (!accountId) {
+        console.error("Account ID missing in webhook");
+        return res.status(400).json({ error: "Account ID missing" });
+      }
+
+      // Проверяем есть ли уже существующие карты пользователя
+      const existingCardsQuery = await db
+        .collection("savedCards")
+        .where("userId", "==", accountId)
+        .where("isDeleted", "==", false)
+        .get();
+
+      const isFirstCard = existingCardsQuery.empty;
+
+      // Сохраняем карту в Firestore
+      const cardDocId = `${accountId}_${finalCardId}`;
+      await db.collection("savedCards").doc(cardDocId).set({
+        userId: accountId,
+        cardId: finalCardId,
+        cardMask: finalCardMask,
+        cardType: finalCardType,
+        isDefault: isFirstCard, // Первая карта автоматически становится default
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDeleted: false,
+      });
+
+      console.log(`Card ${cardDocId} saved successfully for user ${accountId}`);
+
+      return res.status(200).json({
+        success: true,
+        message: "Card saved successfully",
+      });
     }
 
     const orderData = pendingOrderDoc.data();
