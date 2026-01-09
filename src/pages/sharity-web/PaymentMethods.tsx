@@ -17,6 +17,7 @@ import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import SavedCardItem from "@/components/SavedCardItem";
 import LoadingScreen from "@/components/LoadingScreen";
 import Container from "@/components/Container";
+import { CloseWebViewButton } from "@/components/CloseWebViewButton";
 import { isTelegramApp } from "@/lib/telegram";
 
 const PaymentMethods: FC = () => {
@@ -92,30 +93,66 @@ const PaymentMethods: FC = () => {
           zIndex: 100,
         }}
       >
-        <button
-          onClick={handleBack}
+        <div
           style={{
-            background: "none",
-            border: "none",
-            padding: 8,
-            cursor: "pointer",
+            padding: "12px 16px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            gap: 8,
+            backgroundColor: c.background,
           }}
         >
-          <VuesaxIcon name="arrow-left" size={24} color={c.text} />
-        </button>
-        <h1
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: c.text,
-            margin: "0 0 0 12px",
-          }}
-        >
-          Способы оплаты
-        </h1>
+          <div
+            style={{
+              position: "relative",
+              height: 40,
+              display: "flex",
+              alignItems: "center",
+              flex: 1,
+              borderRadius: 8,
+              fontSize: 20,
+              fontWeight: 700,
+              color: c.text,
+            }}
+          >
+            Способ оплаты
+          </div>
+
+          {/* Close Button */}
+          {isTelegram && (
+            <button
+              onClick={handleBack}
+              style={{
+                marginLeft: 8,
+                marginRight: 8,
+                padding: 0,
+                width: 20,
+                height: 20,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "none",
+                border: "1px solid " + c.accent,
+                cursor: "pointer",
+                borderRadius: 20,
+                transition: "background-color 0.2s ease",
+                outline: "none",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = c.controlColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+              aria-label="Закрыть поиск"
+            >
+              <VuesaxIcon name="close" size={8} color={c.accent} />
+            </button>
+          )}
+
+          <CloseWebViewButton />
+        </div>
       </div>
 
       {/* Content */}
