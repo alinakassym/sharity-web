@@ -14,6 +14,14 @@ export type CourseData = {
   category: string;
   title: string;
   isFavorite?: boolean;
+  ageFrom?: number;
+  ageTo?: number;
+  priceFrom?: number;
+  priceText?: string;
+  location?: string; // первый адрес из массива locations
+  phone?: string;
+  whatsapp?: string;
+  telegram?: string;
 };
 
 type Props = {
@@ -25,6 +33,48 @@ type Props = {
 const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
+
+  // Форматирование возраста
+  const ageText = (() => {
+    if (course.ageFrom && course.ageTo) {
+      return `${course.ageFrom}–${course.ageTo} лет`;
+    }
+    if (course.ageFrom) {
+      return `от ${course.ageFrom} лет`;
+    }
+    if (course.ageTo) {
+      return `до ${course.ageTo} лет`;
+    }
+    return null;
+  })();
+
+  // Форматирование цены
+  const priceText = (() => {
+    if (course.priceText) {
+      return course.priceText;
+    }
+    if (course.priceFrom) {
+      const KZT = new Intl.NumberFormat("ru-RU", {
+        style: "currency",
+        currency: "KZT",
+        maximumFractionDigits: 0,
+      });
+      return `от ${KZT.format(course.priceFrom)}`;
+    }
+    return null;
+  })();
+
+  // Функция для очистки номера телефона (оставляем только цифры)
+  const cleanPhone = (phone: string) => phone.replace(/\D/g, "");
+
+  // Генерация ссылок для контактов
+  const whatsappLink = course.whatsapp
+    ? `https://wa.me/${cleanPhone(course.whatsapp)}`
+    : null;
+  const phoneLink = course.phone ? `tel:${course.phone}` : null;
+  const telegramLink = course.telegram
+    ? `https://t.me/${course.telegram.replace(/^@/, "")}`
+    : null;
 
   const chipStyle: React.CSSProperties = {
     fontSize: 12,
@@ -130,44 +180,83 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
             </div>
           </div>
 
-          {/* Chips row (визуально как в примере) */}
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              overflowX: "auto",
-              paddingBottom: 2,
-            }}
-          >
-            <div style={chipStyle}>Возраст —</div>
-            <div style={chipStyle}>Пробное —</div>
-            <div style={chipStyle}>Цена —</div>
-          </div>
+          {/* Chips row (возраст и цена) */}
+          {(ageText || priceText) && (
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                overflowX: "auto",
+                paddingBottom: 2,
+              }}
+            >
+              {ageText && <div style={chipStyle}>{ageText}</div>}
+              {priceText && <div style={chipStyle}>{priceText}</div>}
+            </div>
+          )}
 
-          {/* Meta (вторая строка мелкого текста) */}
-          <div
-            style={{
-              fontSize: 12,
-              color: c.lightText,
-              display: "flex",
-              gap: 10,
-              flexWrap: "wrap",
-            }}
-          >
-            <span>Адрес: —</span>
-          </div>
+          {/* Meta (адрес) */}
+          {course.location && (
+            <div
+              style={{
+                fontSize: 12,
+                color: c.lightText,
+                display: "flex",
+                gap: 10,
+                flexWrap: "wrap",
+              }}
+            >
+              <span>{course.location}</span>
+            </div>
+          )}
 
-          {/* Actions row (только внешний вид, без логики) */}
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              marginTop: 2,
-            }}
-          >
-            <div style={actionStyle}>WhatsApp</div>
-            <div style={actionStyle}>Позвонить</div>
-          </div>
+          {/* Actions row (кнопки контактов) */}
+          {(whatsappLink || phoneLink || telegramLink) && (
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                marginTop: 2,
+              }}
+            >
+              {whatsappLink && (
+                <div
+                  style={{ ...actionStyle, cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(whatsappLink, "_blank");
+                  }}
+                >
+                  WhatsApp
+                </div>
+              )}
+              {phoneLink && (
+                <div
+                  style={{ ...actionStyle, cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = phoneLink;
+                  }}
+                >
+                  Позвонить
+                </div>
+              )}
+              {telegramLink && (
+                <div
+                  style={{ ...actionStyle, cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(telegramLink, "_blank");
+                  }}
+                >
+                  Telegram
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Heart (логика без изменений) */}

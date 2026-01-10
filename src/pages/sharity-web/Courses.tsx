@@ -12,12 +12,6 @@ import { type CourseData } from "@/components/CourseCard";
 import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 
-const KZT = new Intl.NumberFormat("ru-RU", {
-  style: "currency",
-  currency: "KZT",
-  maximumFractionDigits: 0,
-});
-
 const Courses: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -63,8 +57,18 @@ const Courses: FC = () => {
           image: imageUrl,
           category: r.category ?? "",
           title: r.name ?? "",
-          price: KZT.format(Number(r.price) || 0),
           isFavorite: r.isFavorite ?? false,
+          ageFrom: r.ageFrom,
+          ageTo: r.ageTo,
+          priceFrom: r.priceFrom,
+          priceText: r.priceText,
+          location:
+            r.locations && r.locations.length > 0
+              ? r.locations[0].location
+              : undefined,
+          phone: r.phone,
+          whatsapp: r.whatsapp,
+          telegram: r.telegram,
         };
       }),
     [rows],
