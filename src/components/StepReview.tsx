@@ -38,10 +38,10 @@ export const StepReview: FC<StepReviewProps> = ({ c, form, filePreviews }) => {
             margin: "0 0 8px",
           }}
         >
-          Предпросмотр объявления
+          Предпросмотр
         </h3>
         <p style={{ fontSize: 14, color: c.lightText, margin: 0 }}>
-          Проверьте, как будет выглядеть ваше объявление
+          Проверьте, как будет выглядеть публикация
         </p>
       </div>
 

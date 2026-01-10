@@ -53,10 +53,10 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
             margin: "0 0 8px",
           }}
         >
-          Предпросмотр курса
+          Предпросмотр
         </h3>
         <p style={{ fontSize: 14, color: c.lightText, margin: 0 }}>
-          Проверьте, как будет выглядеть объявление
+          Проверьте, как будет выглядеть публикация
         </p>
       </div>
 
