@@ -1,7 +1,7 @@
 // sharity-web/src/pages/sharity-web/CreateCourse.tsx
 
 import type { FC } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
@@ -33,6 +33,100 @@ import CustomSelect from "@/components/CustomSelect";
 
 type StepType = "basic" | "location" | "photos" | "details" | "review";
 
+type CreateCourseFormState = {
+  category: string;
+  selectedFiles: File[];
+  courseName: string;
+  description: string;
+
+  locations: Array<{ location: string; locationCoordinates: [number, number] }>;
+
+  coverImageIndex: number;
+  ageFrom?: number;
+  ageTo?: number;
+  priceFrom?: number;
+  priceText: string;
+  scheduleText: string;
+
+  phone: string;
+  whatsapp: string;
+  telegram: string;
+};
+
+type CreateCourseFormAction =
+  | {
+      type: "SET_FIELD";
+      field: keyof Omit<CreateCourseFormState, "selectedFiles" | "locations">;
+      value: CreateCourseFormState[keyof Omit<
+        CreateCourseFormState,
+        "selectedFiles" | "locations"
+      >];
+    }
+  | { type: "ADD_FILES"; files: File[] }
+  | { type: "REMOVE_FILE"; index: number }
+  | {
+      type: "SET_LOCATIONS";
+      locations: Array<{
+        location: string;
+        locationCoordinates: [number, number];
+      }>;
+    }
+  | { type: "RESET_LOCATIONS" };
+
+const initialCourseFormState: CreateCourseFormState = {
+  category: "",
+  selectedFiles: [],
+  courseName: "",
+  description: "",
+
+  locations: [],
+
+  coverImageIndex: 0,
+  ageFrom: undefined,
+  ageTo: undefined,
+  priceFrom: undefined,
+  priceText: "",
+  scheduleText: "",
+
+  phone: "",
+  whatsapp: "",
+  telegram: "",
+};
+
+const courseFormReducer = (
+  state: CreateCourseFormState,
+  action: CreateCourseFormAction,
+): CreateCourseFormState => {
+  switch (action.type) {
+    case "SET_FIELD":
+      return {
+        ...state,
+        [action.field]: action.value,
+      } as CreateCourseFormState;
+
+    case "ADD_FILES":
+      return {
+        ...state,
+        selectedFiles: [...state.selectedFiles, ...action.files],
+      };
+
+    case "REMOVE_FILE":
+      return {
+        ...state,
+        selectedFiles: state.selectedFiles.filter((_, i) => i !== action.index),
+      };
+
+    case "SET_LOCATIONS":
+      return { ...state, locations: action.locations };
+
+    case "RESET_LOCATIONS":
+      return { ...state, locations: [] };
+
+    default:
+      return state;
+  }
+};
+
 const CreateCourse: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
@@ -43,10 +137,7 @@ const CreateCourse: FC = () => {
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
-  const [category, setCategory] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [courseName, setCourseName] = useState("");
-  const [description, setDescription] = useState("");
 
   // Новая структура данных для локаций
   const [locations, setLocations] = useState<
@@ -70,6 +161,11 @@ const CreateCourse: FC = () => {
   const [tempLocationCoordinates, setTempLocationCoordinates] = useState<
     [number, number] | undefined
   >();
+
+  const [form, dispatch] = useReducer(
+    courseFormReducer,
+    initialCourseFormState,
+  );
 
   const { createCourse } = useRequestCreateCourse();
 
@@ -149,9 +245,9 @@ const CreateCourse: FC = () => {
       const createdBy = user?.username || user?.first_name || undefined;
 
       const courseData = {
-        name: courseName.trim(),
-        category,
-        description: description.trim() || undefined,
+        name: form.courseName.trim(),
+        category: form.category,
+        description: form.description.trim() || undefined,
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
@@ -291,16 +387,28 @@ const CreateCourse: FC = () => {
             <TextField
               label="Название *"
               placeholder="Введите название"
-              value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
+              value={form.courseName}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "courseName",
+                  value: e.target.value,
+                })
+              }
               fullWidth
               variant="outlined"
             />
 
             <CustomSelect
               label="Категория"
-              value={category}
-              onChange={setCategory}
+              value={form.category}
+              onChange={(value) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "category",
+                  value,
+                })
+              }
               options={[
                 { value: "Гимнастика", label: "Гимнастика" },
                 { value: "Танцы", label: "Танцы" },
@@ -591,8 +699,14 @@ const CreateCourse: FC = () => {
             <TextField
               label="Описание"
               placeholder="Опишите подробно"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={form.description}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "description",
+                  value: e.target.value,
+                })
+              }
               multiline
               rows={6}
               fullWidth
@@ -624,7 +738,9 @@ const CreateCourse: FC = () => {
                   placeholder="5"
                   value={ageFrom ?? ""}
                   onChange={(e) =>
-                    setAgeFrom(e.target.value ? Number(e.target.value) : undefined)
+                    setAgeFrom(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
                   }
                   variant="outlined"
                   style={{ flex: 1 }}
@@ -635,7 +751,9 @@ const CreateCourse: FC = () => {
                   placeholder="12"
                   value={ageTo ?? ""}
                   onChange={(e) =>
-                    setAgeTo(e.target.value ? Number(e.target.value) : undefined)
+                    setAgeTo(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
                   }
                   variant="outlined"
                   style={{ flex: 1 }}
@@ -667,7 +785,9 @@ const CreateCourse: FC = () => {
                 placeholder="15000"
                 value={priceFrom ?? ""}
                 onChange={(e) =>
-                  setPriceFrom(e.target.value ? Number(e.target.value) : undefined)
+                  setPriceFrom(
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
                 }
                 fullWidth
                 variant="outlined"
@@ -750,8 +870,8 @@ const CreateCourse: FC = () => {
                     selectedFiles.length > 0
                       ? URL.createObjectURL(selectedFiles[coverImageIndex])
                       : "https://picsum.photos/600?preview",
-                  category: category || "Без категории",
-                  title: courseName || "Название",
+                  category: form.category || "Без категории",
+                  title: form.courseName || "Название",
                 }}
               />
             </div>
@@ -891,7 +1011,7 @@ const CreateCourse: FC = () => {
               </div>
             )}
 
-            {description && (
+            {form.description && (
               <div
                 style={{
                   padding: 16,
@@ -918,7 +1038,7 @@ const CreateCourse: FC = () => {
                     lineHeight: 1.5,
                   }}
                 >
-                  {description}
+                  {form.description}
                 </p>
               </div>
             )}

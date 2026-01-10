@@ -1,3 +1,5 @@
+// sharity-web/src/components/YandexMap.tsx
+
 import { useEffect, useRef, useState } from "react";
 import type { FC } from "react";
 
