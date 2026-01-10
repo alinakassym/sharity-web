@@ -8,22 +8,16 @@ import {
   useSafePlatform,
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
 import { StepBasic } from "@/components/StepBasic";
+import { StepPhotos } from "@/components/StepPhotos";
+
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import { PRODUCTS_BUCKET, testConnection, uploadFiles } from "@/lib/minio";
 import Header from "@/components/Header";
-import {
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import { Stepper, Step, StepLabel, Button, TextField } from "@mui/material";
 import Container from "@/components/Container";
 import CustomSelect from "@/components/CustomSelect";
 import { getTelegramUser } from "@/lib/telegram";
@@ -457,115 +451,13 @@ const Create: FC = () => {
         )}
 
         {currentStep === "photos" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div
-              style={{
-                border: `2px dashed ${c.border}`,
-                borderRadius: 12,
-                padding: 32,
-                textAlign: "center",
-                backgroundColor: c.surfaceColor,
-              }}
-            >
-              <VuesaxIcon name="camera" color={c.lightText} size={48} />
-              <p
-                style={{
-                  margin: "16px 0 8px",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: c.text,
-                }}
-              >
-                Добавьте фотографии
-              </p>
-              <p
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 14,
-                  color: c.lightText,
-                }}
-              >
-                Выберите фотографии товара
-              </p>
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={
-                  <VuesaxIcon name="camera" color={c.lighter} size={20} />
-                }
-              >
-                Выбрать фото
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  hidden
-                  onChange={handleFileChange}
-                />
-              </Button>
-            </div>
-
-            {form.selectedFiles.length > 0 && (
-              <div style={{ marginTop: 16 }}>
-                <h3
-                  style={{
-                    margin: "0 0 12px",
-                    fontSize: 16,
-                    color: c.text,
-                  }}
-                >
-                  Выбранные изображения ({form.selectedFiles.length}):
-                </h3>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                    gap: 8,
-                  }}
-                >
-                  {form.selectedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        position: "relative",
-                        width: 80,
-                        height: 80,
-                        borderRadius: 8,
-                        overflow: "hidden",
-                        backgroundColor: c.controlColor,
-                      }}
-                    >
-                      <img
-                        src={filePreviews[index]?.url}
-                        alt={file.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <IconButton
-                        onClick={() => removeFile(index)}
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          top: 4,
-                          right: 4,
-                          borderColor: c.error,
-                          borderWidth: 1,
-                          borderStyle: "solid",
-                          boxSizing: "content-box",
-                          backgroundColor: `${c.error}40`,
-                        }}
-                      >
-                        <VuesaxIcon name="close" size={6} color={c.error} />
-                      </IconButton>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <StepPhotos
+            c={c}
+            selectedFiles={form.selectedFiles}
+            filePreviews={filePreviews}
+            onFileChange={handleFileChange}
+            onRemoveFile={removeFile}
+          />
         )}
 
         {currentStep === "details" && (
