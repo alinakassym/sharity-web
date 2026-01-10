@@ -14,6 +14,8 @@ import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import CourseCard from "@/components/CourseCard";
 import YandexMap from "@/components/YandexMap";
+import { StepCoursePhotos } from "@/components/StepCoursePhotos";
+
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
   Stepper,
@@ -581,156 +583,13 @@ const CreateCourse: FC = () => {
         )}
 
         {currentStep === "photos" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div
-              style={{
-                border: `2px dashed ${c.border}`,
-                borderRadius: 12,
-                padding: 32,
-                textAlign: "center",
-                backgroundColor: c.surfaceColor,
-              }}
-            >
-              <VuesaxIcon name="camera" color={c.lightText} size={48} />
-              <p
-                style={{
-                  margin: "16px 0 8px",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: c.text,
-                }}
-              >
-                Добавьте фотографии
-              </p>
-              <p
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 14,
-                  color: c.lightText,
-                }}
-              >
-                Выберите фотографии
-              </p>
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={
-                  <VuesaxIcon name="camera" color={c.lighter} size={20} />
-                }
-              >
-                Выбрать фото
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  hidden
-                  onChange={handleFileChange}
-                />
-              </Button>
-            </div>
-
-            {form.selectedFiles.length > 0 && (
-              <div style={{ marginTop: 16 }}>
-                <h3
-                  style={{
-                    margin: "0 0 12px",
-                    fontSize: 16,
-                    color: c.text,
-                  }}
-                >
-                  Выбранные изображения ({form.selectedFiles.length}):
-                </h3>
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: c.lightText,
-                    margin: "0 0 12px",
-                  }}
-                >
-                  Нажмите на изображение, чтобы выбрать его как главное
-                </p>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                    gap: 8,
-                  }}
-                >
-                  {form.selectedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      onClick={() =>
-                        dispatch({
-                          type: "SET_FIELD",
-                          field: "coverImageIndex",
-                          value: index,
-                        })
-                      }
-                      style={{
-                        position: "relative",
-                        width: 80,
-                        height: 80,
-                        borderRadius: 8,
-                        overflow: "hidden",
-                        backgroundColor: c.controlColor,
-                        border:
-                          form.coverImageIndex === index
-                            ? `2px solid ${c.primary}`
-                            : "2px solid transparent",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <img
-                        src={filePreviews[index]?.url}
-                        alt={file.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      {form.coverImageIndex === index && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: 4,
-                            left: 4,
-                            background: c.primary,
-                            color: c.lighter,
-                            padding: "2px 6px",
-                            borderRadius: 4,
-                            fontSize: 10,
-                            fontWeight: 600,
-                          }}
-                        >
-                          Главное
-                        </div>
-                      )}
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFile(index);
-                        }}
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          top: 4,
-                          right: 4,
-                          borderColor: c.error,
-                          borderWidth: 1,
-                          borderStyle: "solid",
-                          boxSizing: "content-box",
-                          backgroundColor: `${c.error}40`,
-                        }}
-                      >
-                        <VuesaxIcon name="close" size={6} color={c.error} />
-                      </IconButton>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <StepCoursePhotos
+            c={c}
+            selectedFiles={form.selectedFiles}
+            filePreviews={filePreviews}
+            onFileChange={handleFileChange}
+            onRemoveFile={removeFile}
+          />
         )}
 
         {currentStep === "details" && (
