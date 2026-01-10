@@ -136,8 +136,11 @@ const CreateCourse: FC = () => {
   const platformName = useSafePlatform();
 
   const [isPublishing, setIsPublishing] = useState(false);
+  const [filePreviews, setFilePreviews] = useState<
+    Array<{ file: File; url: string }>
+  >([]);
+
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // Новая структура данных для локаций
   const [locations, setLocations] = useState<
@@ -178,6 +181,24 @@ const CreateCourse: FC = () => {
     };
     testMinioConnection();
   }, []);
+
+  useEffect(() => {
+    if (form.selectedFiles.length === 0) {
+      setFilePreviews([]);
+      return;
+    }
+
+    const previews = form.selectedFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+
+    setFilePreviews(previews);
+
+    return () => {
+      previews.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+  }, [form.selectedFiles]);
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
@@ -229,11 +250,11 @@ const CreateCourse: FC = () => {
       let coverImage: string | undefined;
 
       // Загружаем изображения в S3, если они выбраны
-      if (selectedFiles.length > 0) {
+      if (form.selectedFiles.length > 0) {
         console.log(
-          `Загружаем ${selectedFiles.length} изображений в Object Storage...`,
+          `Загружаем ${form.selectedFiles.length} изображений в Object Storage...`,
         );
-        imagesArray = await uploadFiles(PRODUCTS_BUCKET, selectedFiles);
+        imagesArray = await uploadFiles(PRODUCTS_BUCKET, form.selectedFiles);
         console.log("Все изображения загружены:", imagesArray);
 
         // ➕ Сохраняем главное изображение
@@ -281,20 +302,20 @@ const CreateCourse: FC = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const filesArray = Array.from(files);
-      // Фильтруем только изображения
-      const imageFiles = filesArray.filter((file) =>
-        file.type.startsWith("image/"),
-      );
-      setSelectedFiles([...selectedFiles, ...imageFiles]);
-    }
+    if (!files) return;
+
+    const filesArray = Array.from(files);
+
+    // если нужно только изображения — оставь фильтр, иначе убери
+    const imageFiles = filesArray.filter((file) =>
+      file.type.startsWith("image/"),
+    );
+
+    dispatch({ type: "ADD_FILES", files: imageFiles });
   };
 
   const removeFile = (indexToRemove: number) => {
-    setSelectedFiles(
-      selectedFiles.filter((_, index) => index !== indexToRemove),
-    );
+    dispatch({ type: "REMOVE_FILE", index: indexToRemove });
   };
 
   // Обработчики для модального окна локации
@@ -596,7 +617,7 @@ const CreateCourse: FC = () => {
               </Button>
             </div>
 
-            {selectedFiles.length > 0 && (
+            {form.selectedFiles.length > 0 && (
               <div style={{ marginTop: 16 }}>
                 <h3
                   style={{
@@ -605,7 +626,7 @@ const CreateCourse: FC = () => {
                     color: c.text,
                   }}
                 >
-                  Выбранные изображения ({selectedFiles.length}):
+                  Выбранные изображения ({form.selectedFiles.length}):
                 </h3>
                 <p
                   style={{
@@ -623,7 +644,7 @@ const CreateCourse: FC = () => {
                     gap: 8,
                   }}
                 >
-                  {selectedFiles.map((file, index) => (
+                  {form.selectedFiles.map((file, index) => (
                     <div
                       key={index}
                       onClick={() => setCoverImageIndex(index)}
@@ -642,7 +663,7 @@ const CreateCourse: FC = () => {
                       }}
                     >
                       <img
-                        src={URL.createObjectURL(file)}
+                        src={filePreviews[index]?.url}
                         alt={file.name}
                         style={{
                           width: "100%",
@@ -867,8 +888,8 @@ const CreateCourse: FC = () => {
                 course={{
                   id: "preview",
                   image:
-                    selectedFiles.length > 0
-                      ? URL.createObjectURL(selectedFiles[coverImageIndex])
+                    form.selectedFiles.length > 0
+                      ? filePreviews[coverImageIndex]?.url
                       : "https://picsum.photos/600?preview",
                   category: form.category || "Без категории",
                   title: form.courseName || "Название",
@@ -1043,7 +1064,7 @@ const CreateCourse: FC = () => {
               </div>
             )}
 
-            {selectedFiles.length > 1 && (
+            {form.selectedFiles.length > 1 && (
               <div
                 style={{
                   padding: 16,
@@ -1059,7 +1080,7 @@ const CreateCourse: FC = () => {
                     margin: "0 0 12px",
                   }}
                 >
-                  Дополнительные фото ({selectedFiles.length - 1})
+                  Дополнительные фото ({form.selectedFiles.length - 1})
                 </h4>
                 <div
                   style={{
@@ -1068,10 +1089,10 @@ const CreateCourse: FC = () => {
                     gap: 8,
                   }}
                 >
-                  {selectedFiles.slice(1).map((file, index) => (
+                  {filePreviews.slice(1).map((_, index) => (
                     <img
                       key={index}
-                      src={URL.createObjectURL(file)}
+                      src={filePreviews[index]?.url}
                       alt={`Photo ${index + 2}`}
                       style={{
                         width: 60,
