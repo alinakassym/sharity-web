@@ -382,13 +382,34 @@ const Create: FC = () => {
           backgroundColor: c.background,
         }}
       >
-        <Stepper activeStep={currentStepIndex} alternativeLabel>
+        <Stepper
+          activeStep={currentStepIndex}
+          alternativeLabel
+          aria-label="Шаги создания объявления"
+        >
           {steps.map((step) => (
             <Step key={step.id}>
-              <StepLabel></StepLabel>
+              <StepLabel
+                sx={{
+                  "& .MuiStepLabel-label": {
+                    position: "absolute",
+                    width: 1,
+                    height: 1,
+                    padding: 0,
+                    margin: -1,
+                    overflow: "hidden",
+                    clip: "rect(0, 0, 0, 0)",
+                    whiteSpace: "nowrap",
+                    border: 0,
+                  },
+                }}
+              >
+                {step.title}
+              </StepLabel>
             </Step>
           ))}
         </Stepper>
+
         <div style={{ textAlign: "center", marginTop: 16 }}>
           <p
             style={{
