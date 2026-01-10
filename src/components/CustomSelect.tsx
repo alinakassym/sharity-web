@@ -1,6 +1,6 @@
 // sharity-web/src/components/CustomSelect.tsx
 
-import type { FC } from "react";
+import type { FC, RefObject } from "react";
 import {
   FormControl,
   InputLabel,
@@ -25,6 +25,7 @@ interface CustomSelectProps {
   fullWidth?: boolean;
   required?: boolean;
   searchable?: boolean; // Включить возможность поиска
+  inputRef?: RefObject<HTMLInputElement | null>;
 }
 
 /**
@@ -42,6 +43,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
   fullWidth = true,
   required = false,
   searchable = false,
+  inputRef,
 }) => {
   const displayLabel = required ? `${label} *` : label;
 
@@ -67,6 +69,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
             {...params}
             label={displayLabel}
             placeholder={placeholder}
+            inputRef={inputRef}
           />
         )}
       />

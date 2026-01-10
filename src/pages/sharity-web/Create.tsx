@@ -10,6 +10,7 @@ import {
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
+import { StepBasic } from "@/components/StepBasic";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
@@ -101,8 +102,19 @@ const Create: FC = () => {
   const [basicErrors, setBasicErrors] = useState<{
     productName?: string;
     category?: string;
+    subcategory?: string;
+    productSize?: string;
     price?: string;
   }>({});
+
+  const clearBasicError = (field: keyof typeof basicErrors) => {
+    setBasicErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   const [form, dispatch] = useReducer(formReducer, initialFormState);
 
@@ -160,6 +172,7 @@ const Create: FC = () => {
 
   // Обработчик изменения категории
   const handleCategoryChange = (newCategory: string) => {
+    clearBasicError("category");
     dispatch({ type: "SET_FIELD", field: "category", value: newCategory });
 
     if (newCategory !== "Гимнастика") {
@@ -177,6 +190,7 @@ const Create: FC = () => {
 
   // Обработчик изменения подкатегории
   const handleSubcategoryChange = (newSubcategory: string) => {
+    clearBasicError("subcategory");
     dispatch({
       type: "SET_FIELD",
       field: "subcategory",
@@ -226,9 +240,15 @@ const Create: FC = () => {
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.id === currentStep);
+
+  const needsSubcategory = form.category === "Гимнастика";
+  const needsProductSize = needsSubcategory && form.subcategory === "Купальник";
+
   const isBasicValid =
     form.productName.trim().length > 0 &&
     form.category.trim().length > 0 &&
+    (!needsSubcategory || form.subcategory.trim().length > 0) &&
+    (!needsProductSize || form.productSize.trim().length > 0) &&
     Number(form.price) > 0;
 
   const canGoNext = useMemo(() => {
@@ -254,6 +274,18 @@ const Create: FC = () => {
 
       if (!form.category.trim()) {
         nextErrors.category = "Выберите категорию";
+      }
+
+      if (form.category === "Гимнастика" && !form.subcategory.trim()) {
+        nextErrors.subcategory = "Выберите подкатегорию";
+      }
+
+      if (
+        form.category === "Гимнастика" &&
+        form.subcategory === "Купальник" &&
+        !form.productSize.trim()
+      ) {
+        nextErrors.productSize = "Выберите размер";
       }
 
       if (!form.price.trim() || Number(form.price) <= 0) {
@@ -390,115 +422,32 @@ const Create: FC = () => {
         }}
       >
         {currentStep === "basic" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <TextField
-              label="Название товара *"
-              placeholder="Введите название товара"
-              value={form.productName}
-              onChange={(e) =>
-                dispatch({
-                  type: "SET_FIELD",
-                  field: "productName",
-                  value: e.target.value,
-                })
-              }
-              error={Boolean(basicErrors.productName)}
-              helperText={basicErrors.productName}
-              fullWidth
-              variant="outlined"
-            />
-
-            <CustomSelect
-              label="Категория"
-              value={form.category}
-              onChange={handleCategoryChange}
-              options={categoryOptions.map((cat) => ({
+          <StepBasic
+            c={c}
+            form={form}
+            dispatch={dispatch}
+            basicErrors={basicErrors}
+            clearBasicError={clearBasicError}
+            categoryOptions={categoryOptions.map((cat) => ({
+              value: cat.name_ru,
+              label: cat.name_ru,
+            }))}
+            gymnasticsSubcategoryOptions={gymnasticsSubcategoryOptions.map(
+              (cat) => ({
                 value: cat.name_ru,
                 label: cat.name_ru,
-              }))}
-              placeholder={
-                isLoadingCategories
-                  ? "Загрузка категорий..."
-                  : "Выберите категорию"
-              }
-              disabled={isLoadingCategories}
-              required
-              searchable
-            />
-            {basicErrors.category && (
-              <p style={{ margin: "4px 0 0", fontSize: 12, color: c.error }}>
-                {basicErrors.category}
-              </p>
+              }),
             )}
-
-            {/* Подкатегории гимнастики - показываем только если выбрана Гимнастика */}
-            {form.category === "Гимнастика" && (
-              <CustomSelect
-                label="Подкатегория"
-                value={form.subcategory}
-                onChange={handleSubcategoryChange}
-                options={gymnasticsSubcategoryOptions.map((cat) => ({
-                  value: cat.name_ru,
-                  label: cat.name_ru,
-                }))}
-                placeholder={
-                  isLoadingGymnasticsCategories
-                    ? "Загрузка подкатегорий..."
-                    : "Выберите подкатегорию"
-                }
-                disabled={isLoadingGymnasticsCategories}
-                searchable
-              />
-            )}
-
-            {/* Размеры купальников - показываем только если выбрана Гимнастика и Купальник */}
-            {form.category === "Гимнастика" &&
-              form.subcategory === "Купальник" && (
-                <CustomSelect
-                  label="Размер"
-                  value={form.productSize}
-                  onChange={(value) => {
-                    dispatch({
-                      type: "SET_FIELD",
-                      field: "productSize",
-                      value,
-                    });
-                    setTimeout(() => {
-                      priceInputRef.current?.focus();
-                    }, 300);
-                  }}
-                  options={leotardSizeOptions}
-                  placeholder={
-                    isLoadingLeotardSizes
-                      ? "Загрузка размеров..."
-                      : "Выберите размер"
-                  }
-                  disabled={isLoadingLeotardSizes}
-                  searchable
-                />
-              )}
-
-            <TextField
-              label="Цена *"
-              placeholder="0"
-              type="number"
-              inputMode="numeric"
-              value={form.price}
-              onChange={(e) =>
-                dispatch({
-                  type: "SET_FIELD",
-                  field: "price",
-                  value: e.target.value,
-                })
-              }
-              error={Boolean(basicErrors.price)}
-              helperText={basicErrors.price || "Укажите цену в тенге"}
-              slotProps={{ htmlInput: { pattern: "[0-9]*" } }}
-              fullWidth
-              variant="outlined"
-              inputRef={priceInputRef}
-            />
-          </div>
+            leotardSizeOptions={leotardSizeOptions}
+            isLoadingCategories={isLoadingCategories}
+            isLoadingGymnasticsCategories={isLoadingGymnasticsCategories}
+            isLoadingLeotardSizes={isLoadingLeotardSizes}
+            handleCategoryChange={handleCategoryChange}
+            handleSubcategoryChange={handleSubcategoryChange}
+            subcategoryInputRef={subcategoryInputRef}
+            sizeInputRef={sizeInputRef}
+            priceInputRef={priceInputRef}
+          />
         )}
 
         {currentStep === "photos" && (
@@ -830,7 +779,7 @@ const Create: FC = () => {
           fullWidth
           variant="contained"
           onClick={handleNext}
-          disabled={isPublishing || !canGoNext}
+          disabled={isPublishing}
         >
           {currentStepIndex === steps.length - 1
             ? isPublishing
