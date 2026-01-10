@@ -147,6 +147,16 @@ const CreateCourse: FC = () => {
     courseName?: string;
     category?: string;
   }>({});
+  const [locationErrors, setLocationErrors] = useState<{
+    locations?: string;
+    contacts?: string;
+  }>({});
+  const [photosErrors, setPhotosErrors] = useState<{
+    photos?: string;
+  }>({});
+  const [detailsErrors, setDetailsErrors] = useState<{
+    description?: string;
+  }>({});
 
   const [ageFrom, setAgeFrom] = useState<number | undefined>();
   const [ageTo, setAgeTo] = useState<number | undefined>();
@@ -168,6 +178,33 @@ const CreateCourse: FC = () => {
 
   const clearBasicError = (field: keyof typeof basicErrors) => {
     setBasicErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const clearLocationError = (field: keyof typeof locationErrors) => {
+    setLocationErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const clearPhotosError = (field: keyof typeof photosErrors) => {
+    setPhotosErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const clearDetailsError = (field: keyof typeof detailsErrors) => {
+    setDetailsErrors((prev) => {
       if (!prev[field]) return prev;
       const next = { ...prev };
       delete next[field];
@@ -241,6 +278,56 @@ const CreateCourse: FC = () => {
       }
 
       setBasicErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
+    // Валидация для второго шага (location)
+    if (currentStep === "location") {
+      const nextErrors: typeof locationErrors = {};
+
+      if (form.locations.length === 0) {
+        nextErrors.locations = "Добавьте хотя бы одну локацию";
+      }
+
+      const hasContact = form.phone.trim() || form.whatsapp.trim() || form.telegram.trim();
+      if (!hasContact) {
+        nextErrors.contacts = "Укажите хотя бы один способ связи";
+      }
+
+      setLocationErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
+    // Валидация для третьего шага (photos)
+    if (currentStep === "photos") {
+      const nextErrors: typeof photosErrors = {};
+
+      if (form.selectedFiles.length === 0) {
+        nextErrors.photos = "Добавьте хотя бы одну фотографию";
+      }
+
+      setPhotosErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
+    // Валидация для четвертого шага (details)
+    if (currentStep === "details") {
+      const nextErrors: typeof detailsErrors = {};
+
+      if (!form.description.trim()) {
+        nextErrors.description = "Введите описание курса";
+      }
+
+      setDetailsErrors(nextErrors);
 
       if (Object.keys(nextErrors).length > 0) {
         return;
@@ -447,6 +534,8 @@ const CreateCourse: FC = () => {
             onChangeTelegram={(value) =>
               dispatch({ type: "SET_FIELD", field: "telegram", value })
             }
+            locationErrors={locationErrors}
+            clearLocationError={clearLocationError}
           />
         )}
 
@@ -456,6 +545,8 @@ const CreateCourse: FC = () => {
             filePreviews={filePreviews}
             onFileChange={handleFileChange}
             onRemoveFile={removeFile}
+            photosErrors={photosErrors}
+            clearPhotosError={clearPhotosError}
           />
         )}
 
@@ -469,6 +560,8 @@ const CreateCourse: FC = () => {
             setAgeTo={setAgeTo}
             priceFrom={priceFrom}
             setPriceFrom={setPriceFrom}
+            detailsErrors={detailsErrors}
+            clearDetailsError={clearDetailsError}
           />
         )}
 

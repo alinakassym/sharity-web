@@ -38,6 +38,11 @@ const PhoneMask = forwardRef<HTMLInputElement, PhoneMaskProps>(
   },
 );
 
+type LocationErrors = {
+  locations?: string;
+  contacts?: string;
+};
+
 interface StepCourseLocationProps {
   locations: LocationItem[];
 
@@ -51,6 +56,9 @@ interface StepCourseLocationProps {
   onChangePhone: (value: string) => void;
   onChangeWhatsapp: (value: string) => void;
   onChangeTelegram: (value: string) => void;
+
+  locationErrors: LocationErrors;
+  clearLocationError: (field: keyof LocationErrors) => void;
 }
 
 export const StepCourseLocation: FC<StepCourseLocationProps> = ({
@@ -63,6 +71,8 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
   onChangePhone,
   onChangeWhatsapp,
   onChangeTelegram,
+  locationErrors,
+  clearLocationError,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -127,11 +137,19 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
       <Button
         variant="outlined"
         fullWidth
-        onClick={onOpenLocationModal}
+        onClick={() => {
+          clearLocationError("locations");
+          onOpenLocationModal();
+        }}
         startIcon={<VuesaxIcon name="location" size={20} color={c.primary} />}
       >
         Добавить адрес
       </Button>
+      {locationErrors.locations && (
+        <p style={{ margin: "-8px 12px 0", fontSize: 12, color: c.error }}>
+          {locationErrors.locations}
+        </p>
+      )}
 
       {/* Контакты */}
       <div
@@ -156,7 +174,10 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
           label="Телефон"
           placeholder="+7 (___) ___-__-__"
           value={phone}
-          onChange={(e) => onChangePhone(e.target.value)}
+          onChange={(e) => {
+            clearLocationError("contacts");
+            onChangePhone(e.target.value);
+          }}
           fullWidth
           variant="outlined"
           style={{ marginBottom: 16 }}
@@ -171,7 +192,10 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
           label="WhatsApp"
           placeholder="+7 (___) ___-__-__"
           value={whatsapp}
-          onChange={(e) => onChangeWhatsapp(e.target.value)}
+          onChange={(e) => {
+            clearLocationError("contacts");
+            onChangeWhatsapp(e.target.value);
+          }}
           fullWidth
           variant="outlined"
           style={{ marginBottom: 16 }}
@@ -186,10 +210,18 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
           label="Telegram"
           placeholder="@username"
           value={telegram}
-          onChange={(e) => onChangeTelegram(e.target.value)}
+          onChange={(e) => {
+            clearLocationError("contacts");
+            onChangeTelegram(e.target.value);
+          }}
           fullWidth
           variant="outlined"
         />
+        {locationErrors.contacts && (
+          <p style={{ margin: "8px 12px 0", fontSize: 12, color: c.error }}>
+            {locationErrors.contacts}
+          </p>
+        )}
       </div>
     </div>
   );

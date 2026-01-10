@@ -11,6 +11,10 @@ type CreateCourseSetFieldAction = {
   value: string;
 };
 
+type DetailsErrors = {
+  description?: string;
+};
+
 interface StepCourseDetailsProps {
   form: {
     description: string;
@@ -28,6 +32,9 @@ interface StepCourseDetailsProps {
 
   priceFrom: number | undefined;
   setPriceFrom: Dispatch<SetStateAction<number | undefined>>;
+
+  detailsErrors: DetailsErrors;
+  clearDetailsError: (field: keyof DetailsErrors) => void;
 }
 
 export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
@@ -39,6 +46,8 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
   setAgeTo,
   priceFrom,
   setPriceFrom,
+  detailsErrors,
+  clearDetailsError,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -48,13 +57,16 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
         label="Описание"
         placeholder="Опишите подробно"
         value={form.description}
-        onChange={(e) =>
+        onChange={(e) => {
+          clearDetailsError("description");
           dispatch({
             type: "SET_FIELD",
             field: "description",
             value: e.target.value,
-          })
-        }
+          });
+        }}
+        error={Boolean(detailsErrors.description)}
+        helperText={detailsErrors.description}
         multiline
         rows={6}
         fullWidth

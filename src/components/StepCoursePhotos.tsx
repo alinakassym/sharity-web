@@ -5,11 +5,17 @@ import { Button, IconButton } from "@mui/material";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+type PhotosErrors = {
+  photos?: string;
+};
+
 interface StepCoursePhotosProps {
   selectedFiles: File[];
   filePreviews: Array<{ file: File; url: string }>;
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveFile: (index: number) => void;
+  photosErrors: PhotosErrors;
+  clearPhotosError: (field: keyof PhotosErrors) => void;
 }
 
 export const StepCoursePhotos: FC<StepCoursePhotosProps> = ({
@@ -17,6 +23,8 @@ export const StepCoursePhotos: FC<StepCoursePhotosProps> = ({
   filePreviews,
   onFileChange,
   onRemoveFile,
+  photosErrors,
+  clearPhotosError,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -57,10 +65,18 @@ export const StepCoursePhotos: FC<StepCoursePhotosProps> = ({
             accept="image/*"
             multiple
             hidden
-            onChange={onFileChange}
+            onChange={(e) => {
+              clearPhotosError("photos");
+              onFileChange(e);
+            }}
           />
         </Button>
       </div>
+      {photosErrors.photos && (
+        <p style={{ margin: "-8px 12px 0", fontSize: 12, color: c.error }}>
+          {photosErrors.photos}
+        </p>
+      )}
 
       {selectedFiles.length > 0 && (
         <div style={{ marginTop: 16 }}>
