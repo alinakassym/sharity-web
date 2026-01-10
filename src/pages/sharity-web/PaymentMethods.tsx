@@ -17,11 +17,9 @@ import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import SavedCardItem from "@/components/SavedCardItem";
 import LoadingScreen from "@/components/LoadingScreen";
 import Container from "@/components/Container";
-import { CloseWebViewButton } from "@/components/CloseWebViewButton";
-import { isTelegramApp } from "@/lib/telegram";
+import PageHeader from "@/components/PageHeader";
 
 const PaymentMethods: FC = () => {
-  const isTelegram = isTelegramApp();
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -37,10 +35,6 @@ const PaymentMethods: FC = () => {
   const { setDefaultCard } = useRequestSetDefaultCard();
 
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
-
-  const handleBack = () => {
-    navigate("/profile");
-  };
 
   const handleAddCard = () => {
     navigate("/add-card");
@@ -80,86 +74,15 @@ const PaymentMethods: FC = () => {
             : paddingTop + 64
       }
     >
-      {/* Header */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          paddingTop: paddingTop,
-          borderBottom: "1px solid " + c.surfaceColor,
-          backgroundColor: c.background,
-          zIndex: 100,
-        }}
-      >
-        <div
-          style={{
-            padding: "12px 16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            backgroundColor: c.background,
-          }}
-        >
-          <div
-            style={{
-              position: "relative",
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              flex: 1,
-              borderRadius: 8,
-              fontSize: 20,
-              fontWeight: 700,
-              color: c.text,
-            }}
-          >
-            Способ оплаты
-          </div>
-
-          {/* Close Button */}
-          {isTelegram && (
-            <button
-              onClick={handleBack}
-              style={{
-                marginLeft: 8,
-                marginRight: 8,
-                padding: 0,
-                width: 20,
-                height: 20,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "none",
-                border: "1px solid " + c.accent,
-                cursor: "pointer",
-                borderRadius: 20,
-                transition: "background-color 0.2s ease",
-                outline: "none",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = c.controlColor;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
-              aria-label="Закрыть поиск"
-            >
-              <VuesaxIcon name="close" size={8} color={c.accent} />
-            </button>
-          )}
-
-          <CloseWebViewButton />
-        </div>
-      </div>
+      {/* Page Header */}
+      <PageHeader title="Способы оплаты" backTo="/profile" />
 
       {/* Content */}
       <div
         style={{
-          paddingTop: isTelegram ? 156 : 64,
-          padding: 16,
+          paddingTop: 0,
+          paddingLeft: 16,
+          paddingRight: 16,
           display: "flex",
           flexDirection: "column",
           gap: 16,
@@ -168,10 +91,10 @@ const PaymentMethods: FC = () => {
         {/* Заголовок секции */}
         <h2
           style={{
-            fontSize: 18,
-            fontWeight: 600,
-            color: c.text,
             margin: "8px 0 0",
+            fontSize: 18,
+            fontWeight: 500,
+            color: c.text,
           }}
         >
           Платёжные карты
@@ -187,7 +110,7 @@ const PaymentMethods: FC = () => {
               textAlign: "center",
             }}
           >
-            <VuesaxIcon name="card" size={48} color={c.lightText} />
+            <VuesaxIcon name="card" size={48} stroke={c.lightText} />
             <p
               style={{
                 fontSize: 16,

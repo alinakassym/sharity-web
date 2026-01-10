@@ -11,6 +11,8 @@ import { isTelegramApp } from "@/lib/telegram";
 import { useSafePaddingTop } from "@/hooks/useTelegramSafeArea";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import LoadingScreen from "@/components/LoadingScreen";
+import PageHeader from "@/components/PageHeader";
+import { Container } from "@mui/material";
 
 const AddCard: FC = () => {
   const navigate = useNavigate();
@@ -23,10 +25,6 @@ const AddCard: FC = () => {
   const { verifyCard, isLoading: isVerifying } = useEpayPayment();
 
   const [error, setError] = useState<string | null>(null);
-
-  const handleBack = () => {
-    navigate("/payment-methods");
-  };
 
   const handleVerifyCard = async () => {
     if (!userData?.telegramId) {
@@ -52,7 +50,7 @@ const AddCard: FC = () => {
     } catch (err) {
       console.error("Card verification error:", err);
       alert(
-        err instanceof Error ? err.message : "Произошла ошибка верификации"
+        err instanceof Error ? err.message : "Произошла ошибка верификации",
       );
     }
   };
@@ -62,7 +60,7 @@ const AddCard: FC = () => {
   const isProcessing = isVerifying;
 
   return (
-    <section
+    <Container
       style={{
         paddingTop: isTelegram ? paddingTop : 0,
         minHeight: "100vh",
@@ -70,53 +68,14 @@ const AddCard: FC = () => {
         backgroundColor: c.background,
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 64,
-          backgroundColor: c.background,
-          borderBottom: `1px solid ${c.border}`,
-          display: "flex",
-          alignItems: "center",
-          padding: "0 16px",
-          zIndex: 10,
-        }}
-      >
-        <button
-          onClick={handleBack}
-          style={{
-            background: "none",
-            border: "none",
-            padding: 8,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <VuesaxIcon name="arrow-left" size={24} color={c.text} />
-        </button>
-        <h1
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: c.text,
-            margin: "0 0 0 12px",
-          }}
-        >
-          Добавить карту
-        </h1>
-      </div>
+      {/* Page Header */}
+      <PageHeader title="Добавить карту" backTo="/payment-methods" />
 
       {/* Content */}
       <div
         style={{
           marginTop: 64,
-          padding: 16,
+          padding: "16px 0",
           display: "flex",
           flexDirection: "column",
           gap: 24,
@@ -167,8 +126,9 @@ const AddCard: FC = () => {
             }}
           >
             Мы используем защищённое соединение для верификации вашей карты.
-            Верификация карты производится без списания средств. Данные карты надёжно
-            шифруются и хранятся в соответствии со стандартами безопасности.
+            Верификация карты производится без списания средств. Данные карты
+            надёжно шифруются и хранятся в соответствии со стандартами
+            безопасности.
           </p>
         </div>
 
@@ -272,7 +232,7 @@ const AddCard: FC = () => {
           платёжной системы. Верификация производится без списания средств.
         </p>
       </div>
-    </section>
+    </Container>
   );
 };
 

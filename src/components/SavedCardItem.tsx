@@ -49,7 +49,7 @@ const SavedCardItem: FC<SavedCardItemProps> = ({
           flexShrink: 0,
         }}
       >
-        <VuesaxIcon name="card" size={24} color={c.primary} />
+        <VuesaxIcon name="card" size={24} stroke={c.primary} />
       </div>
 
       {/* Информация о карте */}
