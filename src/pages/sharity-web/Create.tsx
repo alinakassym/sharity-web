@@ -106,6 +106,9 @@ const Create: FC = () => {
     productSize?: string;
     price?: string;
   }>({});
+  const [filePreviews, setFilePreviews] = useState<
+    Array<{ file: File; url: string }>
+  >([]);
 
   const clearBasicError = (field: keyof typeof basicErrors) => {
     setBasicErrors((prev) => {
@@ -220,6 +223,24 @@ const Create: FC = () => {
     testMinioConnection();
   }, []);
 
+  useEffect(() => {
+    if (form.selectedFiles.length === 0) {
+      setFilePreviews([]);
+      return;
+    }
+
+    const previews = form.selectedFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+
+    setFilePreviews(previews);
+
+    return () => {
+      previews.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+  }, [form.selectedFiles]);
+
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
       id: "basic",
@@ -240,21 +261,6 @@ const Create: FC = () => {
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.id === currentStep);
-
-  const needsSubcategory = form.category === "Гимнастика";
-  const needsProductSize = needsSubcategory && form.subcategory === "Купальник";
-
-  const isBasicValid =
-    form.productName.trim().length > 0 &&
-    form.category.trim().length > 0 &&
-    (!needsSubcategory || form.subcategory.trim().length > 0) &&
-    (!needsProductSize || form.productSize.trim().length > 0) &&
-    Number(form.price) > 0;
-
-  const canGoNext = useMemo(() => {
-    if (currentStep === "basic") return isBasicValid;
-    return true;
-  }, [currentStep, isBasicValid]);
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
@@ -530,7 +536,7 @@ const Create: FC = () => {
                       }}
                     >
                       <img
-                        src={URL.createObjectURL(file)}
+                        src={filePreviews[index]?.url}
                         alt={file.name}
                         style={{
                           width: "100%",
@@ -628,9 +634,7 @@ const Create: FC = () => {
                 product={{
                   id: "preview",
                   image:
-                    form.selectedFiles.length > 0
-                      ? URL.createObjectURL(form.selectedFiles[0])
-                      : "https://picsum.photos/600?preview",
+                    filePreviews[0]?.url ?? "https://picsum.photos/600?preview",
                   category: form.category || "Без категории",
                   title: form.productName || "Название товара",
                   price: form.price
@@ -727,10 +731,10 @@ const Create: FC = () => {
                     gap: 8,
                   }}
                 >
-                  {form.selectedFiles.slice(1).map((file, index) => (
+                  {filePreviews.slice(1).map((p, index) => (
                     <img
                       key={index}
-                      src={URL.createObjectURL(file)}
+                      src={p.url}
                       alt={`Photo ${index + 2}`}
                       style={{
                         width: 60,

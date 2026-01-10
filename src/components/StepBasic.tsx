@@ -1,3 +1,5 @@
+// sharity-web/src/components/StepBasic.tsx
+
 import type { FC, RefObject } from "react";
 import type { Dispatch } from "react";
 import { TextField } from "@mui/material";
@@ -103,7 +105,7 @@ export const StepBasic: FC<StepBasicProps> = ({
         searchable
       />
       {basicErrors.category && (
-        <p style={{ margin: "4px 0 0", fontSize: 12, color: c.error }}>
+        <p style={{ margin: "-12px 12px 0", fontSize: 12, color: c.error }}>
           {basicErrors.category}
         </p>
       )}
@@ -125,7 +127,7 @@ export const StepBasic: FC<StepBasicProps> = ({
             inputRef={subcategoryInputRef}
           />
           {basicErrors.subcategory && (
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: c.error }}>
+            <p style={{ margin: "-12px 12px 0", fontSize: 12, color: c.error }}>
               {basicErrors.subcategory}
             </p>
           )}
@@ -153,7 +155,7 @@ export const StepBasic: FC<StepBasicProps> = ({
             inputRef={sizeInputRef}
           />
           {basicErrors.productSize && (
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: c.error }}>
+            <p style={{ margin: "-12px 12px 0", fontSize: 12, color: c.error }}>
               {basicErrors.productSize}
             </p>
           )}
