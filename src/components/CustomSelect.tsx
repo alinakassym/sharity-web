@@ -8,6 +8,7 @@ import {
   MenuItem,
   Autocomplete,
   TextField,
+  FormHelperText,
 } from "@mui/material";
 
 export interface SelectOption {
@@ -26,6 +27,8 @@ interface CustomSelectProps {
   required?: boolean;
   searchable?: boolean; // Включить возможность поиска
   inputRef?: RefObject<HTMLInputElement | null>;
+  error?: boolean; // Флаг наличия ошибки
+  helperText?: string; // Текст ошибки или подсказки
 }
 
 /**
@@ -44,6 +47,8 @@ const CustomSelect: FC<CustomSelectProps> = ({
   required = false,
   searchable = false,
   inputRef,
+  error = false,
+  helperText,
 }) => {
   const displayLabel = required ? `${label} *` : label;
 
@@ -70,6 +75,8 @@ const CustomSelect: FC<CustomSelectProps> = ({
             label={displayLabel}
             placeholder={placeholder}
             inputRef={inputRef}
+            error={error}
+            helperText={helperText}
           />
         )}
       />
@@ -78,7 +85,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
 
   // Обычный Select без поиска
   return (
-    <FormControl fullWidth={fullWidth} disabled={disabled}>
+    <FormControl fullWidth={fullWidth} disabled={disabled} error={error}>
       <InputLabel>{displayLabel}</InputLabel>
       <Select
         value={value}
@@ -94,6 +101,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
           </MenuItem>
         ))}
       </Select>
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );
 };

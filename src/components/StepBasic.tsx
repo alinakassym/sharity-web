@@ -30,8 +30,6 @@ type BasicErrors = {
 };
 
 interface StepBasicProps {
-  c: { error: string };
-
   form: CreateFormState;
   dispatch: Dispatch<CreateFormAction>;
 
@@ -55,7 +53,6 @@ interface StepBasicProps {
 }
 
 export const StepBasic: FC<StepBasicProps> = ({
-  c,
   form,
   dispatch,
   basicErrors,
@@ -103,12 +100,9 @@ export const StepBasic: FC<StepBasicProps> = ({
         disabled={isLoadingCategories}
         required
         searchable
+        error={Boolean(basicErrors.category)}
+        helperText={basicErrors.category}
       />
-      {basicErrors.category && (
-        <p style={{ margin: "-12px 12px 0", fontSize: 12, color: c.error }}>
-          {basicErrors.category}
-        </p>
-      )}
 
       {form.category === "Гимнастика" && (
         <>
@@ -125,12 +119,9 @@ export const StepBasic: FC<StepBasicProps> = ({
             disabled={isLoadingGymnasticsCategories}
             searchable
             inputRef={subcategoryInputRef}
+            error={Boolean(basicErrors.subcategory)}
+            helperText={basicErrors.subcategory}
           />
-          {basicErrors.subcategory && (
-            <p style={{ margin: "-12px 12px 0", fontSize: 12, color: c.error }}>
-              {basicErrors.subcategory}
-            </p>
-          )}
         </>
       )}
 
@@ -153,12 +144,9 @@ export const StepBasic: FC<StepBasicProps> = ({
             disabled={isLoadingLeotardSizes}
             searchable
             inputRef={sizeInputRef}
+            error={Boolean(basicErrors.productSize)}
+            helperText={basicErrors.productSize}
           />
-          {basicErrors.productSize && (
-            <p style={{ margin: "-12px 12px 0", fontSize: 12, color: c.error }}>
-              {basicErrors.productSize}
-            </p>
-          )}
         </>
       )}
 

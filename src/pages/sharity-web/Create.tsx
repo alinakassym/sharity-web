@@ -444,7 +444,6 @@ const Create: FC = () => {
       >
         {currentStep === "basic" && (
           <StepBasic
-            c={c}
             form={form}
             dispatch={dispatch}
             basicErrors={basicErrors}
