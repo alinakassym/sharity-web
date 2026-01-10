@@ -43,13 +43,16 @@ const Courses: FC = () => {
   const courses: CourseData[] = useMemo(
     () =>
       rows.map((r, i) => {
-        // Приоритет отображения изображений:
-        // 1. Первое изображение из imagesArray
-        // 2. Поле image (для совместимости)
-        // 3. Fallback заглушка
+        // ➕ Приоритет отображения изображений:
+        // 1. coverImage (главное изображение)
+        // 2. Первое изображение из imagesArray
+        // 3. Поле image (для совместимости)
+        // 4. Fallback заглушка
         let imageUrl = `https://picsum.photos/600?${i + 1}`;
 
-        if (r.imagesArray && r.imagesArray.length > 0) {
+        if (r.coverImage) {
+          imageUrl = r.coverImage;
+        } else if (r.imagesArray && r.imagesArray.length > 0) {
           imageUrl = r.imagesArray[0];
         } else if (r.image) {
           imageUrl = r.image;

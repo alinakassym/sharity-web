@@ -15,6 +15,21 @@ interface CourseFromDB {
   createdBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  locations?: Array<{
+    location: string;
+    locationCoordinates: [number, number];
+  }>;
+
+  // ➕ НОВЫЕ поля
+  coverImage?: string;
+  ageFrom?: number;
+  ageTo?: number;
+  priceFrom?: number;
+  priceText?: string;
+  scheduleText?: string;
+  phone?: string;
+  whatsapp?: string;
+  telegram?: string;
 }
 
 export const useRequestGetCourse = (courseId: string | undefined) => {

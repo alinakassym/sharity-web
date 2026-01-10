@@ -1,3 +1,5 @@
+// sharity-web/src/hooks/useRequestCreateCourse.ts
+
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -11,7 +13,21 @@ export interface CreateCourseData {
   imagesArray?: string[];
   createdBy?: string; // Telegram username пользователя
   createdAt?: Date;
-  locations?: Array<{ location: string; locationCoordinates: [number, number] }>; // Массив локаций
+  locations?: Array<{
+    location: string;
+    locationCoordinates: [number, number];
+  }>; // Массив локаций
+
+  // ➕ НОВЫЕ поля
+  coverImage?: string; // Главное изображение из imagesArray
+  ageFrom?: number; // Возраст от (лет)
+  ageTo?: number; // Возраст до (лет)
+  priceFrom?: number; // Цена от (₸)
+  priceText?: string; // Текстовое описание цены
+  scheduleText?: string; // Расписание
+  phone?: string; // Основной телефон
+  whatsapp?: string; // WhatsApp номер
+  telegram?: string; // Telegram username
 }
 
 export const useRequestCreateCourse = () => {

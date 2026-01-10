@@ -1,3 +1,5 @@
+// sharity-web/src/pages/sharity-web/CreateCourse.tsx
+
 import type { FC } from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -51,6 +53,17 @@ const CreateCourse: FC = () => {
     Array<{ location: string; locationCoordinates: [number, number] }>
   >([]);
 
+  // ➕ НОВЫЕ state переменные
+  const [coverImageIndex, setCoverImageIndex] = useState<number>(0); // Индекс главного изображения
+  const [ageFrom, setAgeFrom] = useState<number | undefined>();
+  const [ageTo, setAgeTo] = useState<number | undefined>();
+  const [priceFrom, setPriceFrom] = useState<number | undefined>();
+  const [priceText, setPriceText] = useState("");
+  const [scheduleText, setScheduleText] = useState("");
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [telegram, setTelegram] = useState("");
+
   // Состояние для модального окна
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [tempLocation, setTempLocation] = useState("");
@@ -78,14 +91,14 @@ const CreateCourse: FC = () => {
     },
     {
       id: "location",
-      title: "Локация",
-      description: "Адрес",
+      title: "Локация и контакты",
+      description: "Адреса и способы связи",
     },
     { id: "photos", title: "Фотографии", description: "Добавьте фото товара" },
     {
       id: "details",
-      title: "Описание",
-      description: "Подробное описание товара",
+      title: "Описание и детали",
+      description: "Описание, возраст, цена, расписание",
     },
     {
       id: "review",
@@ -117,6 +130,7 @@ const CreateCourse: FC = () => {
   const handlePublish = async () => {
     try {
       let imagesArray: string[] = [];
+      let coverImage: string | undefined;
 
       // Загружаем изображения в S3, если они выбраны
       if (selectedFiles.length > 0) {
@@ -125,6 +139,9 @@ const CreateCourse: FC = () => {
         );
         imagesArray = await uploadFiles(PRODUCTS_BUCKET, selectedFiles);
         console.log("Все изображения загружены:", imagesArray);
+
+        // ➕ Сохраняем главное изображение
+        coverImage = imagesArray[coverImageIndex];
       }
 
       // Получаем данные пользователя Telegram
@@ -139,6 +156,17 @@ const CreateCourse: FC = () => {
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
         locations: locations.length > 0 ? locations : undefined, // Массив локаций
+
+        // ➕ НОВЫЕ поля
+        coverImage,
+        ageFrom: ageFrom ?? undefined,
+        ageTo: ageTo ?? undefined,
+        priceFrom: priceFrom ?? undefined,
+        priceText: priceText.trim() || undefined,
+        scheduleText: scheduleText.trim() || undefined,
+        phone: phone.trim() || undefined,
+        whatsapp: whatsapp.trim() || undefined,
+        telegram: telegram.trim() || undefined,
       };
 
       const result = await createCourse(courseData);
@@ -359,6 +387,55 @@ const CreateCourse: FC = () => {
             >
               Добавить адрес
             </Button>
+
+            {/* ➕ НОВЫЙ БЛОК: Контакты */}
+            <div
+              style={{
+                marginTop: 24,
+                paddingTop: 24,
+                borderTop: `1px solid ${c.surfaceColor}`,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: c.text,
+                  margin: "0 0 16px",
+                }}
+              >
+                Контакты
+              </h3>
+
+              <TextField
+                label="Телефон"
+                placeholder="+7 (___) ___-__-__"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                fullWidth
+                variant="outlined"
+                style={{ marginBottom: 16 }}
+              />
+
+              <TextField
+                label="WhatsApp"
+                placeholder="+7 (___) ___-__-__"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                fullWidth
+                variant="outlined"
+                style={{ marginBottom: 16 }}
+              />
+
+              <TextField
+                label="Telegram"
+                placeholder="@username"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                fullWidth
+                variant="outlined"
+              />
+            </div>
           </div>
         )}
 
@@ -422,6 +499,15 @@ const CreateCourse: FC = () => {
                 >
                   Выбранные изображения ({selectedFiles.length}):
                 </h3>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: c.lightText,
+                    margin: "0 0 12px",
+                  }}
+                >
+                  Нажмите на изображение, чтобы выбрать его как главное
+                </p>
                 <div
                   style={{
                     display: "grid",
@@ -432,6 +518,7 @@ const CreateCourse: FC = () => {
                   {selectedFiles.map((file, index) => (
                     <div
                       key={index}
+                      onClick={() => setCoverImageIndex(index)}
                       style={{
                         position: "relative",
                         width: 80,
@@ -439,6 +526,11 @@ const CreateCourse: FC = () => {
                         borderRadius: 8,
                         overflow: "hidden",
                         backgroundColor: c.controlColor,
+                        border:
+                          coverImageIndex === index
+                            ? `2px solid ${c.primary}`
+                            : "2px solid transparent",
+                        cursor: "pointer",
                       }}
                     >
                       <img
@@ -450,8 +542,28 @@ const CreateCourse: FC = () => {
                           objectFit: "cover",
                         }}
                       />
+                      {coverImageIndex === index && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 4,
+                            left: 4,
+                            background: c.primary,
+                            color: c.lighter,
+                            padding: "2px 6px",
+                            borderRadius: 4,
+                            fontSize: 10,
+                            fontWeight: 600,
+                          }}
+                        >
+                          Главное
+                        </div>
+                      )}
                       <IconButton
-                        onClick={() => removeFile(index)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFile(index);
+                        }}
                         size="small"
                         sx={{
                           position: "absolute",
@@ -486,6 +598,122 @@ const CreateCourse: FC = () => {
               fullWidth
               variant="outlined"
             />
+
+            {/* ➕ НОВЫЕ поля: Возрастная группа */}
+            <div
+              style={{
+                paddingTop: 24,
+                marginTop: 8,
+                borderTop: `1px solid ${c.surfaceColor}`,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: c.text,
+                  margin: "0 0 16px",
+                }}
+              >
+                Возрастная группа
+              </h3>
+              <div style={{ display: "flex", gap: 16 }}>
+                <TextField
+                  label="От (лет)"
+                  type="number"
+                  placeholder="5"
+                  value={ageFrom ?? ""}
+                  onChange={(e) =>
+                    setAgeFrom(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                  variant="outlined"
+                  style={{ flex: 1 }}
+                />
+                <TextField
+                  label="До (лет)"
+                  type="number"
+                  placeholder="12"
+                  value={ageTo ?? ""}
+                  onChange={(e) =>
+                    setAgeTo(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                  variant="outlined"
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+
+            {/* ➕ НОВЫЕ поля: Стоимость */}
+            <div
+              style={{
+                paddingTop: 24,
+                marginTop: 8,
+                borderTop: `1px solid ${c.surfaceColor}`,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: c.text,
+                  margin: "0 0 16px",
+                }}
+              >
+                Стоимость
+              </h3>
+              <TextField
+                label="Цена от (₸)"
+                type="number"
+                placeholder="15000"
+                value={priceFrom ?? ""}
+                onChange={(e) =>
+                  setPriceFrom(e.target.value ? Number(e.target.value) : undefined)
+                }
+                fullWidth
+                variant="outlined"
+                style={{ marginBottom: 16 }}
+              />
+              <TextField
+                label="Описание цены (опционально)"
+                placeholder="Например: абонемент 25 000₸/мес или цена по запросу"
+                value={priceText}
+                onChange={(e) => setPriceText(e.target.value)}
+                fullWidth
+                multiline
+                rows={2}
+                variant="outlined"
+              />
+            </div>
+
+            {/* ➕ НОВОЕ поле: Расписание */}
+            <div
+              style={{
+                paddingTop: 24,
+                marginTop: 8,
+                borderTop: `1px solid ${c.surfaceColor}`,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: c.text,
+                  margin: "0 0 16px",
+                }}
+              >
+                Расписание
+              </h3>
+              <TextField
+                label="Расписание"
+                placeholder="Например: Пн–Сб 10:00–20:00"
+                value={scheduleText}
+                onChange={(e) => setScheduleText(e.target.value)}
+                fullWidth
+                multiline
+                rows={2}
+                variant="outlined"
+              />
+            </div>
           </div>
         )}
 
@@ -520,13 +748,148 @@ const CreateCourse: FC = () => {
                   id: "preview",
                   image:
                     selectedFiles.length > 0
-                      ? URL.createObjectURL(selectedFiles[0])
+                      ? URL.createObjectURL(selectedFiles[coverImageIndex])
                       : "https://picsum.photos/600?preview",
                   category: category || "Без категории",
                   title: courseName || "Название",
                 }}
               />
             </div>
+
+            {/* ➕ НОВОЕ: Показываем возраст */}
+            {(ageFrom || ageTo) && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: c.surfaceColor,
+                  borderRadius: 12,
+                  marginTop: 8,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: c.text,
+                    margin: "0 0 8px",
+                  }}
+                >
+                  Возраст
+                </h4>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: c.text,
+                    margin: 0,
+                  }}
+                >
+                  {ageFrom && `от ${ageFrom}`} {ageTo && `до ${ageTo} лет`}
+                </p>
+              </div>
+            )}
+
+            {/* ➕ НОВОЕ: Показываем цену */}
+            {(priceFrom || priceText) && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: c.surfaceColor,
+                  borderRadius: 12,
+                  marginTop: 8,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: c.text,
+                    margin: "0 0 8px",
+                  }}
+                >
+                  Стоимость
+                </h4>
+                {priceFrom && (
+                  <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px" }}>
+                    От {priceFrom}₸
+                  </p>
+                )}
+                {priceText && (
+                  <p style={{ fontSize: 14, color: c.text, margin: 0 }}>
+                    {priceText}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* ➕ НОВОЕ: Показываем расписание */}
+            {scheduleText && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: c.surfaceColor,
+                  borderRadius: 12,
+                  marginTop: 8,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: c.text,
+                    margin: "0 0 8px",
+                  }}
+                >
+                  Расписание
+                </h4>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: c.text,
+                    margin: 0,
+                  }}
+                >
+                  {scheduleText}
+                </p>
+              </div>
+            )}
+
+            {/* ➕ НОВОЕ: Показываем контакты */}
+            {(phone || whatsapp || telegram) && (
+              <div
+                style={{
+                  padding: 16,
+                  backgroundColor: c.surfaceColor,
+                  borderRadius: 12,
+                  marginTop: 8,
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: c.text,
+                    margin: "0 0 8px",
+                  }}
+                >
+                  Контакты
+                </h4>
+                {phone && (
+                  <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px" }}>
+                    <strong>Телефон:</strong> {phone}
+                  </p>
+                )}
+                {whatsapp && (
+                  <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px" }}>
+                    <strong>WhatsApp:</strong> {whatsapp}
+                  </p>
+                )}
+                {telegram && (
+                  <p style={{ fontSize: 14, color: c.text, margin: 0 }}>
+                    <strong>Telegram:</strong> {telegram}
+                  </p>
+                )}
+              </div>
+            )}
 
             {description && (
               <div

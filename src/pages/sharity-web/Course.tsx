@@ -7,6 +7,7 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import Header from "@/components/Header";
 import { useRequestGetCourse } from "@/hooks/useRequestGetCourse";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
 
 const Course: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,19 +33,31 @@ const Course: FC = () => {
     ? {
         id: courseData.id,
         image:
-          // Приоритет отображения изображений:
-          // 1. Первое изображение из imagesArray
-          // 2. Параметр image из URL
+          // ➕ Приоритет отображения изображений:
+          // 1. coverImage (главное изображение)
+          // 2. Первое изображение из imagesArray
           // 3. Поле image (для совместимости)
           // 4. Fallback заглушка
-          courseData.imagesArray && courseData.imagesArray.length > 0
+          courseData.coverImage ||
+          (courseData.imagesArray && courseData.imagesArray.length > 0
             ? courseData.imagesArray[0]
             : courseData.image ||
-              `https://picsum.photos/600?${getImageIndex(courseData.id)}`,
+              `https://picsum.photos/600?${getImageIndex(courseData.id)}`),
         category: courseData.category || "",
         title: courseData.name || "",
         description: courseData.description || "",
         imagesArray: courseData.imagesArray || [],
+        locations: courseData.locations || [],
+
+        // ➕ НОВЫЕ поля
+        ageFrom: courseData.ageFrom,
+        ageTo: courseData.ageTo,
+        priceFrom: courseData.priceFrom,
+        priceText: courseData.priceText,
+        scheduleText: courseData.scheduleText,
+        phone: courseData.phone,
+        whatsapp: courseData.whatsapp,
+        telegram: courseData.telegram,
       }
     : null;
 
@@ -143,17 +156,229 @@ const Course: FC = () => {
             {course.title}
           </h2>
 
+          {course.description && (
+            <div
+              style={{
+                fontSize: 16,
+                lineHeight: "1.5",
+                color: c.text,
+                marginTop: 16,
+              }}
+            >
+              {course.description}
+            </div>
+          )}
+        </div>
+
+        {/* ➕ НОВОЕ: Возраст */}
+        {(course.ageFrom || course.ageTo) && (
           <div
             style={{
-              fontSize: 16,
-              lineHeight: "1.5",
-              color: c.text,
-              marginTop: 16,
+              padding: 16,
+              backgroundColor: c.surfaceColor,
+              borderRadius: 12,
+              marginTop: 8,
             }}
           >
-            {course.description}
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: c.text,
+                margin: "0 0 8px",
+              }}
+            >
+              Возраст
+            </h3>
+            <p
+              style={{
+                fontSize: 14,
+                color: c.text,
+                margin: 0,
+              }}
+            >
+              {course.ageFrom && `от ${course.ageFrom}`}{" "}
+              {course.ageTo && `до ${course.ageTo} лет`}
+            </p>
           </div>
-        </div>
+        )}
+
+        {/* ➕ НОВОЕ: Стоимость */}
+        {(course.priceFrom || course.priceText) && (
+          <div
+            style={{
+              padding: 16,
+              backgroundColor: c.surfaceColor,
+              borderRadius: 12,
+              marginTop: 8,
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: c.text,
+                margin: "0 0 8px",
+              }}
+            >
+              Стоимость
+            </h3>
+            {course.priceFrom && (
+              <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px" }}>
+                От {course.priceFrom}₸
+              </p>
+            )}
+            {course.priceText && (
+              <p style={{ fontSize: 14, color: c.text, margin: 0 }}>
+                {course.priceText}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ➕ НОВОЕ: Расписание */}
+        {course.scheduleText && (
+          <div
+            style={{
+              padding: 16,
+              backgroundColor: c.surfaceColor,
+              borderRadius: 12,
+              marginTop: 8,
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: c.text,
+                margin: "0 0 8px",
+              }}
+            >
+              Расписание
+            </h3>
+            <p
+              style={{
+                fontSize: 14,
+                color: c.text,
+                margin: 0,
+              }}
+            >
+              {course.scheduleText}
+            </p>
+          </div>
+        )}
+
+        {/* ➕ НОВОЕ: Локации */}
+        {course.locations.length > 0 && (
+          <div
+            style={{
+              padding: 16,
+              backgroundColor: c.surfaceColor,
+              borderRadius: 12,
+              marginTop: 8,
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: c.text,
+                margin: "0 0 8px",
+              }}
+            >
+              Локации
+            </h3>
+            {course.locations.map((loc, index) => (
+              <div key={index} style={{ marginBottom: index < course.locations.length - 1 ? 12 : 0 }}>
+                <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px", fontWeight: 500 }}>
+                  {loc.location}
+                </p>
+                {loc.locationCoordinates && (
+                  <p style={{ fontSize: 12, color: c.lightText, margin: 0 }}>
+                    {loc.locationCoordinates[0].toFixed(6)}, {loc.locationCoordinates[1].toFixed(6)}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ➕ НОВОЕ: Контакты */}
+        {(course.phone || course.whatsapp || course.telegram) && (
+          <div
+            style={{
+              padding: 16,
+              backgroundColor: c.surfaceColor,
+              borderRadius: 12,
+              marginTop: 8,
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: c.text,
+                margin: "0 0 12px",
+              }}
+            >
+              Контакты
+            </h3>
+
+            {course.phone && (
+              <a
+                href={`tel:${course.phone}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 8,
+                  textDecoration: "none",
+                  color: c.primary,
+                }}
+              >
+                <VuesaxIcon name="call" size={20} color={c.primary} />
+                <span style={{ fontSize: 14 }}>{course.phone}</span>
+              </a>
+            )}
+
+            {course.whatsapp && (
+              <a
+                href={`https://wa.me/${course.whatsapp.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 8,
+                  textDecoration: "none",
+                  color: c.primary,
+                }}
+              >
+                <VuesaxIcon name="whatsapp" size={20} color={c.primary} />
+                <span style={{ fontSize: 14 }}>WhatsApp</span>
+              </a>
+            )}
+
+            {course.telegram && (
+              <a
+                href={`https://t.me/${course.telegram.replace("@", "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  textDecoration: "none",
+                  color: c.primary,
+                }}
+              >
+                <VuesaxIcon name="message" size={20} color={c.primary} />
+                <span style={{ fontSize: 14 }}>{course.telegram}</span>
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Кнопки действий */}
         <div
