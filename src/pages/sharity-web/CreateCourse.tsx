@@ -142,21 +142,9 @@ const CreateCourse: FC = () => {
 
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
 
-  // Новая структура данных для локаций
-  const [locations, setLocations] = useState<
-    Array<{ location: string; locationCoordinates: [number, number] }>
-  >([]);
-
-  // ➕ НОВЫЕ state переменные
-  const [coverImageIndex, setCoverImageIndex] = useState<number>(0); // Индекс главного изображения
   const [ageFrom, setAgeFrom] = useState<number | undefined>();
   const [ageTo, setAgeTo] = useState<number | undefined>();
   const [priceFrom, setPriceFrom] = useState<number | undefined>();
-  const [priceText, setPriceText] = useState("");
-  const [scheduleText, setScheduleText] = useState("");
-  const [phone, setPhone] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [telegram, setTelegram] = useState("");
 
   // Состояние для модального окна
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -258,7 +246,7 @@ const CreateCourse: FC = () => {
         console.log("Все изображения загружены:", imagesArray);
 
         // ➕ Сохраняем главное изображение
-        coverImage = imagesArray[coverImageIndex];
+        coverImage = imagesArray[form.coverImageIndex];
       }
 
       // Получаем данные пользователя Telegram
@@ -272,18 +260,18 @@ const CreateCourse: FC = () => {
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
-        locations: locations.length > 0 ? locations : undefined, // Массив локаций
+        locations: form.locations.length > 0 ? form.locations : undefined, // Массив локаций
 
         // ➕ НОВЫЕ поля
         coverImage,
         ageFrom: ageFrom ?? undefined,
         ageTo: ageTo ?? undefined,
         priceFrom: priceFrom ?? undefined,
-        priceText: priceText.trim() || undefined,
-        scheduleText: scheduleText.trim() || undefined,
-        phone: phone.trim() || undefined,
-        whatsapp: whatsapp.trim() || undefined,
-        telegram: telegram.trim() || undefined,
+        priceText: form.priceText.trim() || undefined,
+        scheduleText: form.scheduleText.trim() || undefined,
+        phone: form.phone.trim() || undefined,
+        whatsapp: form.whatsapp.trim() || undefined,
+        telegram: form.telegram.trim() || undefined,
       };
 
       const result = await createCourse(courseData);
@@ -333,19 +321,25 @@ const CreateCourse: FC = () => {
 
   const handleAddLocation = () => {
     if (tempLocation.trim() && tempLocationCoordinates) {
-      setLocations([
-        ...locations,
-        {
-          location: tempLocation.trim(),
-          locationCoordinates: tempLocationCoordinates,
-        },
-      ]);
+      dispatch({
+        type: "SET_LOCATIONS",
+        locations: [
+          ...form.locations,
+          {
+            location: tempLocation.trim(),
+            locationCoordinates: tempLocationCoordinates,
+          },
+        ],
+      });
       handleCloseLocationModal();
     }
   };
 
   const handleRemoveLocation = (indexToRemove: number) => {
-    setLocations(locations.filter((_, index) => index !== indexToRemove));
+    dispatch({
+      type: "SET_LOCATIONS",
+      locations: form.locations.filter((_, index) => index !== indexToRemove),
+    });
   };
 
   return (
@@ -450,11 +444,11 @@ const CreateCourse: FC = () => {
         {currentStep === "location" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {/* Список добавленных адресов */}
-            {locations.length > 0 && (
+            {form.locations.length > 0 && (
               <div
                 style={{ display: "flex", flexDirection: "column", gap: 12 }}
               >
-                {locations.map((loc, index) => (
+                {form.locations.map((loc, index) => (
                   <div
                     key={index}
                     style={{
@@ -539,8 +533,14 @@ const CreateCourse: FC = () => {
               <TextField
                 label="Телефон"
                 placeholder="+7 (___) ___-__-__"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={form.phone}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "phone",
+                    value: e.target.value,
+                  })
+                }
                 fullWidth
                 variant="outlined"
                 style={{ marginBottom: 16 }}
@@ -549,8 +549,14 @@ const CreateCourse: FC = () => {
               <TextField
                 label="WhatsApp"
                 placeholder="+7 (___) ___-__-__"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
+                value={form.whatsapp}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "whatsapp",
+                    value: e.target.value,
+                  })
+                }
                 fullWidth
                 variant="outlined"
                 style={{ marginBottom: 16 }}
@@ -559,8 +565,14 @@ const CreateCourse: FC = () => {
               <TextField
                 label="Telegram"
                 placeholder="@username"
-                value={telegram}
-                onChange={(e) => setTelegram(e.target.value)}
+                value={form.telegram}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "telegram",
+                    value: e.target.value,
+                  })
+                }
                 fullWidth
                 variant="outlined"
               />
@@ -647,7 +659,13 @@ const CreateCourse: FC = () => {
                   {form.selectedFiles.map((file, index) => (
                     <div
                       key={index}
-                      onClick={() => setCoverImageIndex(index)}
+                      onClick={() =>
+                        dispatch({
+                          type: "SET_FIELD",
+                          field: "coverImageIndex",
+                          value: index,
+                        })
+                      }
                       style={{
                         position: "relative",
                         width: 80,
@@ -656,7 +674,7 @@ const CreateCourse: FC = () => {
                         overflow: "hidden",
                         backgroundColor: c.controlColor,
                         border:
-                          coverImageIndex === index
+                          form.coverImageIndex === index
                             ? `2px solid ${c.primary}`
                             : "2px solid transparent",
                         cursor: "pointer",
@@ -671,7 +689,7 @@ const CreateCourse: FC = () => {
                           objectFit: "cover",
                         }}
                       />
-                      {coverImageIndex === index && (
+                      {form.coverImageIndex === index && (
                         <div
                           style={{
                             position: "absolute",
@@ -817,8 +835,14 @@ const CreateCourse: FC = () => {
               <TextField
                 label="Описание цены (опционально)"
                 placeholder="Например: абонемент 25 000₸/мес или цена по запросу"
-                value={priceText}
-                onChange={(e) => setPriceText(e.target.value)}
+                value={form.priceText}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "priceText",
+                    value: e.target.value,
+                  })
+                }
                 fullWidth
                 multiline
                 rows={2}
@@ -847,8 +871,14 @@ const CreateCourse: FC = () => {
               <TextField
                 label="Расписание"
                 placeholder="Например: Пн–Сб 10:00–20:00"
-                value={scheduleText}
-                onChange={(e) => setScheduleText(e.target.value)}
+                value={form.scheduleText}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "scheduleText",
+                    value: e.target.value,
+                  })
+                }
                 fullWidth
                 multiline
                 rows={2}
@@ -889,7 +919,7 @@ const CreateCourse: FC = () => {
                   id: "preview",
                   image:
                     form.selectedFiles.length > 0
-                      ? filePreviews[coverImageIndex]?.url
+                      ? filePreviews[form.coverImageIndex]?.url
                       : "https://picsum.photos/600?preview",
                   category: form.category || "Без категории",
                   title: form.courseName || "Название",
@@ -930,7 +960,7 @@ const CreateCourse: FC = () => {
             )}
 
             {/* ➕ НОВОЕ: Показываем цену */}
-            {(priceFrom || priceText) && (
+            {(priceFrom || form.priceText) && (
               <div
                 style={{
                   padding: 16,
@@ -954,16 +984,16 @@ const CreateCourse: FC = () => {
                     От {priceFrom}₸
                   </p>
                 )}
-                {priceText && (
+                {form.priceText && (
                   <p style={{ fontSize: 14, color: c.text, margin: 0 }}>
-                    {priceText}
+                    {form.priceText}
                   </p>
                 )}
               </div>
             )}
 
             {/* ➕ НОВОЕ: Показываем расписание */}
-            {scheduleText && (
+            {form.scheduleText && (
               <div
                 style={{
                   padding: 16,
@@ -989,13 +1019,13 @@ const CreateCourse: FC = () => {
                     margin: 0,
                   }}
                 >
-                  {scheduleText}
+                  {form.scheduleText}
                 </p>
               </div>
             )}
 
             {/* ➕ НОВОЕ: Показываем контакты */}
-            {(phone || whatsapp || telegram) && (
+            {(form.phone || form.whatsapp || form.telegram) && (
               <div
                 style={{
                   padding: 16,
@@ -1014,19 +1044,19 @@ const CreateCourse: FC = () => {
                 >
                   Контакты
                 </h4>
-                {phone && (
+                {form.phone && (
                   <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px" }}>
-                    <strong>Телефон:</strong> {phone}
+                    <strong>Телефон:</strong> {form.phone}
                   </p>
                 )}
-                {whatsapp && (
+                {form.whatsapp && (
                   <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px" }}>
-                    <strong>WhatsApp:</strong> {whatsapp}
+                    <strong>WhatsApp:</strong> {form.whatsapp}
                   </p>
                 )}
-                {telegram && (
+                {form.telegram && (
                   <p style={{ fontSize: 14, color: c.text, margin: 0 }}>
-                    <strong>Telegram:</strong> {telegram}
+                    <strong>Telegram:</strong> {form.telegram}
                   </p>
                 )}
               </div>
