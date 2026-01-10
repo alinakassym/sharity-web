@@ -2,22 +2,18 @@
 
 import type { FC } from "react";
 import { useState, useEffect, useMemo, useRef, useReducer } from "react";
-
-import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   useSafePaddingTop,
   useSafePlatform,
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
-import { getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductCard from "@/components/ProductCard";
-import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
-import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
+import { PRODUCTS_BUCKET, testConnection, uploadFiles } from "@/lib/minio";
 import Header from "@/components/Header";
 import {
   Stepper,
@@ -29,6 +25,9 @@ import {
 } from "@mui/material";
 import Container from "@/components/Container";
 import CustomSelect from "@/components/CustomSelect";
+import { getTelegramUser } from "@/lib/telegram";
+import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
+import { useNavigate } from "react-router-dom";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
@@ -99,21 +98,25 @@ const formReducer = (
 const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [isPublishing, setIsPublishing] = useState(false);
+  const [basicErrors, setBasicErrors] = useState<{
+    productName?: string;
+    category?: string;
+    price?: string;
+  }>({});
 
   const [form, dispatch] = useReducer(formReducer, initialFormState);
 
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const navigate = useNavigate();
   const paddingTop = useSafePaddingTop(48, 44);
   const platformName = useSafePlatform();
+  const { createProduct } = useRequestCreateProduct();
+  const navigate = useNavigate();
 
   // Refs для автофокуса
   const subcategoryInputRef = useRef<HTMLInputElement>(null);
   const sizeInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
-
-  const { createProduct } = useRequestCreateProduct();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
     useRequestGetCategories();
   const {
@@ -223,6 +226,15 @@ const Create: FC = () => {
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.id === currentStep);
+  const isBasicValid =
+    form.productName.trim().length > 0 &&
+    form.category.trim().length > 0 &&
+    Number(form.price) > 0;
+
+  const canGoNext = useMemo(() => {
+    if (currentStep === "basic") return isBasicValid;
+    return true;
+  }, [currentStep, isBasicValid]);
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
@@ -233,44 +245,59 @@ const Create: FC = () => {
   };
 
   const handleNext = () => {
+    if (currentStep === "basic") {
+      const nextErrors: typeof basicErrors = {};
+
+      if (!form.productName.trim()) {
+        nextErrors.productName = "Введите название товара";
+      }
+
+      if (!form.category.trim()) {
+        nextErrors.category = "Выберите категорию";
+      }
+
+      if (!form.price.trim() || Number(form.price) <= 0) {
+        nextErrors.price = "Укажите цену больше 0";
+      }
+
+      setBasicErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
     if (currentStepIndex < steps.length - 1) {
       setCurrentStep(steps[currentStepIndex + 1].id);
     } else {
-      // Публикация товара
-      setIsPublishing(true);
       handlePublish();
     }
   };
 
   const handlePublish = async () => {
-    if (!form.productName.trim() || !form.category || !form.price.trim()) {
-      alert("Пожалуйста, заполните все обязательные поля");
-      return;
-    }
+    setIsPublishing(true);
 
     try {
       let imagesArray: string[] = [];
 
-      // Загружаем изображения в S3, если они выбраны
       if (form.selectedFiles.length > 0) {
         imagesArray = await uploadFiles(PRODUCTS_BUCKET, form.selectedFiles);
       }
 
-      // Получаем данные пользователя Telegram
       const { user } = getTelegramUser();
       const createdBy = user?.username || user?.first_name || undefined;
 
       const productData = {
         name: form.productName.trim(),
         category: form.category,
-        subcategory: form.subcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
-        productSize: form.productSize ? Number(form.productSize) : undefined, // Добавляем размер купальника, если выбран
+        subcategory: form.subcategory || undefined,
+        productSize: form.productSize ? Number(form.productSize) : undefined,
         price: Number(form.price),
         description: form.description.trim() || undefined,
         condition: form.condition || undefined,
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
-        createdBy, // Добавляем username пользователя Telegram
+        createdBy,
       };
 
       const result = await createProduct(productData);
@@ -284,6 +311,8 @@ const Create: FC = () => {
     } catch (error) {
       console.error("Ошибка при создании товара:", error);
       alert(`Ошибка при загрузке изображений: ${error}`);
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -373,6 +402,8 @@ const Create: FC = () => {
                   value: e.target.value,
                 })
               }
+              error={Boolean(basicErrors.productName)}
+              helperText={basicErrors.productName}
               fullWidth
               variant="outlined"
             />
@@ -394,6 +425,11 @@ const Create: FC = () => {
               required
               searchable
             />
+            {basicErrors.category && (
+              <p style={{ margin: "4px 0 0", fontSize: 12, color: c.error }}>
+                {basicErrors.category}
+              </p>
+            )}
 
             {/* Подкатегории гимнастики - показываем только если выбрана Гимнастика */}
             {form.category === "Гимнастика" && (
@@ -455,10 +491,11 @@ const Create: FC = () => {
                   value: e.target.value,
                 })
               }
+              error={Boolean(basicErrors.price)}
+              helperText={basicErrors.price || "Укажите цену в тенге"}
               slotProps={{ htmlInput: { pattern: "[0-9]*" } }}
               fullWidth
               variant="outlined"
-              helperText="Укажите цену в тенге"
               inputRef={priceInputRef}
             />
           </div>
@@ -793,7 +830,7 @@ const Create: FC = () => {
           fullWidth
           variant="contained"
           onClick={handleNext}
-          disabled={isPublishing}
+          disabled={isPublishing || !canGoNext}
         >
           {currentStepIndex === steps.length - 1
             ? isPublishing
