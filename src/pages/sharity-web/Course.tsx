@@ -1,3 +1,5 @@
+// sharity-web/src/pages/sharity-web/Course.tsx
+
 import type { FC } from "react";
 import { useParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";

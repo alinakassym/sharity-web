@@ -1,3 +1,5 @@
+// sharity-web/src/hooks/useRequestGetCourses.ts
+
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -30,7 +32,7 @@ export const useRequestGetCourses = () => {
       col,
       (snap) => {
         const arr = snap.docs
-          .map((d) => ({ id: d.id, ...d.data() } as CourseFromDB))
+          .map((d) => ({ id: d.id, ...d.data() }) as CourseFromDB)
           .filter((course) => !course.isDeleted); // Фильтрация удаленных курсов
         setCourses(arr);
         setIsLoading(false);
