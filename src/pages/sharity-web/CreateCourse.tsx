@@ -11,11 +11,12 @@ import {
 } from "@/hooks/useTelegramSafeArea";
 import { getTelegramUser } from "@/lib/telegram";
 import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import YandexMap from "@/components/YandexMap";
+import { StepCourseBasic } from "@/components/StepCourseBasic";
 import { StepCoursePhotos } from "@/components/StepCoursePhotos";
 import { StepCourseReview } from "@/components/StepCourseReview";
 import { StepCourseDetails } from "@/components/StepCourseDetails";
+import { StepCourseLocation } from "@/components/StepCourseLocation";
 
 import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
@@ -24,7 +25,6 @@ import {
   StepLabel,
   Button,
   TextField,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -32,7 +32,6 @@ import {
 } from "@mui/material";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
-import CustomSelect from "@/components/CustomSelect";
 
 type StepType = "basic" | "location" | "photos" | "details" | "review";
 
@@ -401,186 +400,28 @@ const CreateCourse: FC = () => {
         }}
       >
         {currentStep === "basic" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <TextField
-              label="Название *"
-              placeholder="Введите название"
-              value={form.courseName}
-              onChange={(e) =>
-                dispatch({
-                  type: "SET_FIELD",
-                  field: "courseName",
-                  value: e.target.value,
-                })
-              }
-              fullWidth
-              variant="outlined"
-            />
-
-            <CustomSelect
-              label="Категория"
-              value={form.category}
-              onChange={(value) =>
-                dispatch({
-                  type: "SET_FIELD",
-                  field: "category",
-                  value,
-                })
-              }
-              options={[
-                { value: "Гимнастика", label: "Гимнастика" },
-                { value: "Танцы", label: "Танцы" },
-                { value: "Балет", label: "Балет" },
-                { value: "Волейбол", label: "Волейбол" },
-                { value: "Теннис", label: "Теннис" },
-                { value: "Футбол", label: "Футбол" },
-                { value: "Хоккей", label: "Хоккей" },
-                { value: "Бег", label: "Бег" },
-              ]}
-              placeholder="Выберите категорию"
-              required
-              searchable
-            />
-          </div>
+          <StepCourseBasic form={form} dispatch={dispatch} />
         )}
 
         {currentStep === "location" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Список добавленных адресов */}
-            {form.locations.length > 0 && (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                {form.locations.map((loc, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      padding: 16,
-                      backgroundColor: c.surfaceColor,
-                      borderRadius: 12,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color: c.text,
-                        }}
-                      >
-                        {loc.location}
-                      </p>
-                      <p
-                        style={{
-                          margin: "4px 0 0",
-                          fontSize: 12,
-                          color: c.lightText,
-                        }}
-                      >
-                        {loc.locationCoordinates[0].toFixed(6)},{" "}
-                        {loc.locationCoordinates[1].toFixed(6)}
-                      </p>
-                    </div>
-                    <IconButton
-                      onClick={() => handleRemoveLocation(index)}
-                      size="small"
-                      sx={{
-                        borderColor: c.error,
-                        borderWidth: 1,
-                        borderStyle: "solid",
-                        backgroundColor: `${c.error}20`,
-                      }}
-                    >
-                      <VuesaxIcon name="close" size={16} color={c.error} />
-                    </IconButton>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Кнопка добавить адрес */}
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={handleOpenLocationModal}
-              startIcon={
-                <VuesaxIcon name="location" size={20} color={c.primary} />
-              }
-            >
-              Добавить адрес
-            </Button>
-
-            {/* ➕ НОВЫЙ БЛОК: Контакты */}
-            <div
-              style={{
-                marginTop: 24,
-                paddingTop: 24,
-                borderTop: `1px solid ${c.surfaceColor}`,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: c.text,
-                  margin: "0 0 16px",
-                }}
-              >
-                Контакты
-              </h3>
-
-              <TextField
-                label="Телефон"
-                placeholder="+7 (___) ___-__-__"
-                value={form.phone}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_FIELD",
-                    field: "phone",
-                    value: e.target.value,
-                  })
-                }
-                fullWidth
-                variant="outlined"
-                style={{ marginBottom: 16 }}
-              />
-
-              <TextField
-                label="WhatsApp"
-                placeholder="+7 (___) ___-__-__"
-                value={form.whatsapp}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_FIELD",
-                    field: "whatsapp",
-                    value: e.target.value,
-                  })
-                }
-                fullWidth
-                variant="outlined"
-                style={{ marginBottom: 16 }}
-              />
-
-              <TextField
-                label="Telegram"
-                placeholder="@username"
-                value={form.telegram}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_FIELD",
-                    field: "telegram",
-                    value: e.target.value,
-                  })
-                }
-                fullWidth
-                variant="outlined"
-              />
-            </div>
-          </div>
+          <StepCourseLocation
+            c={c}
+            locations={form.locations}
+            phone={form.phone}
+            whatsapp={form.whatsapp}
+            telegram={form.telegram}
+            onOpenLocationModal={handleOpenLocationModal}
+            onRemoveLocation={handleRemoveLocation}
+            onChangePhone={(value) =>
+              dispatch({ type: "SET_FIELD", field: "phone", value })
+            }
+            onChangeWhatsapp={(value) =>
+              dispatch({ type: "SET_FIELD", field: "whatsapp", value })
+            }
+            onChangeTelegram={(value) =>
+              dispatch({ type: "SET_FIELD", field: "telegram", value })
+            }
+          />
         )}
 
         {currentStep === "photos" && (
