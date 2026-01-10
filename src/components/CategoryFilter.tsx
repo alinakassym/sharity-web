@@ -1,3 +1,5 @@
+// sharity-web/src/components/CloseWebViewButton.tsx
+
 import { useMemo } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";
@@ -58,7 +60,16 @@ export const CategoryFilter: FC<Props> = ({
           marginBottom: 16,
         }}
       >
-        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: colors.text }}>{title}</h2>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 16,
+            fontWeight: 700,
+            color: colors.text,
+          }}
+        >
+          {title}
+        </h2>
         <button
           onClick={onOpenFilter}
           style={{

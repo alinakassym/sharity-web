@@ -1,4 +1,4 @@
-// shared/hooks/useColorScheme.ts
+// sharity-web/src/hooks/useColorScheme.ts
 
 import { useEffect, useState } from "react";
 

@@ -1,10 +1,12 @@
 // sharity-web/src/components/CourseCard.tsx
 
-import type { FC } from "react";
-import { useNavigate } from "react-router-dom";
-import { useColorScheme } from "../hooks/useColorScheme";
-import { Colors } from "../theme/colors";
-import HeartIcon from "./icons/HeartIcon";
+import { type FC } from "react";
+import { Link } from "react-router-dom";
+import { IconButton } from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 
 export type CourseData = {
   id: string;
@@ -16,93 +18,180 @@ export type CourseData = {
 
 type Props = {
   course: CourseData;
-  isLiked?: boolean;
-  showHeartBtn?: boolean;
-  onHeartPress?: (courseId: string) => void;
+  isLiked: boolean;
+  onHeartPress: (id: string) => void;
 };
 
-export const CourseCard: FC<Props> = ({
-  course,
-  isLiked = false,
-  showHeartBtn = true,
-  onHeartPress,
-}) => {
-  const navigate = useNavigate();
+const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
-  const handleCardClick = () => {
-    navigate(`/course/${course.id}`);
+  const chipStyle: React.CSSProperties = {
+    fontSize: 12,
+    fontWeight: 600,
+    color: c.text,
+    backgroundColor: c.background,
+    padding: "6px 10px",
+    borderRadius: 999,
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+  };
+
+  const actionStyle: React.CSSProperties = {
+    fontSize: 12,
+    fontWeight: 600,
+    color: c.text,
+    backgroundColor: c.background,
+    padding: "10px 12px",
+    borderRadius: 12,
+    lineHeight: 1,
+    textAlign: "center",
+    userSelect: "none",
+    flex: 1,
   };
 
   return (
-    <div
-      style={{ background: "transparent", cursor: "pointer" }}
-      onClick={handleCardClick}
+    <Link
+      to={`/course/${course.id}`}
+      style={{
+        textDecoration: "none",
+        color: "inherit",
+        display: "block",
+      }}
     >
-      {/* изображение + сердце */}
       <div
         style={{
+          display: "flex",
+          gap: 12,
+          padding: 12,
+          borderRadius: 16,
+          backgroundColor: c.surfaceColor,
           position: "relative",
-          marginBottom: 8,
         }}
       >
-        <img
-          src={course.image}
-          alt={course.title}
+        {/* Image */}
+        <div
           style={{
-            width: "100%",
-            aspectRatio: "1 / 1",
-            objectFit: "cover",
-            borderRadius: 12,
-            display: "block",
-            border: `1px solid ${c.border}`,
-            backgroundColor: c.lighter,
+            width: 96,
+            height: 96,
+            borderRadius: 14,
             overflow: "hidden",
+            flexShrink: 0,
           }}
-        />
-        {showHeartBtn && (
-          <button
-            type="button"
-            aria-label={isLiked ? "Убрать из избранного" : "В избранное"}
-            onClick={(e) => {
-              e.stopPropagation();
-              onHeartPress?.(course.id);
-            }}
+        >
+          <img
+            src={course.image}
+            alt={course.title}
             style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              padding: 0,
-              minWidth: 32,
-              maxWidth: 32,
-              height: 32,
-              borderRadius: 16,
-              background: "rgba(255,255,255,0.9)",
-              border: "none",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </div>
+
+        {/* Content */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          {/* Top text */}
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: c.lightText,
+                fontWeight: 600,
+                marginBottom: 4,
+              }}
+            >
+              {course.category}
+            </div>
+
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                lineHeight: 1.3,
+                color: c.text,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {course.title}
+            </div>
+          </div>
+
+          {/* Chips row (визуально как в примере) */}
+          <div
+            style={{
               display: "flex",
-              placeItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-              outline: "none",
+              gap: 8,
+              overflowX: "auto",
+              paddingBottom: 2,
             }}
           >
-            <HeartIcon isLiked={isLiked} />
-          </button>
-        )}
-      </div>
+            <div style={chipStyle}>Возраст —</div>
+            <div style={chipStyle}>Пробное —</div>
+            <div style={chipStyle}>Цена —</div>
+          </div>
 
-      {/* текст */}
-      <div style={{ display: "grid", gap: 4 }}>
-        <div style={{ fontSize: 12, color: c.lightText }}>
-          {course.category}
+          {/* Meta (вторая строка мелкого текста) */}
+          <div
+            style={{
+              fontSize: 12,
+              color: c.lightText,
+              display: "flex",
+              gap: 10,
+              flexWrap: "wrap",
+            }}
+          >
+            <span>Адрес: —</span>
+          </div>
+
+          {/* Actions row (только внешний вид, без логики) */}
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginTop: 2,
+            }}
+          >
+            <div style={actionStyle}>WhatsApp</div>
+            <div style={actionStyle}>Позвонить</div>
+          </div>
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: c.text }}>
-          {course.title}
-        </div>
+
+        {/* Heart (логика без изменений) */}
+        <IconButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onHeartPress(course.id);
+          }}
+          size="small"
+          sx={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+          }}
+        >
+          {isLiked ? (
+            <FavoriteIcon sx={{ color: "#E53935", fontSize: 20 }} />
+          ) : (
+            <FavoriteBorderIcon sx={{ color: c.lightText, fontSize: 20 }} />
+          )}
+        </IconButton>
       </div>
-    </div>
+    </Link>
   );
 };
 

@@ -1,4 +1,5 @@
-// src/components/CloseWebViewButton.tsx
+// sharity-web/src/components/CloseWebViewButton.tsx
+
 import { useMemo } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";

@@ -1,3 +1,5 @@
+// sharity-web/src/hooks/useRequestUpdateProduct.ts
+
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -19,7 +21,10 @@ export const useRequestUpdateProduct = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const updateProduct = async (productId: string, updateData: UpdateProductData) => {
+  const updateProduct = async (
+    productId: string,
+    updateData: UpdateProductData,
+  ) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -39,7 +44,10 @@ export const useRequestUpdateProduct = () => {
 
       return { success: true };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Произошла ошибка при обновлении товара";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Произошла ошибка при обновлении товара";
       setError(errorMessage);
       setIsLoading(false);
 
@@ -47,7 +55,10 @@ export const useRequestUpdateProduct = () => {
     }
   };
 
-  const toggleFavorite = async (productId: string, currentFavoriteState: boolean) => {
+  const toggleFavorite = async (
+    productId: string,
+    currentFavoriteState: boolean,
+  ) => {
     return updateProduct(productId, { isFavorite: !currentFavoriteState });
   };
 

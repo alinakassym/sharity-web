@@ -20,7 +20,7 @@ export const Colors = {
     text: darkenColor,
     lightText: darkenGrayColor,
     background: "#FFFFFF",
-    surfaceColor: "#F0EDE6",
+    surfaceColor: "#F5F2F2", //"#F0EDE6",
     opacity: "rgba(30, 26, 41, 0.1)",
     tint: primaryColor,
     icon: grayColor,
