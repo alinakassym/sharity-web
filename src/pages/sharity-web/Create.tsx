@@ -16,7 +16,7 @@ import { StepDetails } from "@/components/StepDetails";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
-import { PRODUCTS_BUCKET, testConnection, uploadFiles } from "@/lib/minio";
+import { PRODUCTS_BUCKET, uploadFiles } from "@/lib/minio";
 import Header from "@/components/Header";
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
 import Container from "@/components/Container";
@@ -206,16 +206,6 @@ const Create: FC = () => {
       }
     }, 300);
   };
-
-  // Тестируем подключение к Minio при загрузке компонента
-  useEffect(() => {
-    const testMinioConnection = async () => {
-      console.log("Проверяем подключение к Minio...");
-      const isConnected = await testConnection();
-      console.log("Результат подключения:", isConnected);
-    };
-    testMinioConnection();
-  }, []);
 
   useEffect(() => {
     if (form.selectedFiles.length === 0) {

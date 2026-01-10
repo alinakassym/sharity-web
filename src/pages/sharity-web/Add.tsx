@@ -108,8 +108,9 @@ const Add: FC = () => {
 
         {/* Placement Options */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {placementOptions.map((o) => (
+          {placementOptions.map((o, indx) => (
             <FullWidthButton
+              key={o.id + indx}
               label={o.title}
               iconName={o.icon}
               btnColor={c.controlColor}

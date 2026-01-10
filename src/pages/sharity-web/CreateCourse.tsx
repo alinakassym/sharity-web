@@ -18,7 +18,7 @@ import { StepCourseReview } from "@/components/StepCourseReview";
 import { StepCourseDetails } from "@/components/StepCourseDetails";
 import { StepCourseLocation } from "@/components/StepCourseLocation";
 
-import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
+import { uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
   Stepper,
   Step,
@@ -161,16 +161,6 @@ const CreateCourse: FC = () => {
   );
 
   const { createCourse } = useRequestCreateCourse();
-
-  // Тестируем подключение к Minio при загрузке компонента
-  useEffect(() => {
-    const testMinioConnection = async () => {
-      console.log("Проверяем подключение к Minio...");
-      const isConnected = await testConnection();
-      console.log("Результат подключения:", isConnected);
-    };
-    testMinioConnection();
-  }, []);
 
   useEffect(() => {
     if (form.selectedFiles.length === 0) {

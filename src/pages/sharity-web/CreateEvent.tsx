@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
@@ -10,7 +10,7 @@ import { Colors } from "@/theme/colors";
 import { getTelegramUser } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { useRequestCreateEvent } from "@/hooks/useRequestCreateEvent";
-import { testConnection, uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
+import { uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
   Stepper,
   Step,
@@ -55,16 +55,6 @@ const CreateEvent: FC = () => {
   const locationInputRef = useRef<HTMLDivElement>(null);
 
   const { createEvent } = useRequestCreateEvent();
-
-  // Тестируем подключение к Minio при загрузке компонента
-  useEffect(() => {
-    const testMinioConnection = async () => {
-      console.log("Проверяем подключение к Minio...");
-      const isConnected = await testConnection();
-      console.log("Результат подключения:", isConnected);
-    };
-    testMinioConnection();
-  }, []);
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
