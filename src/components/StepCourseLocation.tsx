@@ -1,11 +1,38 @@
 import type { FC } from "react";
+import { forwardRef } from "react";
 import { Button, IconButton, TextField } from "@mui/material";
+import { IMaskInput } from "react-imask";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 
 type LocationItem = {
   location: string;
   locationCoordinates: [number, number];
 };
+
+interface PhoneMaskProps {
+  onChange: (event: { target: { name: string; value: string } }) => void;
+  name: string;
+}
+
+const PhoneMask = forwardRef<HTMLInputElement, PhoneMaskProps>(
+  function PhoneMask(props, ref) {
+    const { onChange, ...other } = props;
+    return (
+      <IMaskInput
+        {...other}
+        mask="+7 (000) 000-00-00"
+        definitions={{
+          "0": /[0-9]/,
+        }}
+        inputRef={ref}
+        onAccept={(value: unknown) =>
+          onChange({ target: { name: props.name, value: value as string } })
+        }
+        overwrite
+      />
+    );
+  },
+);
 
 interface StepCourseLocationProps {
   c: {
@@ -136,6 +163,11 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
           fullWidth
           variant="outlined"
           style={{ marginBottom: 16 }}
+          slotProps={{
+            input: {
+              inputComponent: PhoneMask as never,
+            },
+          }}
         />
 
         <TextField
@@ -146,6 +178,11 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
           fullWidth
           variant="outlined"
           style={{ marginBottom: 16 }}
+          slotProps={{
+            input: {
+              inputComponent: PhoneMask as never,
+            },
+          }}
         />
 
         <TextField
