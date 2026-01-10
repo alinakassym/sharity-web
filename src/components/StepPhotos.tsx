@@ -1,3 +1,5 @@
+// sharity-web/src/components/StepPhotos.tsx
+
 import type { FC } from "react";
 import { Button, IconButton } from "@mui/material";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
