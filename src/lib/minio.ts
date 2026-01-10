@@ -1,3 +1,5 @@
+// sharity-web/src/lib/minio.ts
+
 import {
   S3Client,
   ListObjectsV2Command,

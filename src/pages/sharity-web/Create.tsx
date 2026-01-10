@@ -1,5 +1,8 @@
+// sharity-web/src/pages/sharity-web/Create.tsx
+
 import type { FC } from "react";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useReducer } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
@@ -29,17 +32,76 @@ import CustomSelect from "@/components/CustomSelect";
 
 type StepType = "basic" | "photos" | "details" | "review";
 
+type CreateFormState = {
+  category: string;
+  subcategory: string;
+  productSize: string;
+  condition: string;
+  selectedFiles: File[];
+  productName: string;
+  price: string;
+  description: string;
+};
+
+type CreateFormAction =
+  | {
+      type: "SET_FIELD";
+      field: keyof Omit<CreateFormState, "selectedFiles">;
+      value: string;
+    }
+  | { type: "ADD_FILES"; files: File[] }
+  | { type: "REMOVE_FILE"; index: number }
+  | { type: "RESET_SUBCATEGORY_AND_SIZE" }
+  | { type: "RESET_SIZE" };
+
+const initialFormState: CreateFormState = {
+  category: "",
+  subcategory: "",
+  productSize: "",
+  condition: "",
+  selectedFiles: [],
+  productName: "",
+  price: "",
+  description: "",
+};
+
+const formReducer = (
+  state: CreateFormState,
+  action: CreateFormAction,
+): CreateFormState => {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+
+    case "ADD_FILES":
+      return {
+        ...state,
+        selectedFiles: [...state.selectedFiles, ...action.files],
+      };
+
+    case "REMOVE_FILE":
+      return {
+        ...state,
+        selectedFiles: state.selectedFiles.filter((_, i) => i !== action.index),
+      };
+
+    case "RESET_SUBCATEGORY_AND_SIZE":
+      return { ...state, subcategory: "", productSize: "" };
+
+    case "RESET_SIZE":
+      return { ...state, productSize: "" };
+
+    default:
+      return state;
+  }
+};
+
 const Create: FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
-  const [category, setCategory] = useState("");
-  const [subcategory, setSubcategory] = useState("");
-  const [productSize, setProductSize] = useState("");
-  const [condition, setCondition] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
+
+  const [form, dispatch] = useReducer(formReducer, initialFormState);
+
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const navigate = useNavigate();
@@ -81,35 +143,30 @@ const Create: FC = () => {
 
   // Очищаем подкатегорию гимнастики при изменении основной категории
   useEffect(() => {
-    if (category !== "Гимнастика") {
-      setSubcategory("");
-      setProductSize("");
+    if (form.category !== "Гимнастика") {
+      dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
     }
-  }, [category]);
+  }, [form.category]);
 
   // Очищаем размер купальника при изменении подкатегории
   useEffect(() => {
-    if (subcategory !== "Купальник") {
-      setProductSize("");
+    if (form.subcategory !== "Купальник") {
+      dispatch({ type: "RESET_SIZE" });
     }
-  }, [subcategory]);
+  }, [form.subcategory]);
 
   // Обработчик изменения категории
   const handleCategoryChange = (newCategory: string) => {
-    setCategory(newCategory);
-    // Если выбрана не гимнастика, очищаем подкатегорию и размер
+    dispatch({ type: "SET_FIELD", field: "category", value: newCategory });
+
     if (newCategory !== "Гимнастика") {
-      setSubcategory("");
-      setProductSize("");
+      dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
     }
 
-    // Автофокус на следующий инпут
     setTimeout(() => {
       if (newCategory === "Гимнастика") {
-        // Если есть подкатегория → фокус на подкатегорию
         subcategoryInputRef.current?.focus();
       } else {
-        // Иначе → фокус на цену
         priceInputRef.current?.focus();
       }
     }, 300);
@@ -117,19 +174,20 @@ const Create: FC = () => {
 
   // Обработчик изменения подкатегории
   const handleSubcategoryChange = (newSubcategory: string) => {
-    setSubcategory(newSubcategory);
-    // Если выбрана не купальник, очищаем размер
+    dispatch({
+      type: "SET_FIELD",
+      field: "subcategory",
+      value: newSubcategory,
+    });
+
     if (newSubcategory !== "Купальник") {
-      setProductSize("");
+      dispatch({ type: "RESET_SIZE" });
     }
 
-    // Автофокус на следующий инпут
     setTimeout(() => {
       if (newSubcategory === "Купальник") {
-        // Если есть размер → фокус на размер
         sizeInputRef.current?.focus();
       } else {
-        // Иначе → фокус на цену
         priceInputRef.current?.focus();
       }
     }, 300);
@@ -185,7 +243,7 @@ const Create: FC = () => {
   };
 
   const handlePublish = async () => {
-    if (!productName.trim() || !category || !price.trim()) {
+    if (!form.productName.trim() || !form.category || !form.price.trim()) {
       alert("Пожалуйста, заполните все обязательные поля");
       return;
     }
@@ -194,12 +252,8 @@ const Create: FC = () => {
       let imagesArray: string[] = [];
 
       // Загружаем изображения в S3, если они выбраны
-      if (selectedFiles.length > 0) {
-        console.log(
-          `Загружаем ${selectedFiles.length} изображений в Object Storage...`,
-        );
-        imagesArray = await uploadFiles(PRODUCTS_BUCKET, selectedFiles);
-        console.log("Все изображения загружены:", imagesArray);
+      if (form.selectedFiles.length > 0) {
+        imagesArray = await uploadFiles(PRODUCTS_BUCKET, form.selectedFiles);
       }
 
       // Получаем данные пользователя Telegram
@@ -207,13 +261,13 @@ const Create: FC = () => {
       const createdBy = user?.username || user?.first_name || undefined;
 
       const productData = {
-        name: productName.trim(),
-        category,
-        subcategory: subcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
-        productSize: productSize ? Number(productSize) : undefined, // Добавляем размер купальника, если выбран
-        price: Number(price),
-        description: description.trim() || undefined,
-        condition: condition || undefined,
+        name: form.productName.trim(),
+        category: form.category,
+        subcategory: form.subcategory || undefined, // Добавляем подкатегорию гимнастики, если выбрана
+        productSize: form.productSize ? Number(form.productSize) : undefined, // Добавляем размер купальника, если выбран
+        price: Number(form.price),
+        description: form.description.trim() || undefined,
+        condition: form.condition || undefined,
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
@@ -235,20 +289,20 @@ const Create: FC = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const filesArray = Array.from(files);
-      // Фильтруем только изображения
-      const imageFiles = filesArray.filter((file) =>
-        file.type.startsWith("image/"),
-      );
-      setSelectedFiles([...selectedFiles, ...imageFiles]);
-    }
+    if (!files) return;
+
+    const filesArray = Array.from(files);
+
+    // Фильтруем только изображения
+    const imageFiles = filesArray.filter((file) =>
+      file.type.startsWith("image/"),
+    );
+
+    dispatch({ type: "ADD_FILES", files: imageFiles });
   };
 
   const removeFile = (indexToRemove: number) => {
-    setSelectedFiles(
-      selectedFiles.filter((_, index) => index !== indexToRemove),
-    );
+    dispatch({ type: "REMOVE_FILE", index: indexToRemove });
   };
 
   return (
@@ -311,15 +365,21 @@ const Create: FC = () => {
             <TextField
               label="Название товара *"
               placeholder="Введите название товара"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              value={form.productName}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "productName",
+                  value: e.target.value,
+                })
+              }
               fullWidth
               variant="outlined"
             />
 
             <CustomSelect
               label="Категория"
-              value={category}
+              value={form.category}
               onChange={handleCategoryChange}
               options={categoryOptions.map((cat) => ({
                 value: cat.name_ru,
@@ -336,10 +396,10 @@ const Create: FC = () => {
             />
 
             {/* Подкатегории гимнастики - показываем только если выбрана Гимнастика */}
-            {category === "Гимнастика" && (
+            {form.category === "Гимнастика" && (
               <CustomSelect
                 label="Подкатегория"
-                value={subcategory}
+                value={form.subcategory}
                 onChange={handleSubcategoryChange}
                 options={gymnasticsSubcategoryOptions.map((cat) => ({
                   value: cat.name_ru,
@@ -356,35 +416,45 @@ const Create: FC = () => {
             )}
 
             {/* Размеры купальников - показываем только если выбрана Гимнастика и Купальник */}
-            {category === "Гимнастика" && subcategory === "Купальник" && (
-              <CustomSelect
-                label="Размер"
-                value={productSize}
-                onChange={(value) => {
-                  setProductSize(value);
-                  // Автофокус на цену после выбора размера
-                  setTimeout(() => {
-                    priceInputRef.current?.focus();
-                  }, 300);
-                }}
-                options={leotardSizeOptions}
-                placeholder={
-                  isLoadingLeotardSizes
-                    ? "Загрузка размеров..."
-                    : "Выберите размер"
-                }
-                disabled={isLoadingLeotardSizes}
-                searchable
-              />
-            )}
+            {form.category === "Гимнастика" &&
+              form.subcategory === "Купальник" && (
+                <CustomSelect
+                  label="Размер"
+                  value={form.productSize}
+                  onChange={(value) => {
+                    dispatch({
+                      type: "SET_FIELD",
+                      field: "productSize",
+                      value,
+                    });
+                    setTimeout(() => {
+                      priceInputRef.current?.focus();
+                    }, 300);
+                  }}
+                  options={leotardSizeOptions}
+                  placeholder={
+                    isLoadingLeotardSizes
+                      ? "Загрузка размеров..."
+                      : "Выберите размер"
+                  }
+                  disabled={isLoadingLeotardSizes}
+                  searchable
+                />
+              )}
 
             <TextField
               label="Цена *"
               placeholder="0"
               type="number"
               inputMode="numeric"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              value={form.price}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "price",
+                  value: e.target.value,
+                })
+              }
               slotProps={{ htmlInput: { pattern: "[0-9]*" } }}
               fullWidth
               variant="outlined"
@@ -443,7 +513,7 @@ const Create: FC = () => {
               </Button>
             </div>
 
-            {selectedFiles.length > 0 && (
+            {form.selectedFiles.length > 0 && (
               <div style={{ marginTop: 16 }}>
                 <h3
                   style={{
@@ -452,7 +522,7 @@ const Create: FC = () => {
                     color: c.text,
                   }}
                 >
-                  Выбранные изображения ({selectedFiles.length}):
+                  Выбранные изображения ({form.selectedFiles.length}):
                 </h3>
                 <div
                   style={{
@@ -461,7 +531,7 @@ const Create: FC = () => {
                     gap: 8,
                   }}
                 >
-                  {selectedFiles.map((file, index) => (
+                  {form.selectedFiles.map((file, index) => (
                     <div
                       key={index}
                       style={{
@@ -511,8 +581,14 @@ const Create: FC = () => {
             <TextField
               label="Описание товара"
               placeholder="Опишите товар подробно: состояние, размер, особенности..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={form.description}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "description",
+                  value: e.target.value,
+                })
+              }
               multiline
               rows={6}
               fullWidth
@@ -521,8 +597,10 @@ const Create: FC = () => {
 
             <CustomSelect
               label="Состояние"
-              value={condition}
-              onChange={setCondition}
+              value={form.condition}
+              onChange={(value) =>
+                dispatch({ type: "SET_FIELD", field: "condition", value })
+              }
               options={[
                 { value: "Новое", label: "Новое" },
                 { value: "Отличное", label: "Отличное" },
@@ -564,19 +642,19 @@ const Create: FC = () => {
                 product={{
                   id: "preview",
                   image:
-                    selectedFiles.length > 0
-                      ? URL.createObjectURL(selectedFiles[0])
+                    form.selectedFiles.length > 0
+                      ? URL.createObjectURL(form.selectedFiles[0])
                       : "https://picsum.photos/600?preview",
-                  category: category || "Без категории",
-                  title: productName || "Название товара",
-                  price: price
-                    ? `${Number(price).toLocaleString("ru-RU")} ₸`
+                  category: form.category || "Без категории",
+                  title: form.productName || "Название товара",
+                  price: form.price
+                    ? `${Number(form.price).toLocaleString("ru-RU")} ₸`
                     : "0 ₸",
                 }}
               />
             </div>
 
-            {description && (
+            {form.description && (
               <div
                 style={{
                   padding: 16,
@@ -603,12 +681,12 @@ const Create: FC = () => {
                     lineHeight: 1.5,
                   }}
                 >
-                  {description}
+                  {form.description}
                 </p>
               </div>
             )}
 
-            {condition && (
+            {form.condition && (
               <div
                 style={{
                   padding: 16,
@@ -633,12 +711,12 @@ const Create: FC = () => {
                     margin: 0,
                   }}
                 >
-                  {condition}
+                  {form.condition}
                 </p>
               </div>
             )}
 
-            {selectedFiles.length > 1 && (
+            {form.selectedFiles.length > 1 && (
               <div
                 style={{
                   padding: 16,
@@ -654,7 +732,7 @@ const Create: FC = () => {
                     margin: "0 0 12px",
                   }}
                 >
-                  Дополнительные фото ({selectedFiles.length - 1})
+                  Дополнительные фото ({form.selectedFiles.length - 1})
                 </h4>
                 <div
                   style={{
@@ -663,7 +741,7 @@ const Create: FC = () => {
                     gap: 8,
                   }}
                 >
-                  {selectedFiles.slice(1).map((file, index) => (
+                  {form.selectedFiles.slice(1).map((file, index) => (
                     <img
                       key={index}
                       src={URL.createObjectURL(file)}

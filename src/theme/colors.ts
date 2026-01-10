@@ -1,3 +1,5 @@
+// sharity-web/src/theme/colors.ts
+
 const primaryColor = "#907BE2";
 const accentColor = "#00ECBE";
 const darkenColor = "#1E1A29";

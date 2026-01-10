@@ -1,6 +1,8 @@
-import { createTheme } from '@mui/material/styles';
-import type { Theme } from '@mui/material/styles';
-import { Colors } from './colors';
+// sharity-web/src/theme/muiTheme.ts
+
+import { createTheme } from "@mui/material/styles";
+import type { Theme } from "@mui/material/styles";
+import { Colors } from "./colors";
 
 type Scheme = "light" | "dark";
 

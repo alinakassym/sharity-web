@@ -1,4 +1,5 @@
-// src/lib/telegram.ts
+// sharity-web/src/lib/telegram.ts
+
 export type TGUser = {
   id: number;
   first_name: string;
@@ -73,14 +74,18 @@ export async function requestTgFullscreen(): Promise<boolean> {
   if (typeof window === "undefined") return false;
 
   // Типобезопасный доступ к Telegram.WebApp
-  const tg = (window as Window & {
-    Telegram?: { WebApp?: { 
-      ready: () => void;
-      expand: () => void;
-      requestFullscreen?: () => void; // новые клиенты
-      isExpanded?: boolean;            // бэк-совместимости нет, просто не упасть
-    }};
-  }).Telegram?.WebApp;
+  const tg = (
+    window as Window & {
+      Telegram?: {
+        WebApp?: {
+          ready: () => void;
+          expand: () => void;
+          requestFullscreen?: () => void; // новые клиенты
+          isExpanded?: boolean; // бэк-совместимости нет, просто не упасть
+        };
+      };
+    }
+  ).Telegram?.WebApp;
 
   if (!tg) return false;
 

@@ -1,3 +1,5 @@
+// sharity-web/src/components/icons/VuesaxIcon.tsx
+
 import type { FC } from "react";
 
 export interface VuesaxIconProps {

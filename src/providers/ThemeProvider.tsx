@@ -1,8 +1,10 @@
-import type { FC, ReactNode } from 'react';
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { useColorScheme } from '../hooks/useColorScheme';
-import { createCustomMuiTheme } from '../theme/muiTheme';
+// sharity-web/src/providers/ThemeProvider.tsx
+
+import type { FC, ReactNode } from "react";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { createCustomMuiTheme } from "../theme/muiTheme";
 
 interface ThemeProviderProps {
   children: ReactNode;

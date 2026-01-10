@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+// shared/hooks/useColorScheme.ts
+
+import { useEffect, useState } from "react";
 
 declare global {
   interface Window {

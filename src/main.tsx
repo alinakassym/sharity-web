@@ -1,3 +1,5 @@
+// sharity-web/src/main.tsx
+
 import { useEffect } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

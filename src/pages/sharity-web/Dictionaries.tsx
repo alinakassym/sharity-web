@@ -10,6 +10,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Header from "@/components/Header";
 import NavigationButton from "@/components/NavigationButton";
 import Container from "@/components/Container";
+import PageHeader from "@/components/PageHeader";
 
 const Dictionaries: FC = () => {
   const scheme = useColorScheme();
@@ -53,13 +54,13 @@ const Dictionaries: FC = () => {
     <Container
       paddingTop={
         platformName === "desktop"
-          ? paddingTop + 92
+          ? 64
           : platformName === "unknown"
-            ? 88
-            : paddingTop + 44
+            ? 64
+            : paddingTop + 64
       }
     >
-      <Header title="Справочники" showGoBackBtn />
+      <PageHeader title="Справочники" backTo="/profile" />
 
       <div
         style={{

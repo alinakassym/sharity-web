@@ -1,4 +1,6 @@
-import type { FC } from 'react'
+// sharity-web/src/App.tsx
+
+import type { FC } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useBodyBackground } from "./hooks/useBodyBackground";
 import { ThemeProvider } from "./providers/ThemeProvider";
@@ -87,4 +89,4 @@ const App: FC = () => {
   );
 };
 
-export default App
+export default App;
