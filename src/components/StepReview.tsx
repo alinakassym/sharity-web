@@ -1,3 +1,5 @@
+// sharity-web/src/components/StepReview.tsx
+
 import type { FC } from "react";
 import ProductCard from "@/components/ProductCard";
 

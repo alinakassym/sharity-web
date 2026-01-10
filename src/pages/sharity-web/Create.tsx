@@ -8,19 +8,18 @@ import {
   useSafePlatform,
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
-import ProductCard from "@/components/ProductCard";
 import { StepBasic } from "@/components/StepBasic";
 import { StepPhotos } from "@/components/StepPhotos";
 import { StepReview } from "@/components/StepReview";
+import { StepDetails } from "@/components/StepDetails";
 
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import { PRODUCTS_BUCKET, testConnection, uploadFiles } from "@/lib/minio";
 import Header from "@/components/Header";
-import { Stepper, Step, StepLabel, Button, TextField } from "@mui/material";
+import { Stepper, Step, StepLabel, Button } from "@mui/material";
 import Container from "@/components/Container";
-import CustomSelect from "@/components/CustomSelect";
 import { getTelegramUser } from "@/lib/telegram";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useNavigate } from "react-router-dom";
@@ -462,39 +461,7 @@ const Create: FC = () => {
         )}
 
         {currentStep === "details" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <TextField
-              label="Описание товара"
-              placeholder="Опишите товар подробно: состояние, размер, особенности..."
-              value={form.description}
-              onChange={(e) =>
-                dispatch({
-                  type: "SET_FIELD",
-                  field: "description",
-                  value: e.target.value,
-                })
-              }
-              multiline
-              rows={6}
-              fullWidth
-              variant="outlined"
-            />
-
-            <CustomSelect
-              label="Состояние"
-              value={form.condition}
-              onChange={(value) =>
-                dispatch({ type: "SET_FIELD", field: "condition", value })
-              }
-              options={[
-                { value: "Новое", label: "Новое" },
-                { value: "Отличное", label: "Отличное" },
-                { value: "Хорошее", label: "Хорошее" },
-                { value: "Удовлетворительное", label: "Удовлетворительное" },
-              ]}
-              placeholder="Выберите состояние"
-            />
-          </div>
+          <StepDetails form={form} dispatch={dispatch} />
         )}
 
         {currentStep === "review" && (

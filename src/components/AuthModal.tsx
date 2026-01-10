@@ -1,3 +1,5 @@
+// sharity-web/src/components/AuthModal.tsx
+
 import { useState } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
