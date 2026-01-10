@@ -8,6 +8,8 @@ import {
   useSafePlatform,
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
+import Container from "@/components/Container";
+import Header from "@/components/Header";
 import { StepBasic } from "@/components/StepBasic";
 import { StepPhotos } from "@/components/StepPhotos";
 import { StepReview } from "@/components/StepReview";
@@ -17,9 +19,9 @@ import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import { PRODUCTS_BUCKET, uploadFiles } from "@/lib/minio";
-import Header from "@/components/Header";
+
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
-import Container from "@/components/Container";
+
 import { getTelegramUser } from "@/lib/telegram";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useNavigate } from "react-router-dom";

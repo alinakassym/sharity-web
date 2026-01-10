@@ -1,3 +1,5 @@
+// shirarity-web/src/components/StepCourseReview.tsx
+
 import type { FC } from "react";
 import CourseCard from "@/components/CourseCard";
 

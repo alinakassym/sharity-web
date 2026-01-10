@@ -1,3 +1,5 @@
+// shirarity-web/src/components/StepCourseDetails.tsx
+
 import type { Dispatch, FC, SetStateAction } from "react";
 import { TextField } from "@mui/material";
 import { useColorScheme } from "@/hooks/useColorScheme";

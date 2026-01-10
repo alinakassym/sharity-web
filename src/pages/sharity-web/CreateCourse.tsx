@@ -143,6 +143,10 @@ const CreateCourse: FC = () => {
   >([]);
 
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
+  const [basicErrors, setBasicErrors] = useState<{
+    courseName?: string;
+    category?: string;
+  }>({});
 
   const [ageFrom, setAgeFrom] = useState<number | undefined>();
   const [ageTo, setAgeTo] = useState<number | undefined>();
@@ -161,6 +165,15 @@ const CreateCourse: FC = () => {
   );
 
   const { createCourse } = useRequestCreateCourse();
+
+  const clearBasicError = (field: keyof typeof basicErrors) => {
+    setBasicErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (form.selectedFiles.length === 0) {
@@ -215,6 +228,25 @@ const CreateCourse: FC = () => {
   };
 
   const handleNext = () => {
+    // Валидация для первого шага (basic)
+    if (currentStep === "basic") {
+      const nextErrors: typeof basicErrors = {};
+
+      if (!form.courseName.trim()) {
+        nextErrors.courseName = "Введите название курса";
+      }
+
+      if (!form.category.trim()) {
+        nextErrors.category = "Выберите категорию";
+      }
+
+      setBasicErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
     if (currentStepIndex < steps.length - 1) {
       setCurrentStep(steps[currentStepIndex + 1].id);
     } else {
@@ -390,7 +422,12 @@ const CreateCourse: FC = () => {
         }}
       >
         {currentStep === "basic" && (
-          <StepCourseBasic form={form} dispatch={dispatch} />
+          <StepCourseBasic
+            form={form}
+            dispatch={dispatch}
+            basicErrors={basicErrors}
+            clearBasicError={clearBasicError}
+          />
         )}
 
         {currentStep === "location" && (

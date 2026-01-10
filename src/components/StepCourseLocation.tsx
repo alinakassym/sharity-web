@@ -1,3 +1,5 @@
+// sharity-web/src/components/StepCourseLocation.tsx
+
 import type { FC } from "react";
 import { forwardRef } from "react";
 import { Button, IconButton, TextField } from "@mui/material";

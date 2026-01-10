@@ -1,3 +1,5 @@
+// sharity-web/src/components/StepCourseBasic.tsx
+
 import type { Dispatch, FC } from "react";
 import { TextField } from "@mui/material";
 import CustomSelect from "@/components/CustomSelect";
@@ -8,17 +10,26 @@ type CreateCourseSetFieldAction = {
   value: string;
 };
 
+type BasicErrors = {
+  courseName?: string;
+  category?: string;
+};
+
 interface StepCourseBasicProps {
   form: {
     courseName: string;
     category: string;
   };
   dispatch: Dispatch<CreateCourseSetFieldAction>;
+  basicErrors: BasicErrors;
+  clearBasicError: (field: keyof BasicErrors) => void;
 }
 
 export const StepCourseBasic: FC<StepCourseBasicProps> = ({
   form,
   dispatch,
+  basicErrors,
+  clearBasicError,
 }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -26,13 +37,16 @@ export const StepCourseBasic: FC<StepCourseBasicProps> = ({
         label="Название *"
         placeholder="Введите название"
         value={form.courseName}
-        onChange={(e) =>
+        onChange={(e) => {
+          clearBasicError("courseName");
           dispatch({
             type: "SET_FIELD",
             field: "courseName",
             value: e.target.value,
-          })
-        }
+          });
+        }}
+        error={Boolean(basicErrors.courseName)}
+        helperText={basicErrors.courseName}
         fullWidth
         variant="outlined"
       />
@@ -40,13 +54,14 @@ export const StepCourseBasic: FC<StepCourseBasicProps> = ({
       <CustomSelect
         label="Категория"
         value={form.category}
-        onChange={(value) =>
+        onChange={(value) => {
+          clearBasicError("category");
           dispatch({
             type: "SET_FIELD",
             field: "category",
             value,
-          })
-        }
+          });
+        }}
         options={[
           { value: "Гимнастика", label: "Гимнастика" },
           { value: "Танцы", label: "Танцы" },
@@ -60,6 +75,8 @@ export const StepCourseBasic: FC<StepCourseBasicProps> = ({
         placeholder="Выберите категорию"
         required
         searchable
+        error={Boolean(basicErrors.category)}
+        helperText={basicErrors.category}
       />
     </div>
   );
