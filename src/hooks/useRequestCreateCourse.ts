@@ -48,6 +48,13 @@ export const useRequestCreateCourse = () => {
         updatedAt: new Date(),
       };
 
+      // Удаляем поля со значением undefined (Firestore не принимает undefined)
+      Object.keys(dataToSave).forEach((key) => {
+        if (dataToSave[key as keyof typeof dataToSave] === undefined) {
+          delete dataToSave[key as keyof typeof dataToSave];
+        }
+      });
+
       const col = collection(db, "courses");
       const docRef = await addDoc(col, dataToSave);
 
