@@ -405,7 +405,6 @@ const CreateCourse: FC = () => {
 
         {currentStep === "location" && (
           <StepCourseLocation
-            c={c}
             locations={form.locations}
             phone={form.phone}
             whatsapp={form.whatsapp}
@@ -426,7 +425,6 @@ const CreateCourse: FC = () => {
 
         {currentStep === "photos" && (
           <StepCoursePhotos
-            c={c}
             selectedFiles={form.selectedFiles}
             filePreviews={filePreviews}
             onFileChange={handleFileChange}
@@ -436,7 +434,6 @@ const CreateCourse: FC = () => {
 
         {currentStep === "details" && (
           <StepCourseDetails
-            c={c}
             form={form}
             dispatch={dispatch}
             ageFrom={ageFrom}

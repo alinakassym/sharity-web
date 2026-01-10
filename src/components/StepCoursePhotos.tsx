@@ -1,19 +1,9 @@
 import type { FC } from "react";
 import { Button, IconButton } from "@mui/material";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
-
-type ColorsShape = {
-  surfaceColor: string;
-  border: string;
-  controlColor: string;
-  lightText: string;
-  text: string;
-  lighter: string;
-  error: string;
-};
-
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 interface StepCoursePhotosProps {
-  c: ColorsShape;
   selectedFiles: File[];
   filePreviews: Array<{ file: File; url: string }>;
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -21,12 +11,13 @@ interface StepCoursePhotosProps {
 }
 
 export const StepCoursePhotos: FC<StepCoursePhotosProps> = ({
-  c,
   selectedFiles,
   filePreviews,
   onFileChange,
   onRemoveFile,
 }) => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div

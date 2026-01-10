@@ -1,10 +1,7 @@
 import type { Dispatch, FC, SetStateAction } from "react";
 import { TextField } from "@mui/material";
-
-type ColorsShape = {
-  surfaceColor: string;
-  text: string;
-};
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 
 type CreateCourseSetFieldAction = {
   type: "SET_FIELD";
@@ -13,8 +10,6 @@ type CreateCourseSetFieldAction = {
 };
 
 interface StepCourseDetailsProps {
-  c: ColorsShape;
-
   form: {
     description: string;
     priceText: string;
@@ -34,7 +29,6 @@ interface StepCourseDetailsProps {
 }
 
 export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
-  c,
   form,
   dispatch,
   ageFrom,
@@ -44,6 +38,8 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
   priceFrom,
   setPriceFrom,
 }) => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <TextField

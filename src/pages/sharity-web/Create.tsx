@@ -472,7 +472,6 @@ const Create: FC = () => {
 
         {currentStep === "photos" && (
           <StepPhotos
-            c={c}
             selectedFiles={form.selectedFiles}
             filePreviews={filePreviews}
             onFileChange={handleFileChange}
@@ -485,7 +484,7 @@ const Create: FC = () => {
         )}
 
         {currentStep === "review" && (
-          <StepReview c={c} form={form} filePreviews={filePreviews} />
+          <StepReview form={form} filePreviews={filePreviews} />
         )}
       </div>
 

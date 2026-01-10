@@ -3,6 +3,8 @@ import { forwardRef } from "react";
 import { Button, IconButton, TextField } from "@mui/material";
 import { IMaskInput } from "react-imask";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 
 type LocationItem = {
   location: string;
@@ -35,14 +37,6 @@ const PhoneMask = forwardRef<HTMLInputElement, PhoneMaskProps>(
 );
 
 interface StepCourseLocationProps {
-  c: {
-    background: string;
-    surfaceColor: string;
-    text: string;
-    lightText: string;
-    primary: string;
-    error: string;
-  };
   locations: LocationItem[];
 
   phone: string;
@@ -58,7 +52,6 @@ interface StepCourseLocationProps {
 }
 
 export const StepCourseLocation: FC<StepCourseLocationProps> = ({
-  c,
   locations,
   phone,
   whatsapp,
@@ -69,6 +62,8 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
   onChangeWhatsapp,
   onChangeTelegram,
 }) => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Список добавленных адресов */}

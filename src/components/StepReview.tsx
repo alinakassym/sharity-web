@@ -2,15 +2,10 @@
 
 import type { FC } from "react";
 import ProductCard from "@/components/ProductCard";
-
-type ColorsShape = {
-  surfaceColor: string;
-  lightText: string;
-  text: string;
-};
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 
 interface StepReviewProps {
-  c: ColorsShape;
   form: {
     category: string;
     productName: string;
@@ -22,7 +17,9 @@ interface StepReviewProps {
   filePreviews: Array<{ file: File; url: string }>;
 }
 
-export const StepReview: FC<StepReviewProps> = ({ c, form, filePreviews }) => {
+export const StepReview: FC<StepReviewProps> = ({ form, filePreviews }) => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
   const previewImage =
     filePreviews[0]?.url ?? "https://picsum.photos/600?preview";
   const additionalPreviews = filePreviews.slice(1);
