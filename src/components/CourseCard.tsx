@@ -7,6 +7,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import VuesaxIcon from "./icons/VuesaxIcon";
 
 export type CourseData = {
   id: string;
@@ -71,7 +72,6 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
   const whatsappLink = course.whatsapp
     ? `https://wa.me/${cleanPhone(course.whatsapp)}`
     : null;
-  const phoneLink = course.phone ? `tel:${course.phone}` : null;
   const telegramLink = course.telegram
     ? `https://t.me/${course.telegram.replace(/^@/, "")}`
     : null;
@@ -88,6 +88,10 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
   };
 
   const actionStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
     fontSize: 12,
     fontWeight: 600,
     color: c.text,
@@ -95,28 +99,32 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
     padding: "10px 12px",
     borderRadius: 12,
     lineHeight: 1,
-    textAlign: "center",
     userSelect: "none",
     flex: 1,
   };
 
   return (
-    <Link
-      to={`/course/${course.id}`}
+    <div
       style={{
-        textDecoration: "none",
-        color: "inherit",
-        display: "block",
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        padding: 12,
+        borderRadius: 16,
+        backgroundColor: c.surfaceColor,
+        position: "relative",
       }}
     >
-      <div
+      {/* Clickable area - Image and text */}
+      <Link
+        to={`/course/${course.id}`}
         style={{
+          textDecoration: "none",
+          color: "inherit",
           display: "flex",
           gap: 12,
-          padding: 12,
-          borderRadius: 16,
-          backgroundColor: c.surfaceColor,
-          position: "relative",
+          flex: 1,
+          minWidth: 0,
         }}
       >
         {/* Image */}
@@ -194,93 +202,124 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
               {priceText && <div style={chipStyle}>{priceText}</div>}
             </div>
           )}
-
-          {/* Meta (адрес) */}
-          {course.location && (
-            <div
-              style={{
-                fontSize: 12,
-                color: c.lightText,
-                display: "flex",
-                gap: 10,
-                flexWrap: "wrap",
-              }}
-            >
-              <span>{course.location}</span>
-            </div>
-          )}
-
-          {/* Actions row (кнопки контактов) */}
-          {(whatsappLink || phoneLink || telegramLink) && (
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                marginTop: 2,
-              }}
-            >
-              {whatsappLink && (
-                <div
-                  style={{ ...actionStyle, cursor: "pointer" }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.open(whatsappLink, "_blank");
-                  }}
-                >
-                  WhatsApp
-                </div>
-              )}
-              {phoneLink && (
-                <div
-                  style={{ ...actionStyle, cursor: "pointer" }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = phoneLink;
-                  }}
-                >
-                  Позвонить
-                </div>
-              )}
-              {telegramLink && (
-                <div
-                  style={{ ...actionStyle, cursor: "pointer" }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.open(telegramLink, "_blank");
-                  }}
-                >
-                  Telegram
-                </div>
-              )}
-            </div>
-          )}
         </div>
+      </Link>
 
-        {/* Heart (логика без изменений) */}
-        <IconButton
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onHeartPress(course.id);
-          }}
-          size="small"
-          sx={{
-            position: "absolute",
-            top: 6,
-            right: 6,
+      {/* Meta (адрес) */}
+      {course.location && (
+        <div
+          style={{
+            fontSize: 12,
+            lineHeight: "18px",
+            color: c.lightText,
+            display: "flex",
+            gap: 4,
+            flexWrap: "wrap",
           }}
         >
-          {isLiked ? (
-            <FavoriteIcon sx={{ color: "#E53935", fontSize: 20 }} />
-          ) : (
-            <FavoriteBorderIcon sx={{ color: c.lightText, fontSize: 20 }} />
-          )}
-        </IconButton>
-      </div>
-    </Link>
+          <span style={{ paddingTop: 2 }}>
+            <VuesaxIcon name="location" size={12} />
+          </span>
+          <span>{course.location}</span>
+        </div>
+      )}
+
+      {/* Actions row (кнопки контактов) - ВНЕ Link! */}
+      {(whatsappLink || course.phone || telegramLink) && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+            }}
+          >
+            {whatsappLink && (
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  ...actionStyle,
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <VuesaxIcon name="whatsapp" size={12} />
+                WhatsApp
+              </a>
+            )}
+            {course.phone && (
+              <div
+                style={{
+                  ...actionStyle,
+                  cursor: "pointer",
+                }}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  try {
+                    await navigator.clipboard.writeText(course.phone!);
+                    alert(
+                      `Номер телефона скопирован в буфер обмена!\n\n${course.phone}\n\nВставьте номер в приложение для звонков.`,
+                    );
+                  } catch {
+                    // Если копирование не сработало, показываем номер
+                    alert(
+                      `Номер телефона:\n${course.phone}\n\nСкопируйте номер вручную для звонка.`,
+                    );
+                  }
+                }}
+              >
+                <VuesaxIcon name="call" strokeWidth={2} size={12} />
+                Позвонить
+              </div>
+            )}
+            {telegramLink && (
+              <a
+                href={telegramLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  ...actionStyle,
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <VuesaxIcon name="telegram" strokeWidth={2} size={12} />
+                Telegram
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Heart (логика без изменений) */}
+      <IconButton
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onHeartPress(course.id);
+        }}
+        size="small"
+        sx={{
+          position: "absolute",
+          top: 6,
+          right: 6,
+        }}
+      >
+        {isLiked ? (
+          <FavoriteIcon sx={{ color: "#E53935", fontSize: 20 }} />
+        ) : (
+          <FavoriteBorderIcon sx={{ color: c.lightText, fontSize: 20 }} />
+        )}
+      </IconButton>
+    </div>
   );
 };
 
