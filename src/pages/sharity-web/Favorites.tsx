@@ -7,6 +7,7 @@ import SearchHeader from "@/components/SearchHeader";
 import type { ProductData } from "@/components/ProductCard";
 import ProductGrid from "@/components/ProductGrid";
 import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const KZT = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -21,12 +22,15 @@ const Favorites: FC = () => {
   const [searchValue, setSearchValue] = useState("");
 
   const { products: rows, isLoading } = useRequestGetProducts();
+  // Получаем список избранных продуктов текущего пользователя
+  const { favorites: favoriteIds, isLoading: isLoadingFavorites } =
+    useFavorites("product");
 
-  // Firestore -> ProductData (для грида), фильтруем только избранные
+  // Firestore -> ProductData (для грида), фильтруем только избранные текущего пользователя
   const products: ProductData[] = useMemo(
     () =>
       rows
-        .filter((r) => r.isFavorite === true)
+        .filter((r) => favoriteIds.has(r.id)) // Фильтруем по избранному текущего пользователя
         .map((r, i) => {
           // Приоритет отображения изображений:
           // 1. Первое изображение из imagesArray
@@ -49,7 +53,7 @@ const Favorites: FC = () => {
             isFavorite: r.isFavorite ?? false,
           };
         }),
-    [rows],
+    [rows, favoriteIds],
   );
 
   // фильтрация по поиску
@@ -92,7 +96,7 @@ const Favorites: FC = () => {
           backgroundColor: c.background,
         }}
       >
-        {isLoading ? (
+        {isLoading || isLoadingFavorites ? (
           <div style={{ padding: 16 }}>Загрузка…</div>
         ) : products.length === 0 ? (
           <div

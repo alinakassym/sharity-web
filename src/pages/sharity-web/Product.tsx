@@ -257,41 +257,6 @@ const Product: FC = () => {
             <VuesaxIcon name="shopping-cart" size={20} color={c.lighter} />
             Купить
           </button>
-
-          {/* Другие кнопки */}
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              style={{
-                flex: 1,
-                padding: "16px",
-                backgroundColor: c.controlColor,
-                color: c.text,
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "16px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Связаться с продавцом
-            </button>
-
-            <button
-              style={{
-                padding: "16px",
-                backgroundColor: c.controlColor,
-                color: c.text,
-                border: "none",
-                borderRadius: "12px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <VuesaxIcon name="search" size={20} color={c.text} />
-            </button>
-          </div>
         </div>
       </div>
     </Container>

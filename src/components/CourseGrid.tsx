@@ -1,8 +1,8 @@
 // sharity-web/src/components/CourseGrid.tsx
 
-import { useState, useEffect } from "react";
 import type { FC } from "react";
 import CourseCard, { type CourseData } from "@/components/CourseCard";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Props = {
   courses: CourseData[];
@@ -11,26 +11,8 @@ type Props = {
 };
 
 export const CourseGrid: FC<Props> = ({ courses, gap = 16 }) => {
-  const [liked, setLiked] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    // Синхронизация с исходными данными: если у курса isFavorite === true, отмечаем его
-    const initialLiked = new Set<string>();
-    courses.forEach((c) => {
-      if (c.isFavorite) initialLiked.add(c.id);
-    });
-    setLiked(initialLiked);
-  }, [courses]);
-
-  const toggleLike = async (id: string) => {
-    // Оптимистично обновляем UI
-    setLiked((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  // Используем новый хук для управления избранным
+  const { isFavorite, toggleFavorite } = useFavorites("course");
 
   return (
     <div
@@ -45,8 +27,8 @@ export const CourseGrid: FC<Props> = ({ courses, gap = 16 }) => {
         <div key={p.id}>
           <CourseCard
             course={p}
-            isLiked={liked.has(p.id)}
-            onHeartPress={toggleLike}
+            isLiked={isFavorite(p.id)}
+            onHeartPress={toggleFavorite}
           />
         </div>
       ))}
