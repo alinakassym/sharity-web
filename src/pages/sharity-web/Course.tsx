@@ -289,15 +289,22 @@ const Course: FC = () => {
               Локации
             </h3>
             {course.locations.map((loc, index) => (
-              <div key={index} style={{ marginBottom: index < course.locations.length - 1 ? 12 : 0 }}>
-                <p style={{ fontSize: 14, color: c.text, margin: "0 0 4px", fontWeight: 500 }}>
+              <div
+                key={index}
+                style={{
+                  marginBottom: index < course.locations.length - 1 ? 12 : 0,
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: c.text,
+                    margin: "0 0 4px",
+                    fontWeight: 500,
+                  }}
+                >
                   {loc.location}
                 </p>
-                {loc.locationCoordinates && (
-                  <p style={{ fontSize: 12, color: c.lightText, margin: 0 }}>
-                    {loc.locationCoordinates[0].toFixed(6)}, {loc.locationCoordinates[1].toFixed(6)}
-                  </p>
-                )}
               </div>
             ))}
           </div>
@@ -325,20 +332,34 @@ const Course: FC = () => {
             </h3>
 
             {course.phone && (
-              <a
-                href={`tel:${course.phone}`}
+              <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
                   marginBottom: 8,
-                  textDecoration: "none",
                   color: c.primary,
+                  cursor: "pointer",
+                }}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  try {
+                    await navigator.clipboard.writeText(course.phone!);
+                    alert(
+                      `Номер телефона скопирован в буфер обмена!\n\n${course.phone}\n\nВставьте номер в приложение для звонков.`,
+                    );
+                  } catch {
+                    // Если копирование не сработало, показываем номер
+                    alert(
+                      `Номер телефона:\n${course.phone}\n\nСкопируйте номер вручную для звонка.`,
+                    );
+                  }
                 }}
               >
                 <VuesaxIcon name="call" size={20} color={c.primary} />
                 <span style={{ fontSize: 14 }}>{course.phone}</span>
-              </a>
+              </div>
             )}
 
             {course.whatsapp && (
