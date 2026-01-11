@@ -1,3 +1,5 @@
+// sharity-web/src/pages/sharity-web/MyOrders.tsx
+
 import type { FC } from "react";
 import { Timestamp } from "firebase/firestore";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -7,7 +9,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRequestGetOrders } from "@/hooks/useRequestGetOrders";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 
-const Orders: FC = () => {
+const MyOrders: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const isTelegram = isTelegramApp();
@@ -46,9 +48,7 @@ const Orders: FC = () => {
   };
 
   // Статус на русском
-  const getStatusLabel = (
-    status: string,
-  ): { text: string; color: string } => {
+  const getStatusLabel = (status: string): { text: string; color: string } => {
     switch (status) {
       case "paid":
         return { text: "Оплачен", color: c.primary };
@@ -272,4 +272,4 @@ const Orders: FC = () => {
   );
 };
 
-export default Orders;
+export default MyOrders;
