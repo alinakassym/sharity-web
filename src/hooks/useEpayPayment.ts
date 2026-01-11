@@ -119,33 +119,37 @@ export const useEpayPayment = () => {
       #epay-widget-container {
         position: fixed !important;
         top: 120px;
+        left: 0;
         max-width: 500px !important;
-        max-height: 70vh !important;
-        margin-top: 120px !important;
+        max-height: 80vh !important;
+        margin-top: 0 !important;
       },
       #halyk-payment-widget {
         position: fixed !important;
         top: 120px;
+        left: 0;
         max-width: 500px !important;
-        max-height: 70vh !important;
-        margin-top: 120px !important;
+        max-height: 80vh !important;
+        margin-top: 0 !important;
       }
 
       /* Если виджет использует iframe */
       iframe[src*="epay"] {
         position: fixed !important;
         top: 120px;
+        left: 0;
         max-width: 500px !important;
-        max-height: 70vh !important;
-        margin-top: 120px !important;
+        max-height: 80vh !important;
+        margin-top: 0 !important;
         border-radius: 12px !important;
       },
       iframe[src*="halyk"] {
         position: fixed !important;
         top: 120px;
+        left: 0;
         max-width: 500px !important;
-        max-height: 70vh !important;
-        margin-top: 120px !important;
+        max-height: 80vh !important;
+        margin-top: 0 !important;
         border-radius: 12px !important;
       }
 
@@ -153,10 +157,12 @@ export const useEpayPayment = () => {
       .epay-overlay: {
         position: fixed !important;
         top: 120px;
+        left: 0;
       },
       .halyk-overlay {
         position: fixed !important;
         top: 120px;
+        left: 0;
         background: rgba(0, 0, 0, 0.7) !important;
       }
 
@@ -165,32 +171,36 @@ export const useEpayPayment = () => {
         #epay-widget-container iframe[src*="halyk"] {
           position: fixed !important;
           top: 120px;
+        left: 0;
           padding-top: 100px !important;
-          margin-top: 100px !important;
+          Coumargin-top: 0 !important;rseGrid
           max-width: 95vw !important;
           max-height: 80vh !important;
         },
         #halyk-payment-widget iframe[src*="halyk"] {
           position: fixed !important;
           top: 120px;
+        left: 0;
           padding-top: 100px !important;
-          margin-top: 100px !important;
+          Coumargin-top: 0 !important;rseGrid
           max-width: 95vw !important;
           max-height: 80vh !important;
         },
         iframe[src*="epay"] iframe[src*="halyk"] {
           position: fixed !important;
           top: 120px;
+        left: 0;
           padding-top: 100px !important;
-          margin-top: 100px !important;
+          Coumargin-top: 0 !important;rseGrid
           max-width: 95vw !important;
           max-height: 80vh !important;
         },
         iframe[src*="halyk"] {
           position: fixed !important;
           top: 120px;
+        left: 0;
           padding-top: 100px !important;
-          margin-top: 100px !important;
+          Coumargin-top: 0 !important;rseGrid
           max-width: 95vw !important;
           max-height: 80vh !important;
         }
