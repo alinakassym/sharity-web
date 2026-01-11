@@ -1,4 +1,5 @@
-// src/pages/sharity-web/Profile.tsx
+// sharity-web/src/pages/sharity-web/Profile.tsx
+
 import { useEffect } from "react";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +35,10 @@ const Profile: FC = () => {
 
   // Проверяем, является ли пользователь админом
   const isAdmin = userData?.role === "admin";
+
+  // Проверяем, является ли пользователь менеджером или админом
+  const isManagerOrAdmin =
+    userData?.role === "manager" || userData?.role === "admin";
 
   return (
     <section
@@ -81,6 +86,14 @@ const Profile: FC = () => {
           <NavigationButton
             label="Способы оплаты"
             onClick={() => handleNavigateTo("/payment-methods")}
+          />
+        )}
+
+        {/* Кнопка перехода к заказам (только для менеджера и админа) */}
+        {userData && isManagerOrAdmin && (
+          <NavigationButton
+            label="Заказы"
+            onClick={() => handleNavigateTo("/all-orders")}
           />
         )}
 
