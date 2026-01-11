@@ -14,6 +14,7 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import type { ProductData } from "@/components/ProductCard";
 import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const KZT = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -33,6 +34,9 @@ const Store: FC = () => {
     useRequestGetProducts();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
     useRequestGetCategories();
+
+  // Получаем список избранных продуктов текущего пользователя
+  const { favorites: favoriteProductIds } = useFavorites("product");
 
   // Определяем, откуда была открыта страница
   const backTo = (location.state as { from?: string })?.from || "/";
@@ -83,14 +87,30 @@ const Store: FC = () => {
   const filtered = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
     return products.filter((p) => {
-      const byCat = selectedLabels.size === 0 || selectedLabels.has(p.category);
+      // Проверяем, выбрана ли категория "Избранное"
+      const isFavoritesSelected = selectedLabels.has("Избранное");
+
+      // Фильтрация по категориям
+      let byCat = true;
+      if (selectedLabels.size > 0) {
+        if (isFavoritesSelected) {
+          // Если выбрано "Избранное" - показываем только избранные продукты пользователя
+          byCat = favoriteProductIds.has(p.id);
+        } else {
+          // Иначе фильтруем по обычным категориям
+          byCat = selectedLabels.has(p.category);
+        }
+      }
+
+      // Фильтрация по поиску
       const byQuery =
         q.length === 0 ||
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q);
+
       return byCat && byQuery;
     });
-  }, [products, selectedLabels, searchValue]);
+  }, [products, selectedLabels, searchValue, favoriteProductIds]);
 
   return (
     <section
