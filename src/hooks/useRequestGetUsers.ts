@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { UserData } from "./useRequestCreateUser";
 
@@ -15,7 +15,7 @@ export const useRequestGetUsers = () => {
         setError(null);
 
         const usersRef = collection(db, "users");
-        const q = query(usersRef, orderBy("createdAt", "desc"));
+        const q = query(usersRef);
         const querySnapshot = await getDocs(q);
 
         const usersData: UserData[] = [];

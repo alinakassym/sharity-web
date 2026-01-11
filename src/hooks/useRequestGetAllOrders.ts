@@ -6,7 +6,7 @@ import {
   query,
   where,
   onSnapshot,
-  orderBy,
+  // orderBy, // TODO: Раскомментировать после создания индекса
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -67,7 +67,7 @@ export const useRequestGetAllOrders = () => {
     const q = query(
       col,
       where("isDeleted", "==", false), // Показываем только не удалённые заказы
-      orderBy("createdAt", "desc"), // Сортировка по дате создания (новые сверху)
+      // orderBy("createdAt", "desc"), // TODO: Создать индекс в Firebase Console, затем раскомментировать
     );
 
     const unsub = onSnapshot(
