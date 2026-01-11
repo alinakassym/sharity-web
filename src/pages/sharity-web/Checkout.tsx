@@ -9,7 +9,6 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEpayPayment } from "@/hooks/useEpayPayment";
 import { useRequestSavePendingOrder } from "@/hooks/useRequestSavePendingOrder";
 import Container from "@/components/Container";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { isTelegramApp } from "@/lib/telegram";
 import ProductHeader from "@/components/ProductHeader";
 import { generateOrderNumber } from "@/lib/orders";
@@ -418,14 +417,7 @@ const Checkout: FC = () => {
             gap: 8,
           }}
         >
-          <VuesaxIcon
-            name={isPaymentLoading ? "clock" : "wallet-3"}
-            size={20}
-            color={c.lighter}
-          />
-          {isPaymentLoading
-            ? "Загрузка..."
-            : `Оплатить ${KZT.format(totalAmount)}`}
+          {isPaymentLoading ? "Загрузка..." : "Оформить заказ"}
         </button>
       </div>
     </Container>

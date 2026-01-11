@@ -6,17 +6,23 @@ import { useNavigate } from "react-router-dom";
 import { Timestamp } from "firebase/firestore";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRequestGetOrders } from "@/hooks/useRequestGetOrders";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import LoadingScreen from "@/components/LoadingScreen";
+import Container from "@/components/Container";
+import PageHeader from "@/components/PageHeader";
 
 const Orders: FC = () => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const isTelegram = isTelegramApp();
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
   const { userData, isLoading: isLoadingUser } = useCurrentUser();
 
   // Получаем все заказы (без фильтра по пользователю)
@@ -83,13 +89,14 @@ const Orders: FC = () => {
   }
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 48 : 44,
-        minHeight: "100vh",
-        paddingBottom: "74px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
       <div
         style={{
@@ -99,40 +106,7 @@ const Orders: FC = () => {
           gap: 16,
         }}
       >
-        {/* Header с кнопкой назад */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <div
-            onClick={() => navigate(-1)}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: c.surfaceColor,
-            }}
-          >
-            <VuesaxIcon name="arrow-left" size={24} color={c.text} />
-          </div>
-          <h1
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              color: c.text,
-              margin: 0,
-            }}
-          >
-            Все заказы
-          </h1>
-        </div>
+        <PageHeader title="Заказы" backTo="/profile" />
 
         {/* Loading */}
         {isLoadingOrders && (
@@ -316,7 +290,7 @@ const Orders: FC = () => {
             );
           })}
       </div>
-    </section>
+    </Container>
   );
 };
 
