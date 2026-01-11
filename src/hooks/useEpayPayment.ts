@@ -395,8 +395,8 @@ export const useEpayPayment = () => {
         // Генерируем уникальный invoiceId
         const invoiceId = `${Date.now()}`.slice(-12);
         const secretHash = "DEMO_HASH";
-        const amount = 0;
-        const currency = "USD"; // Для Card Verification всегда USD согласно документации ePay
+        const amount = 10; // Минимальная сумма для верификации карты (10 KZT)
+        const currency = "KZT"; // Для Card Verification всегда KZT согласно документации ePay
 
         // Получаем токен для верификации
         const token = await getToken(invoiceId, amount, secretHash, currency);
@@ -404,11 +404,22 @@ export const useEpayPayment = () => {
         // Загружаем библиотеку
         await loadPaymentLib();
 
-        // Формируем параметры для cardverification
+        // Формируем параметры для виджета (используем тот же showPaymentWidget)
         const verificationObject = {
           invoiceId,
           invoiceIdAlt: invoiceId,
-          backLink: window.location.origin + window.location.pathname.replace(/\/add-card.*/, '/payment-methods'),
+          backLink:
+            window.location.origin +
+            window.location.pathname.replace(
+              /\/add-card.*/,
+              "/payment-methods",
+            ),
+          failureBackLink:
+            window.location.origin +
+            window.location.pathname.replace(
+              /\/add-card.*/,
+              "/payment-methods",
+            ),
           postLink: `${window.location.origin}/api/payment/callback`,
           failurePostLink: `${window.location.origin}/api/payment/callback`,
           language: "RUS",
@@ -417,8 +428,7 @@ export const useEpayPayment = () => {
           terminal: EPAY_CONFIG.terminal,
           amount,
           currency,
-          cardSave: true,
-          paymentType: "cardVerification",
+          cardSave: true, // Ключевой флаг для сохранения карты
           name: params.payerName || "Покупатель",
           data: JSON.stringify({
             statement: {
@@ -426,63 +436,80 @@ export const useEpayPayment = () => {
               invoiceID: invoiceId,
             },
           }),
+          recurrent: true,
           auth: token,
         };
 
-        // Вызываем метод верификации карты
+        // Открываем виджет (используем showPaymentWidget как в initiatePayment)
         return new Promise((resolve) => {
-          if (!window.halyk?.cardverification) {
+          if (!window.halyk) {
             resolve({
               success: false,
-              message: "Card verification method not available",
+              message: "Payment library not loaded",
             });
             return;
           }
 
-          window.halyk.cardverification(verificationObject, (result) => {
-            console.log("Card verification callback:", result);
-            console.log("Card verification callback - full result:", JSON.stringify(result, null, 2));
+          window.halyk.showPaymentWidget(verificationObject, (result) => {
+            console.log("Card verification widget callback:", result);
+            console.log(
+              "Card verification widget callback - full result:",
+              JSON.stringify(result, null, 2),
+            );
+
+            // Проверяем результат верификации (аналогично initiatePayment)
+            let verificationSuccess = false;
 
             if (result && typeof result === "object") {
               const resultObj = result as Record<string, unknown>;
 
-              // Проверяем код ответа
-              if (resultObj.code === "ok") {
-                const cardId = resultObj.cardId as string | undefined;
-                const cardMask = resultObj.cardMask as string | undefined;
-                const cardType = resultObj.cardType as string | undefined;
-
-                console.log("Card verification successful:", { cardId, cardMask, cardType });
-
-                setIsLoading(false);
-                resolve({
-                  success: true,
-                  cardId,
-                  cardMask,
-                  cardType,
-                });
-              } else if (resultObj.code === "error") {
-                const reason = resultObj.reason as string | undefined;
-                console.error("Card verification failed:", reason);
-
-                setIsLoading(false);
-                resolve({
-                  success: false,
-                  message: reason || "Card verification failed",
-                });
-              } else {
-                console.warn("Unexpected response format:", result);
-                setIsLoading(false);
-                resolve({
-                  success: false,
-                  message: "Unexpected response format",
-                });
+              // Проверяем поле success
+              if ("success" in resultObj) {
+                verificationSuccess = resultObj.success === true;
               }
+              // Или проверяем поле status
+              else if ("status" in resultObj) {
+                verificationSuccess =
+                  resultObj.status === "success" ||
+                  resultObj.status === "APPROVED";
+              }
+            }
+
+            // Извлекаем данные карты из результата
+            const resultObj = result as Record<string, unknown>;
+            console.log("Extracting card data from verification result...");
+            console.log("cardId:", resultObj.cardId);
+            console.log("cardMask:", resultObj.cardMask);
+            console.log("cardType:", resultObj.cardType);
+            console.log("All keys in result:", Object.keys(resultObj));
+
+            const cardId = resultObj.cardId as string | undefined;
+            const cardMask = resultObj.cardMask as string | undefined;
+            const cardType = resultObj.cardType as string | undefined;
+
+            if (verificationSuccess && cardId) {
+              console.log("Card verification successful:", {
+                cardId,
+                cardMask,
+                cardType,
+              });
+              setIsLoading(false);
+              resolve({
+                success: true,
+                cardId,
+                cardMask,
+                cardType,
+              });
             } else {
+              const message = resultObj.message as string | undefined;
+              console.error(
+                "Card verification failed:",
+                message || "Unknown error",
+              );
               setIsLoading(false);
               resolve({
                 success: false,
-                message: "Invalid response from card verification",
+                message: message || "Card verification failed",
               });
             }
           });
