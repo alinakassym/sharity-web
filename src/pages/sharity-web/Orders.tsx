@@ -11,7 +11,7 @@ import {
   useSafePlatform,
 } from "@/hooks/useTelegramSafeArea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useRequestGetOrders } from "@/hooks/useRequestGetOrders";
+import { useRequestGetAllOrders } from "@/hooks/useRequestGetAllOrders";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import LoadingScreen from "@/components/LoadingScreen";
 import Container from "@/components/Container";
@@ -26,7 +26,7 @@ const Orders: FC = () => {
   const { userData, isLoading: isLoadingUser } = useCurrentUser();
 
   // Получаем все заказы (без фильтра по пользователю)
-  const { orders, isLoading: isLoadingOrders } = useRequestGetOrders();
+  const { orders, isLoading: isLoadingOrders } = useRequestGetAllOrders();
 
   // Проверяем права доступа
   const isManagerOrAdmin =

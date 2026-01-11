@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestGetOrders.ts
+// sharity-web/src/hooks/useRequestGetAllOrders.ts
 
 import { useEffect, useState } from "react";
 import {
@@ -6,7 +6,7 @@ import {
   query,
   where,
   onSnapshot,
-  // orderBy,
+  orderBy,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -54,23 +54,20 @@ export interface OrderFromDB {
   updatedAt?: Date | Timestamp;
 }
 
-export const useRequestGetOrders = (buyerId?: string) => {
+/**
+ * Хук для получения ВСЕХ заказов (для менеджеров и администраторов)
+ * Возвращает все заказы без фильтрации по покупателю
+ */
+export const useRequestGetAllOrders = () => {
   const [orders, setOrders] = useState<OrderFromDB[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!buyerId) {
-      setOrders([]);
-      setIsLoading(false);
-      return;
-    }
-
     const col = collection(db, "orders");
     const q = query(
       col,
-      where("buyerId", "==", buyerId),
       where("isDeleted", "==", false), // Показываем только не удалённые заказы
-      // orderBy("createdAt", "desc"), // Сортировка по дате создания (новые сверху)
+      orderBy("createdAt", "desc"), // Сортировка по дате создания (новые сверху)
     );
 
     const unsub = onSnapshot(
@@ -79,17 +76,18 @@ export const useRequestGetOrders = (buyerId?: string) => {
         const arr = snap.docs.map(
           (d) => ({ id: d.id, ...d.data() }) as OrderFromDB,
         );
+        console.log("Fetched all orders:", arr);
         setOrders(arr);
         setIsLoading(false);
       },
       (err) => {
-        console.error("Error fetching orders:", err);
+        console.error("Error fetching all orders:", err);
         setIsLoading(false);
       },
     );
 
     return unsub;
-  }, [buyerId]);
+  }, []);
 
   return { orders, isLoading };
 };
