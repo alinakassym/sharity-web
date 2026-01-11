@@ -2,13 +2,8 @@
 
 import { type FC } from "react";
 import { Skeleton } from "@mui/material";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/theme/colors";
 
 const ProductCardSkeleton: FC = () => {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme];
-
   return (
     <div style={{ background: "transparent" }}>
       {/* Изображение + сердце */}
@@ -17,19 +12,10 @@ const ProductCardSkeleton: FC = () => {
           variant="rounded"
           width="100%"
           sx={{
+            minHeight: 213.5,
+            maxHeight: 213.5,
             aspectRatio: "1 / 1",
             borderRadius: "12px",
-          }}
-        />
-        {/* Кнопка сердечка */}
-        <Skeleton
-          variant="circular"
-          width={32}
-          height={32}
-          sx={{
-            position: "absolute",
-            top: 8,
-            right: 8,
           }}
         />
       </div>

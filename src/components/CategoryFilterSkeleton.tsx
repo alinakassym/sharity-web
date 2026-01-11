@@ -2,13 +2,8 @@
 
 import { type FC } from "react";
 import { Skeleton } from "@mui/material";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/theme/colors";
 
 const CategoryFilterSkeleton: FC = () => {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme];
-
   return (
     <section style={{ width: "100%" }}>
       {/* Заголовок + "Фильтр" */}
@@ -32,12 +27,13 @@ const CategoryFilterSkeleton: FC = () => {
           gap: 16,
         }}
       >
-        {Array.from({ length: 6 }).map((_, index) => (
+        {Array.from({ length: 9 }).map((_, index) => (
           <Skeleton
             key={index}
             variant="rounded"
             height={48}
             sx={{
+              minHeight: 48,
               borderRadius: "24px",
               minWidth: 120,
               flex: "0 0 auto",
