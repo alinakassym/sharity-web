@@ -1,5 +1,4 @@
-// sharity-web/src/components/CloseWebViewButton.tsx
-
+// sharity-web/src/components/CategoryFilter.tsx
 import { useMemo } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";
@@ -92,7 +91,7 @@ export const CategoryFilter: FC<Props> = ({
           display: "flex",
           flexWrap: "wrap",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: 16,
+          gap: 12,
         }}
       >
         {categories.map((c) => {
@@ -106,7 +105,7 @@ export const CategoryFilter: FC<Props> = ({
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                padding: "10px 14px",
+                padding: "8px 12px",
                 border: "none",
                 cursor: "pointer",
                 borderRadius: 24,

@@ -31,9 +31,9 @@ const CategoryFilterSkeleton: FC = () => {
           <Skeleton
             key={index}
             variant="rounded"
-            height={48}
+            height={44}
             sx={{
-              minHeight: 48,
+              minHeight: 44,
               borderRadius: "24px",
               minWidth: 120,
               flex: "0 0 auto",

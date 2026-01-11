@@ -13,6 +13,7 @@ import CourseCardSkeleton from "@/components/CourseCardSkeleton";
 import { type CourseData } from "@/components/CourseCard";
 import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Courses: FC = () => {
   const scheme = useColorScheme();
@@ -25,6 +26,9 @@ const Courses: FC = () => {
   const { courses: rows, isLoading: isLoadingCourses } = useRequestGetCourses();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
     useRequestGetCategories();
+
+  // Получаем список избранных курсов текущего пользователя
+  const { favorites: favoriteCourseIds } = useFavorites("course");
 
   // Преобразуем категории из Firebase в формат Category для CategoryFilter
   const categories: Category[] = useMemo(() => {
@@ -85,14 +89,30 @@ const Courses: FC = () => {
   const filtered = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
     return courses.filter((p) => {
-      const byCat = selectedLabels.size === 0 || selectedLabels.has(p.category);
+      // Проверяем, выбрана ли категория "Избранное"
+      const isFavoritesSelected = selectedLabels.has("Избранное");
+
+      // Фильтрация по категориям
+      let byCat = true;
+      if (selectedLabels.size > 0) {
+        if (isFavoritesSelected) {
+          // Если выбрано "Избранное" - показываем только избранные курсы пользователя
+          byCat = favoriteCourseIds.has(p.id);
+        } else {
+          // Иначе фильтруем по обычным категориям
+          byCat = selectedLabels.has(p.category);
+        }
+      }
+
+      // Фильтрация по поиску
       const byQuery =
         q.length === 0 ||
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q);
+
       return byCat && byQuery;
     });
-  }, [courses, selectedLabels, searchValue]);
+  }, [courses, selectedLabels, searchValue, favoriteCourseIds]);
 
   return (
     <section
