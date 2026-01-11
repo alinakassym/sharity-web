@@ -1,3 +1,5 @@
+// sharity-web/src/pages/sharity-web/Checkout.tsx
+
 import { useState, useEffect } from "react";
 import type { FC } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -41,7 +43,7 @@ const Checkout: FC = () => {
 
   // Адрес доставки
   const [deliveryAddress, setDeliveryAddress] = useState({
-    city: "",
+    city: "Астана",
     street: "",
     building: "",
     apartment: "",
@@ -120,10 +122,13 @@ const Checkout: FC = () => {
     }
 
     // Также сохраняем в sessionStorage для обратной совместимости
-    sessionStorage.setItem("pendingOrder", JSON.stringify({
-      ...orderData,
-      invoiceId,
-    }));
+    sessionStorage.setItem(
+      "pendingOrder",
+      JSON.stringify({
+        ...orderData,
+        invoiceId,
+      }),
+    );
 
     const paymentResult = await initiatePayment({
       amount: totalAmount,
@@ -232,16 +237,15 @@ const Checkout: FC = () => {
               type="text"
               placeholder="Город *"
               value={deliveryAddress.city}
-              onChange={(e) =>
-                setDeliveryAddress({ ...deliveryAddress, city: e.target.value })
-              }
+              disabled
               style={{
                 padding: 12,
                 borderRadius: 8,
                 border: `1px solid ${c.border}`,
                 fontSize: 14,
-                color: c.text,
-                backgroundColor: c.background,
+                color: c.lightText,
+                backgroundColor: c.controlColor,
+                cursor: "not-allowed",
               }}
             />
 
