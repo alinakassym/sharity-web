@@ -7,7 +7,9 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
+import CategoryFilterSkeleton from "@/components/CategoryFilterSkeleton";
 import CourseGrid from "@/components/CourseGrid";
+import CourseCardSkeleton from "@/components/CourseCardSkeleton";
 import { type CourseData } from "@/components/CourseCard";
 import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
@@ -113,7 +115,7 @@ const Courses: FC = () => {
         }}
       >
         {isLoadingCategories ? (
-          <div style={{ padding: 16 }}>Загрузка категорий…</div>
+          <CategoryFilterSkeleton />
         ) : (
           <CategoryFilter
             categories={categories}
@@ -125,7 +127,17 @@ const Courses: FC = () => {
         )}
 
         {isLoadingCourses ? (
-          <div style={{ padding: 16 }}>Загрузка курсов…</div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gap: 12,
+            }}
+          >
+            {Array.from({ length: 5 }).map((_, index) => (
+              <CourseCardSkeleton key={index} />
+            ))}
+          </div>
         ) : (
           <CourseGrid courses={filtered} />
         )}
