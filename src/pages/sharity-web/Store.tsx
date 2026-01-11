@@ -1,4 +1,5 @@
-// src/pages/Store.tsx
+// sharity-web/src/pages/sharity-web/Store.tsx
+
 import type { FC } from "react";
 import { useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
@@ -7,7 +8,9 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
+import CategoryFilterSkeleton from "@/components/CategoryFilterSkeleton";
 import ProductGrid from "@/components/ProductGrid";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import type { ProductData } from "@/components/ProductCard";
 import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
@@ -28,10 +31,8 @@ const Store: FC = () => {
 
   const { products: rows, isLoading: isLoadingProducts } =
     useRequestGetProducts();
-  const {
-    categories: categoriesFromFirebase,
-    isLoading: isLoadingCategories,
-  } = useRequestGetCategories();
+  const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
+    useRequestGetCategories();
 
   // Определяем, откуда была открыта страница
   const backTo = (location.state as { from?: string })?.from || "/";
@@ -115,7 +116,7 @@ const Store: FC = () => {
         }}
       >
         {isLoadingCategories ? (
-          <div style={{ padding: 16 }}>Загрузка категорий…</div>
+          <CategoryFilterSkeleton />
         ) : (
           <CategoryFilter
             categories={categories}
@@ -127,7 +128,17 @@ const Store: FC = () => {
         )}
 
         {isLoadingProducts ? (
-          <div style={{ padding: 16 }}>Загрузка товаров…</div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: 12,
+            }}
+          >
+            {Array.from({ length: 6 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
         ) : (
           <ProductGrid products={filtered} fromPage={backTo} />
         )}
