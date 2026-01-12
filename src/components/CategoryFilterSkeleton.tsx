@@ -16,7 +16,7 @@ const CategoryFilterSkeleton: FC = () => {
         }}
       >
         <Skeleton variant="text" width={100} height={24} />
-        <Skeleton variant="text" width={60} height={20} />
+        <Skeleton variant="text" width={60} height={24} />
       </div>
 
       {/* Сетка карточек-пилюль (показываем 6 скелетонов) */}
@@ -24,7 +24,7 @@ const CategoryFilterSkeleton: FC = () => {
         style={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 16,
+          gap: 12,
         }}
       >
         {Array.from({ length: 9 }).map((_, index) => (
@@ -35,7 +35,7 @@ const CategoryFilterSkeleton: FC = () => {
             sx={{
               minHeight: 44,
               borderRadius: "24px",
-              minWidth: 120,
+              minWidth: "30%",
               flex: "0 0 auto",
             }}
           />

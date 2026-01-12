@@ -2,23 +2,29 @@
 
 import type { FC } from "react";
 import { useState, useMemo } from "react";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
+import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
+import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
+import { useFavorites } from "@/hooks/useFavorites";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import CategoryFilterSkeleton from "@/components/CategoryFilterSkeleton";
 import CourseGrid from "@/components/CourseGrid";
 import CourseCardSkeleton from "@/components/CourseCardSkeleton";
 import { type CourseData } from "@/components/CourseCard";
-import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
-import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
-import { useFavorites } from "@/hooks/useFavorites";
+import Container from "@/components/Container";
 
 const Courses: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const isTelegram = isTelegramApp();
+
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
 
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
@@ -115,13 +121,14 @@ const Courses: FC = () => {
   }, [courses, selectedLabels, searchValue, favoriteCourseIds]);
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 112 : 64,
-        minHeight: "100vh",
-        paddingBottom: "74px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
       <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
 
@@ -162,7 +169,7 @@ const Courses: FC = () => {
           <CourseGrid courses={filtered} />
         )}
       </div>
-    </section>
+    </Container>
   );
 };
 

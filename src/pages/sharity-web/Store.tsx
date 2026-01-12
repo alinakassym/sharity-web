@@ -5,7 +5,10 @@ import { useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import CategoryFilterSkeleton from "@/components/CategoryFilterSkeleton";
@@ -15,6 +18,7 @@ import type { ProductData } from "@/components/ProductCard";
 import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
 import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
 import { useFavorites } from "@/hooks/useFavorites";
+import Container from "@/components/Container";
 
 const KZT = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -24,9 +28,13 @@ const KZT = new Intl.NumberFormat("ru-RU", {
 
 const Store: FC = () => {
   const location = useLocation();
+
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const isTelegram = isTelegramApp();
+
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
+
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
@@ -113,13 +121,14 @@ const Store: FC = () => {
   }, [products, selectedLabels, searchValue, favoriteProductIds]);
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 112 : 64,
-        minHeight: "100vh",
-        paddingBottom: "74px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
       <SearchHeader
         searchValue={searchValue}
@@ -163,7 +172,7 @@ const Store: FC = () => {
           <ProductGrid products={filtered} fromPage={backTo} />
         )}
       </div>
-    </section>
+    </Container>
   );
 };
 
