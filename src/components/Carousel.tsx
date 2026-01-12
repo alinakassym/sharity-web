@@ -1,3 +1,5 @@
+// sharity-web/src/components/Carousel.tsx
+
 import type { FC } from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -20,24 +22,70 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
   const scheme = useColorScheme();
   const colors = Colors[scheme];
   const timeoutRef = useRef<number | null>(null);
+  const startXRef = useRef<number | null>(null);
+  const movedRef = useRef(false);
+
+  const SWIPE_THRESHOLD = 40;
 
   // Aspect ratio: 113:360 (height:width)
   const aspectRatio = 113 / 360;
 
   // Create extended items array with clones for infinite effect
   // [last, ...items, first]
-  const extendedItems = items.length > 0
-    ? [items[items.length - 1], ...items, items[0]]
-    : [];
+  const extendedItems =
+    items.length > 0 ? [items[items.length - 1], ...items, items[0]] : [];
+
+  const clearAutoPlayTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
 
   const goToNext = useCallback(() => {
     setIsTransitioning(true);
     setCurrentIndex((prev) => prev + 1);
   }, []);
 
+  const goToPrev = useCallback(() => {
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev - 1);
+  }, []);
+
   const goToSlide = (index: number) => {
     setIsTransitioning(true);
     setCurrentIndex(index + 1); // +1 because of the cloned first item
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Левой кнопкой мыши, или любое касание
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    clearAutoPlayTimeout();
+    startXRef.current = e.clientX;
+    movedRef.current = false;
+
+    // чтобы корректно отработал pointerup даже если палец ушёл за пределы
+    (e.currentTarget as HTMLDivElement).setPointerCapture?.(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (startXRef.current == null) return;
+    const dx = e.clientX - startXRef.current;
+    if (Math.abs(dx) > 6) movedRef.current = true;
+  };
+
+  const handlePointerEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (startXRef.current == null) return;
+
+    const dx = e.clientX - startXRef.current;
+    startXRef.current = null;
+
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+
+    if (dx < 0)
+      goToNext(); // свайп влево -> следующий
+    else goToPrev(); // свайп вправо -> предыдущий
   };
 
   // Handle infinite loop reset
@@ -67,6 +115,7 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
       return () => {
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
         }
       };
     }
@@ -85,12 +134,17 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
 
   return (
     <div
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
       style={{
         position: "relative",
         width: "100%",
         paddingBottom: `${aspectRatio * 100}%`, // Maintain aspect ratio
         overflow: "hidden",
         backgroundColor: colors.surfaceColor,
+        touchAction: "none",
       }}
     >
       {/* Images */}
