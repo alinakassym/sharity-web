@@ -1,3 +1,5 @@
+// sharity-web/src/components/ProductHeader.tsx
+
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -37,11 +39,12 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack, backTo }) => {
     >
       <div
         style={{
+          paddingLeft: 16,
           paddingRight: 16,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
+          gap: 16,
           backgroundColor: c.background,
         }}
       >
@@ -49,11 +52,13 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack, backTo }) => {
         <div
           style={{
             paddingTop: 0,
-            width: 56,
+            width: 40,
             height: 40,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            borderRadius: 8,
+            backgroundColor: c.controlColor,
             cursor: "pointer",
           }}
           onClick={onGoBack}
