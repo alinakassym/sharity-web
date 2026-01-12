@@ -146,7 +146,7 @@ const Home: FC = () => {
         }}
       >
         {/* Carousel Banner */}
-        <Carousel items={carouselItems} autoPlayInterval={3000} />
+        <Carousel items={carouselItems} autoPlayInterval={5000} />
 
         {/* Menu Buttons */}
         <MenuButtons items={menuItems} from="/" />

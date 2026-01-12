@@ -14,9 +14,19 @@ interface CarouselItem {
 interface CarouselProps {
   items: CarouselItem[];
   autoPlayInterval?: number;
+  /**
+   * Соотношение сторон (высота/ширина)
+   * Например: 140/360 ≈ 0.389 для баннера, 9/16 ≈ 0.563 для вертикального, 3/4 = 0.75
+   * @default 140/360 (≈ 0.389)
+   */
+  aspectRatio?: number;
 }
 
-const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
+const Carousel: FC<CarouselProps> = ({
+  items,
+  autoPlayInterval = 3000,
+  aspectRatio = 140 / 360,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 (first real slide)
   const [isTransitioning, setIsTransitioning] = useState(true);
   const scheme = useColorScheme();
@@ -26,9 +36,6 @@ const Carousel: FC<CarouselProps> = ({ items, autoPlayInterval = 3000 }) => {
   const movedRef = useRef(false);
 
   const SWIPE_THRESHOLD = 40;
-
-  // Aspect ratio: 113:360 (height:width)
-  const aspectRatio = 113 / 360;
 
   // Create extended items array with clones for infinite effect
   // [last, ...items, first]
