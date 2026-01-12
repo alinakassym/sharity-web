@@ -582,6 +582,12 @@ const CreateCourse: FC = () => {
             showShortDescription={showShortDescription}
             setShowShortDescription={setShowShortDescription}
             dispatch={dispatch}
+            ageFrom={ageFrom}
+            ageTo={ageTo}
+            priceFrom={priceFrom}
+            setAgeFrom={setAgeFrom}
+            setAgeTo={setAgeTo}
+            setPriceFrom={setPriceFrom}
           />
         )}
       </div>

@@ -15,6 +15,12 @@ type LocationItem = {
   locationCoordinates: [number, number];
 };
 
+type CreateCourseFormAction = {
+  type: "SET_FIELD";
+  field: string;
+  value: string | number | undefined;
+};
+
 interface StepCourseReviewProps {
   c: ColorsShape;
   form: {
@@ -35,11 +41,11 @@ interface StepCourseReviewProps {
   filePreviews: Array<{ file: File; url: string }>;
   showShortDescription: boolean;
   setShowShortDescription: (value: boolean) => void;
-  dispatch: (action: {
-    type: "SET_FIELD";
-    field: string;
-    value: string;
-  }) => void;
+  dispatch: (action: CreateCourseFormAction) => void;
+  // Дополнительные поля для редактирования
+  ageFrom?: number;
+  ageTo?: number;
+  priceFrom?: number;
 }
 
 export const StepCourseReview: FC<StepCourseReviewProps> = ({
@@ -49,6 +55,9 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
   showShortDescription,
   setShowShortDescription,
   dispatch,
+  ageFrom,
+  ageTo,
+  priceFrom,
 }) => {
   const previewImage =
     filePreviews[0]?.url ?? "https://picsum.photos/600?preview";
@@ -61,6 +70,37 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div
+        style={{
+          maxWidth: "100%",
+          display: "grid",
+          gridTemplateColumns: "1fr",
+        }}
+      >
+        <CourseCard
+          showHeartBtn={false}
+          isLiked={false}
+          onHeartPress={() => {}}
+          course={{
+            id: "preview",
+            image: previewImage,
+            category: form.category || "Без категории",
+            title: form.courseName || "Название курса",
+            ageFrom: ageFrom,
+            ageTo: ageTo,
+            priceFrom: priceFrom,
+            priceText: form.priceText || undefined,
+            location: form.locations[0]?.location || undefined,
+            phone: form.phone || undefined,
+            whatsapp: form.whatsapp || undefined,
+            telegram: form.telegram || undefined,
+            shortDescription: showShortDescription
+              ? form.shortDescription || undefined
+              : undefined,
+          }}
+        />
+      </div>
+
       {/* Переключатель и инпут для короткого описания */}
       <div
         style={{
@@ -118,34 +158,6 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
             />
           </div>
         )}
-      </div>
-
-      <div style={{ textAlign: "center", marginBottom: 16 }}>
-        <h3
-          style={{
-            fontSize: 18,
-            fontWeight: 600,
-            color: c.text,
-            margin: "0 0 8px",
-          }}
-        >
-          Предпросмотр
-        </h3>
-        <p style={{ fontSize: 14, color: c.lightText, margin: 0 }}>
-          Проверьте, как будет выглядеть публикация
-        </p>
-      </div>
-
-      <div style={{ display: "flex", flex: 1 }}>
-        <CourseCard
-          showHeartBtn={false}
-          course={{
-            id: "preview",
-            image: previewImage,
-            category: form.category || "Без категории",
-            title: form.courseName || "Название курса",
-          }}
-        />
       </div>
 
       {form.description && (

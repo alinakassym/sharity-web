@@ -21,6 +21,7 @@ export type CourseData = {
   phone?: string;
   whatsapp?: string;
   telegram?: string;
+  shortDescription?: string;
 };
 
 type Props = {
@@ -55,9 +56,6 @@ const CourseCard: FC<Props> = ({
 
   // Форматирование цены
   const priceText = (() => {
-    if (course.priceText) {
-      return course.priceText;
-    }
     if (course.priceFrom) {
       const KZT = new Intl.NumberFormat("ru-RU", {
         style: "currency",
@@ -65,6 +63,9 @@ const CourseCard: FC<Props> = ({
         maximumFractionDigits: 0,
       });
       return `от ${KZT.format(course.priceFrom)}`;
+    }
+    if (course.priceText) {
+      return course.priceText;
     }
     return null;
   })();
@@ -228,7 +229,20 @@ const CourseCard: FC<Props> = ({
         </div>
       </Link>
 
-      <div></div>
+      {course?.shortDescription && (
+        <div
+          style={{
+            display: "flex",
+            gap: 4,
+            flexWrap: "wrap",
+            fontSize: 12,
+            fontWeight: 500,
+            lineHeight: "16px",
+          }}
+        >
+          {course.shortDescription}
+        </div>
+      )}
 
       {/* Actions row (кнопки контактов) - ВНЕ Link! */}
       {(whatsappLink || course.phone || telegramLink) && (
