@@ -67,6 +67,7 @@ type CreateCourseFormAction =
     }
   | { type: "ADD_FILES"; files: File[] }
   | { type: "REMOVE_FILE"; index: number }
+  | { type: "SET_COVER_IMAGE_INDEX"; index: number }
   | {
       type: "SET_LOCATIONS";
       locations: Array<{
@@ -114,10 +115,34 @@ const courseFormReducer = (
         selectedFiles: [...state.selectedFiles, ...action.files],
       };
 
-    case "REMOVE_FILE":
+    case "REMOVE_FILE": {
+      // const newFiles = state.selectedFiles.filter((_, i) => i !== action.index);
+      let newCoverIndex = state.coverImageIndex;
+
+      // Если удаляем главное изображение, сбрасываем на первое
+      if (action.index === state.coverImageIndex) {
+        newCoverIndex = 0;
+      }
+      // Если удаляем изображение до главного, нужно уменьшить индекс
+      else if (action.index < state.coverImageIndex) {
+        newCoverIndex = state.coverImageIndex - 1;
+      }
+      // Если остается 0 файлов, сбросим на 0
+      if (state.selectedFiles.length === 1) {
+        newCoverIndex = 0;
+      }
+
       return {
         ...state,
         selectedFiles: state.selectedFiles.filter((_, i) => i !== action.index),
+        coverImageIndex: newCoverIndex,
+      };
+    }
+
+    case "SET_COVER_IMAGE_INDEX":
+      return {
+        ...state,
+        coverImageIndex: action.index,
       };
 
     case "SET_LOCATIONS":
@@ -421,6 +446,10 @@ const CreateCourse: FC = () => {
     dispatch({ type: "REMOVE_FILE", index: indexToRemove });
   };
 
+  const setCoverImage = (index: number) => {
+    dispatch({ type: "SET_COVER_IMAGE_INDEX", index });
+  };
+
   // Обработчики для модального окна локации
   const handleOpenLocationModal = () => {
     setTempLocation("");
@@ -551,6 +580,8 @@ const CreateCourse: FC = () => {
             onRemoveFile={removeFile}
             photosErrors={photosErrors}
             clearPhotosError={clearPhotosError}
+            coverImageIndex={form.coverImageIndex}
+            onSetCoverImage={setCoverImage}
           />
         )}
 
