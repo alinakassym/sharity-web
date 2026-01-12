@@ -13,7 +13,7 @@ import MenuButtons from "@/components/MenuButtons";
 import EventsCarousel from "@/components/EventsCarousel";
 import Container from "@/components/Container";
 import { useRequestGetEvents } from "@/hooks/useRequestGetEvents";
-import bannerImage from "@/assets/banner.png";
+import bannerImage from "@/assets/IZUMRUD-banner.png";
 import menuImg1 from "@/assets/menu-img1.png";
 import menuImg2 from "@/assets/menu-img2.jpg";
 import menuImg3 from "@/assets/menu-img3.png";
