@@ -1,13 +1,15 @@
 // shirarity-web/src/components/StepCourseReview.tsx
 
-import type { FC } from "react";
+import { type FC, type Dispatch, useState } from "react";
 import { Switch, TextField, FormControlLabel } from "@mui/material";
 import CourseCard from "@/components/CourseCard";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 
-type ColorsShape = {
-  surfaceColor: string;
-  lightText: string;
-  text: string;
+type CreateCourseSetFieldAction = {
+  type: "SET_FIELD";
+  field: "shortDescription";
+  value: string;
 };
 
 type LocationItem = {
@@ -15,14 +17,7 @@ type LocationItem = {
   locationCoordinates: [number, number];
 };
 
-type CreateCourseFormAction = {
-  type: "SET_FIELD";
-  field: string;
-  value: string | number | undefined;
-};
-
 interface StepCourseReviewProps {
-  c: ColorsShape;
   form: {
     category: string;
     courseName: string;
@@ -38,27 +33,25 @@ interface StepCourseReviewProps {
     whatsapp: string;
     telegram: string;
   };
+  dispatch: Dispatch<CreateCourseSetFieldAction>;
   filePreviews: Array<{ file: File; url: string }>;
-  showShortDescription: boolean;
-  setShowShortDescription: (value: boolean) => void;
-  dispatch: (action: CreateCourseFormAction) => void;
-  // Дополнительные поля для редактирования
+  // Поля только для отображения в CourseCard (не редактируются)
   ageFrom?: number;
   ageTo?: number;
   priceFrom?: number;
 }
 
 export const StepCourseReview: FC<StepCourseReviewProps> = ({
-  c,
   form,
-  filePreviews,
-  showShortDescription,
-  setShowShortDescription,
   dispatch,
+  filePreviews,
   ageFrom,
   ageTo,
   priceFrom,
 }) => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+
   const previewImage =
     filePreviews[0]?.url ?? "https://picsum.photos/600?preview";
 
@@ -67,6 +60,9 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
 
   const MAX_SHORT_DESC_LENGTH = 100;
   const remainingChars = MAX_SHORT_DESC_LENGTH - form.shortDescription.length;
+
+  // Состояние для переключателя короткого описания
+  const [showShortDescription, setShowShortDescription] = useState(false);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

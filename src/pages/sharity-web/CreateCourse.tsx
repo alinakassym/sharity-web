@@ -164,9 +164,6 @@ const CreateCourse: FC = () => {
   const [ageTo, setAgeTo] = useState<number | undefined>();
   const [priceFrom, setPriceFrom] = useState<number | undefined>();
 
-  // Состояние для переключателя короткого описания
-  const [showShortDescription, setShowShortDescription] = useState(false);
-
   // Состояние для модального окна
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [tempLocation, setTempLocation] = useState("");
@@ -297,7 +294,8 @@ const CreateCourse: FC = () => {
         nextErrors.locations = "Добавьте хотя бы одну локацию";
       }
 
-      const hasContact = form.phone.trim() || form.whatsapp.trim() || form.telegram.trim();
+      const hasContact =
+        form.phone.trim() || form.whatsapp.trim() || form.telegram.trim();
       if (!hasContact) {
         nextErrors.contacts = "Укажите хотя бы один способ связи";
       }
@@ -373,10 +371,7 @@ const CreateCourse: FC = () => {
         name: form.courseName.trim(),
         category: form.category,
         description: form.description.trim() || undefined,
-        shortDescription:
-          showShortDescription && form.shortDescription.trim()
-            ? form.shortDescription.trim()
-            : undefined,
+        shortDescription: form.shortDescription.trim() ?? undefined,
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
@@ -576,18 +571,12 @@ const CreateCourse: FC = () => {
 
         {currentStep === "review" && (
           <StepCourseReview
-            c={c}
             form={form}
-            filePreviews={filePreviews}
-            showShortDescription={showShortDescription}
-            setShowShortDescription={setShowShortDescription}
             dispatch={dispatch}
+            filePreviews={filePreviews}
             ageFrom={ageFrom}
             ageTo={ageTo}
             priceFrom={priceFrom}
-            setAgeFrom={setAgeFrom}
-            setAgeTo={setAgeTo}
-            setPriceFrom={setPriceFrom}
           />
         )}
       </div>
