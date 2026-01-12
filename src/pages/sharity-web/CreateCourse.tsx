@@ -440,6 +440,9 @@ const CreateCourse: FC = () => {
     );
 
     dispatch({ type: "ADD_FILES", files: imageFiles });
+
+    // Очищаем значение input, чтобы можно было выбрать тот же файл снова
+    event.target.value = "";
   };
 
   const removeFile = (indexToRemove: number) => {
