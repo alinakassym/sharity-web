@@ -2,12 +2,10 @@
 
 import { type FC } from "react";
 import { Link } from "react-router-dom";
-import { IconButton } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
+import HeartIcon from "./icons/HeartIcon";
 
 export type CourseData = {
   id: string;
@@ -28,10 +26,16 @@ export type CourseData = {
 type Props = {
   course: CourseData;
   isLiked: boolean;
+  showHeartBtn?: boolean;
   onHeartPress: (id: string) => void;
 };
 
-const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
+const CourseCard: FC<Props> = ({
+  course,
+  isLiked,
+  showHeartBtn,
+  onHeartPress,
+}) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
@@ -130,8 +134,8 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
         {/* Image */}
         <div
           style={{
-            width: 96,
-            height: 96,
+            width: 98,
+            height: 98,
             borderRadius: 14,
             overflow: "hidden",
             flexShrink: 0,
@@ -153,7 +157,7 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 8,
+            gap: 6,
             flex: 1,
             minWidth: 0,
           }}
@@ -202,27 +206,29 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
               {priceText && <div style={chipStyle}>{priceText}</div>}
             </div>
           )}
+
+          {/* Meta (адрес) */}
+          {course.location && (
+            <div
+              style={{
+                fontSize: 12,
+                lineHeight: "18px",
+                color: c.lightText,
+                display: "flex",
+                gap: 4,
+                flexWrap: "wrap",
+              }}
+            >
+              <span style={{ paddingTop: 2 }}>
+                <VuesaxIcon name="location" size={12} />
+              </span>
+              <span>{course.location}</span>
+            </div>
+          )}
         </div>
       </Link>
 
-      {/* Meta (адрес) */}
-      {course.location && (
-        <div
-          style={{
-            fontSize: 12,
-            lineHeight: "18px",
-            color: c.lightText,
-            display: "flex",
-            gap: 4,
-            flexWrap: "wrap",
-          }}
-        >
-          <span style={{ paddingTop: 2 }}>
-            <VuesaxIcon name="location" size={12} />
-          </span>
-          <span>{course.location}</span>
-        </div>
-      )}
+      <div></div>
 
       {/* Actions row (кнопки контактов) - ВНЕ Link! */}
       {(whatsappLink || course.phone || telegramLink) && (
@@ -299,26 +305,36 @@ const CourseCard: FC<Props> = ({ course, isLiked, onHeartPress }) => {
         </div>
       )}
 
-      {/* Heart (логика без изменений) */}
-      <IconButton
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onHeartPress(course.id);
-        }}
-        size="small"
-        sx={{
-          position: "absolute",
-          top: 6,
-          right: 6,
-        }}
-      >
-        {isLiked ? (
-          <FavoriteIcon sx={{ color: "#E53935", fontSize: 20 }} />
-        ) : (
-          <FavoriteBorderIcon sx={{ color: c.lightText, fontSize: 20 }} />
-        )}
-      </IconButton>
+      {showHeartBtn && (
+        <button
+          type="button"
+          aria-label={isLiked ? "Убрать из избранного" : "В избранное"}
+          onClick={(e) => {
+            e.stopPropagation();
+            onHeartPress?.(course.id);
+          }}
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            padding: 0,
+            minWidth: 32,
+            maxWidth: 32,
+            height: 32,
+            borderRadius: 16,
+            background: "rgba(255,255,255,0.9)",
+            border: "none",
+            display: "flex",
+            placeItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+            outline: "none",
+          }}
+        >
+          <HeartIcon isLiked={isLiked} />
+        </button>
+      )}
     </div>
   );
 };

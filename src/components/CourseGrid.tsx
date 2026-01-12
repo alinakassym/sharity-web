@@ -28,6 +28,7 @@ export const CourseGrid: FC<Props> = ({ courses, gap = 16 }) => {
           <CourseCard
             course={p}
             isLiked={isFavorite(p.id)}
+            showHeartBtn
             onHeartPress={toggleFavorite}
           />
         </div>
