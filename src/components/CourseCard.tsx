@@ -25,15 +25,15 @@ export type CourseData = {
 
 type Props = {
   course: CourseData;
-  isLiked: boolean;
+  isLiked?: boolean;
   showHeartBtn?: boolean;
-  onHeartPress: (id: string) => void;
+  onHeartPress?: (id: string) => void;
 };
 
 const CourseCard: FC<Props> = ({
   course,
-  isLiked,
-  showHeartBtn,
+  isLiked = false,
+  showHeartBtn = false,
   onHeartPress,
 }) => {
   const scheme = useColorScheme();

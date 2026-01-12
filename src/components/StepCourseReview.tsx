@@ -1,6 +1,7 @@
 // shirarity-web/src/components/StepCourseReview.tsx
 
 import type { FC } from "react";
+import { Switch, TextField, FormControlLabel } from "@mui/material";
 import CourseCard from "@/components/CourseCard";
 
 type ColorsShape = {
@@ -20,6 +21,7 @@ interface StepCourseReviewProps {
     category: string;
     courseName: string;
     description: string;
+    shortDescription: string;
     selectedFiles: File[];
     locations: LocationItem[];
 
@@ -31,12 +33,22 @@ interface StepCourseReviewProps {
     telegram: string;
   };
   filePreviews: Array<{ file: File; url: string }>;
+  showShortDescription: boolean;
+  setShowShortDescription: (value: boolean) => void;
+  dispatch: (action: {
+    type: "SET_FIELD";
+    field: string;
+    value: string;
+  }) => void;
 }
 
 export const StepCourseReview: FC<StepCourseReviewProps> = ({
   c,
   form,
   filePreviews,
+  showShortDescription,
+  setShowShortDescription,
+  dispatch,
 }) => {
   const previewImage =
     filePreviews[0]?.url ?? "https://picsum.photos/600?preview";
@@ -44,8 +56,70 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
   const hasContacts = Boolean(form.phone || form.whatsapp || form.telegram);
   const hasMeta = Boolean(form.priceText || form.scheduleText);
 
+  const MAX_SHORT_DESC_LENGTH = 100;
+  const remainingChars = MAX_SHORT_DESC_LENGTH - form.shortDescription.length;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Переключатель и инпут для короткого описания */}
+      <div
+        style={{
+          padding: 16,
+          backgroundColor: c.surfaceColor,
+          borderRadius: 12,
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showShortDescription}
+              onChange={(e) => setShowShortDescription(e.target.checked)}
+            />
+          }
+          label="Показать короткое описание или анонс"
+          sx={{
+            "& .MuiFormControlLabel-label": {
+              fontSize: 14,
+              fontWeight: 500,
+              color: c.text,
+            },
+          }}
+        />
+
+        {showShortDescription && (
+          <div style={{ marginTop: 16 }}>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Короткое описание"
+              placeholder="Введите короткое описание или анонс (до 100 символов)"
+              value={form.shortDescription}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= MAX_SHORT_DESC_LENGTH) {
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "shortDescription",
+                    value: value,
+                  });
+                }
+              }}
+              helperText={`Осталось символов: ${remainingChars}`}
+              sx={{
+                "& .MuiFormLabel-root": {
+                  backgroundColor: c.surfaceColor,
+                },
+                "& .MuiFormHelperText-root": {
+                  color: remainingChars < 20 ? "#FFA500" : c.lightText,
+                  fontWeight: remainingChars < 20 ? 600 : 400,
+                },
+              }}
+            />
+          </div>
+        )}
+      </div>
+
       <div style={{ textAlign: "center", marginBottom: 16 }}>
         <h3
           style={{
@@ -62,7 +136,7 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
         </p>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", flex: 1 }}>
         <CourseCard
           showHeartBtn={false}
           course={{

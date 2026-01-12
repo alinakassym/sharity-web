@@ -40,6 +40,7 @@ type CreateCourseFormState = {
   selectedFiles: File[];
   courseName: string;
   description: string;
+  shortDescription: string;
 
   locations: Array<{ location: string; locationCoordinates: [number, number] }>;
 
@@ -80,6 +81,7 @@ const initialCourseFormState: CreateCourseFormState = {
   selectedFiles: [],
   courseName: "",
   description: "",
+  shortDescription: "",
 
   locations: [],
 
@@ -161,6 +163,9 @@ const CreateCourse: FC = () => {
   const [ageFrom, setAgeFrom] = useState<number | undefined>();
   const [ageTo, setAgeTo] = useState<number | undefined>();
   const [priceFrom, setPriceFrom] = useState<number | undefined>();
+
+  // Состояние для переключателя короткого описания
+  const [showShortDescription, setShowShortDescription] = useState(false);
 
   // Состояние для модального окна
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -368,6 +373,10 @@ const CreateCourse: FC = () => {
         name: form.courseName.trim(),
         category: form.category,
         description: form.description.trim() || undefined,
+        shortDescription:
+          showShortDescription && form.shortDescription.trim()
+            ? form.shortDescription.trim()
+            : undefined,
         isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
@@ -566,7 +575,14 @@ const CreateCourse: FC = () => {
         )}
 
         {currentStep === "review" && (
-          <StepCourseReview c={c} form={form} filePreviews={filePreviews} />
+          <StepCourseReview
+            c={c}
+            form={form}
+            filePreviews={filePreviews}
+            showShortDescription={showShortDescription}
+            setShowShortDescription={setShowShortDescription}
+            dispatch={dispatch}
+          />
         )}
       </div>
 
