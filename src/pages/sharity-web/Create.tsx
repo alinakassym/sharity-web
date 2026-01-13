@@ -361,7 +361,7 @@ const Create: FC = () => {
   return (
     <Container
       paddingTop={
-        platformName === "desktop" ? paddingTop + 92 : paddingTop + 44
+        platformName === "desktop" ? paddingTop + 92 : paddingTop + 64
       }
     >
       {/* Header */}

@@ -28,8 +28,8 @@ const Container: FC<ThemeProviderProps> = ({
       style={{
         position: "relative",
         paddingTop: paddingTop ? paddingTop : isTelegram ? paddingTop : 44,
-        height: "100vh",
-        paddingBottom: "160px",
+        minHeight: "100vh",
+        paddingBottom: "80px",
         backgroundColor: c.background,
       }}
     >
