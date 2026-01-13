@@ -196,42 +196,44 @@ const Carousel: FC<CarouselProps> = ({
       </div>
 
       {/* Indicators */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 12,
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          gap: 8,
-          zIndex: 10,
-        }}
-      >
-        {items.map((item, index) => {
-          const actualIndex = getActualIndex();
-          const isActive = index === actualIndex;
+      {items.length > 1 && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 12,
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: 8,
+            zIndex: 10,
+          }}
+        >
+          {items.map((item, index) => {
+            const actualIndex = getActualIndex();
+            const isActive = index === actualIndex;
 
-          return (
-            <button
-              key={item.id}
-              onClick={() => goToSlide(index)}
-              style={{
-                width: isActive ? 24 : 8,
-                height: 8,
-                borderRadius: 4,
-                border: "none",
-                backgroundColor: isActive
-                  ? colors.primary
-                  : colors.lighter + "80",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                padding: 0,
-              }}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          );
-        })}
-      </div>
+            return (
+              <button
+                key={item.id}
+                onClick={() => goToSlide(index)}
+                style={{
+                  width: isActive ? 24 : 8,
+                  height: 8,
+                  borderRadius: 4,
+                  border: "none",
+                  backgroundColor: isActive
+                    ? colors.primary
+                    : colors.lighter + "80",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  padding: 0,
+                }}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
