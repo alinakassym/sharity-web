@@ -3,50 +3,33 @@
 import type { FC } from "react";
 import { useParams } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useRequestGetCourse } from "@/hooks/useRequestGetCourse";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import Header from "@/components/Header";
-import { useRequestGetCourse } from "@/hooks/useRequestGetCourse";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import Carousel from "@/components/Carousel";
 
 const Course: FC = () => {
   const { id } = useParams<{ id: string }>();
-  const scheme = useColorScheme();
-  const c = Colors[scheme];
-
   const isTelegram = isTelegramApp();
-
   const { course: courseData, isLoading, error } = useRequestGetCourse(id);
 
-  // Генерируем стабильный индекс для fallback картинки на основе ID
-  const getImageIndex = (id: string) => {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      const char = id.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash % 1000) + 1;
-  };
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
 
   const course = courseData
     ? {
         id: courseData.id,
-        image:
-          // ➕ Приоритет отображения изображений:
-          // 1. coverImage (главное изображение)
-          // 2. Первое изображение из imagesArray
-          // 3. Поле image (для совместимости)
-          // 4. Fallback заглушка
-          courseData.coverImage ||
-          (courseData.imagesArray && courseData.imagesArray.length > 0
-            ? courseData.imagesArray[0]
-            : courseData.image ||
-              `https://picsum.photos/600?${getImageIndex(courseData.id)}`),
         category: courseData.category || "",
         title: courseData.name || "",
         description: courseData.description || "",
-        imagesArray: courseData.imagesArray || [],
+        imagesArray:
+          courseData.imagesArray?.map((imageUrl, index) => ({
+            id: `${courseData.id}-${index}`,
+            image: imageUrl,
+            alt: courseData.name,
+          })) || [],
         locations: courseData.locations || [],
 
         // ➕ НОВЫЕ поля
@@ -119,19 +102,7 @@ const Course: FC = () => {
       >
         {/* Изображение */}
         <div style={{}}>
-          <img
-            src={course.image}
-            alt={course.title}
-            style={{
-              width: "100%",
-              aspectRatio: "1 / 1",
-              objectFit: "cover",
-              borderRadius: "12px",
-              border: `1px solid ${c.border}`,
-              backgroundColor: c.lighter,
-              overflow: "hidden",
-            }}
-          />
+          <Carousel items={course.imagesArray} aspectRatio={280 / 360} />
         </div>
 
         {/* Информация о товаре */}

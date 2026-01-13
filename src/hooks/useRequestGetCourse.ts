@@ -1,3 +1,5 @@
+// sharity-web/src/hooks/useRequestGetCourse.ts
+
 import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -53,7 +55,10 @@ export const useRequestGetCourse = (courseId: string | undefined) => {
       courseRef,
       (docSnap) => {
         if (docSnap.exists()) {
-          const courseData = { id: docSnap.id, ...docSnap.data() } as CourseFromDB;
+          const courseData = {
+            id: docSnap.id,
+            ...docSnap.data(),
+          } as CourseFromDB;
           // Проверяем, не удален ли курс
           if (courseData.isDeleted) {
             setCourse(null);
