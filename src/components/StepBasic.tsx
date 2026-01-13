@@ -99,7 +99,6 @@ export const StepBasic: FC<StepBasicProps> = ({
         }
         disabled={isLoadingCategories}
         required
-        searchable
         error={Boolean(basicErrors.category)}
         helperText={basicErrors.category}
       />
@@ -117,7 +116,6 @@ export const StepBasic: FC<StepBasicProps> = ({
                 : "Выберите подкатегорию"
             }
             disabled={isLoadingGymnasticsCategories}
-            searchable
             inputRef={subcategoryInputRef}
             error={Boolean(basicErrors.subcategory)}
             helperText={basicErrors.subcategory}
