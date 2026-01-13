@@ -15,6 +15,11 @@ interface CarouselProps {
   items: CarouselItem[];
   autoPlayInterval?: number;
   /**
+   * Включить/выключить автоматическое перелистывание
+   * @default true
+   */
+  autoPlay?: boolean;
+  /**
    * Соотношение сторон (высота/ширина)
    * Например: 140/360 ≈ 0.389 для баннера, 9/16 ≈ 0.563 для вертикального, 3/4 = 0.75
    * @default 140/360 (≈ 0.389)
@@ -25,6 +30,7 @@ interface CarouselProps {
 const Carousel: FC<CarouselProps> = ({
   items,
   autoPlayInterval = 3000,
+  autoPlay = true,
   aspectRatio = 140 / 360,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 (first real slide)
@@ -114,7 +120,7 @@ const Carousel: FC<CarouselProps> = ({
 
   // Auto-play
   useEffect(() => {
-    if (autoPlayInterval > 0) {
+    if (autoPlay && autoPlayInterval > 0) {
       timeoutRef.current = window.setTimeout(() => {
         goToNext();
       }, autoPlayInterval);
@@ -126,7 +132,7 @@ const Carousel: FC<CarouselProps> = ({
         }
       };
     }
-  }, [currentIndex, autoPlayInterval, goToNext]);
+  }, [currentIndex, autoPlay, autoPlayInterval, goToNext]);
 
   if (items.length === 0) {
     return null;
