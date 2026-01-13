@@ -8,8 +8,9 @@ import { useRequestCreateCourse } from "@/hooks/useRequestCreateCourse";
 import {
   useSafePaddingTop,
   useSafePlatform,
+  useTelegramSafeArea,
 } from "@/hooks/useTelegramSafeArea";
-import { getTelegramUser } from "@/lib/telegram";
+import { getTelegramUser, isTelegramApp } from "@/lib/telegram";
 import { Colors } from "@/theme/colors";
 import YandexMap from "@/components/YandexMap";
 import { StepCourseBasic } from "@/components/StepCourseBasic";
@@ -158,11 +159,14 @@ const courseFormReducer = (
 
 const CreateCourse: FC = () => {
   const navigate = useNavigate();
+
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
-  const paddingTop = useSafePaddingTop(48, 44);
+  const paddingTop = useSafePaddingTop(68, 44);
   const platformName = useSafePlatform();
+  const isTelegram = isTelegramApp();
+  const safeArea = useTelegramSafeArea();
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [filePreviews, setFilePreviews] = useState<
@@ -489,11 +493,15 @@ const CreateCourse: FC = () => {
     });
   };
 
+  const topPadding = isTelegram
+    ? safeArea.top > 0
+      ? safeArea.top + 64
+      : 64
+    : 0;
+
   return (
     <Container
-      paddingTop={
-        platformName === "desktop" ? paddingTop + 92 : paddingTop + 44
-      }
+      paddingTop={platformName === "desktop" ? paddingTop + 112 : topPadding}
     >
       {/* Header */}
       <Header title="Размещение: Классы/Школы" showGoBackBtn />

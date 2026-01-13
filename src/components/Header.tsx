@@ -40,7 +40,19 @@ const Header: FC<LocationHeaderProps> = ({
     navigate(-1);
   };
 
-  const topPadding = isTelegram ? (safeArea.top > 0 ? safeArea.top + 0 : 0) : 0;
+  const hasSafeArea = safeArea.top > 0;
+
+  const topPadding = isTelegram
+    ? safeArea.top > 0
+      ? safeArea.top + 48
+      : 0
+    : 0;
+
+  const topPadding2 = isTelegram
+    ? safeArea.top > 0
+      ? safeArea.top + 0
+      : 0
+    : 0;
 
   return (
     <div
@@ -49,31 +61,33 @@ const Header: FC<LocationHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: isTelegram ? 92 : 0,
+        paddingTop: isTelegram ? topPadding : 0,
         borderBottom: "1px solid " + c.surfaceColor,
         backgroundColor: isTelegram ? c.background : c.background,
         zIndex: 100,
       }}
     >
       {/* Location */}
-      <div
-        style={{
-          position: "absolute",
-          top: topPadding,
-          left: "50%",
-          transform: "translateX(-50%)",
-          paddingLeft: 16,
-          paddingRight: 16,
-          height: isTelegram ? 48 : 44,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          // backgroundColor: c.background,
-        }}
-      >
-        <LocationButton location={location} onClick={onLocationClick} />
-      </div>
+      {hasSafeArea && (
+        <div
+          style={{
+            position: "fixed",
+            top: topPadding2,
+            left: "50%",
+            transform: "translateX(-50%)",
+            paddingLeft: 16,
+            paddingRight: 16,
+            height: isTelegram ? 48 : 44,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            // backgroundColor: c.background,
+          }}
+        >
+          <LocationButton location={location} onClick={onLocationClick} />
+        </div>
+      )}
       <div
         style={{
           paddingRight: 16,
