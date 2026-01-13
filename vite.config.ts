@@ -12,7 +12,8 @@ export default defineConfig({
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
   server: {
-    allowedHosts: [".ngrok-free.dev", ".ngrok.io"],
+    port: 5175,
+    allowedHosts: [".ngrok-free.dev", ".ngrok.io", "slow-trains-shout.loca.lt"],
   },
   build: {
     outDir: isVercel ? "dist" : "docs",
