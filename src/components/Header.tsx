@@ -49,14 +49,21 @@ const Header: FC<LocationHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: topPadding,
+        paddingTop: isTelegram ? 92 : 0,
         borderBottom: "1px solid " + c.surfaceColor,
-        backgroundColor: c.background,
+        backgroundColor: isTelegram ? c.background : c.background,
         zIndex: 100,
       }}
     >
+      {/* Location */}
       <div
         style={{
+          position: "absolute",
+          top: topPadding,
+          left: "50%",
+          transform: "translateX(-50%)",
+          paddingLeft: 16,
+          paddingRight: 16,
           height: isTelegram ? 48 : 44,
           display: "flex",
           alignItems: "center",
@@ -79,7 +86,7 @@ const Header: FC<LocationHeaderProps> = ({
       >
         <div
           style={{
-            height: 44,
+            height: 64,
             display: "flex",
             flex: 1,
             alignItems: "center",
@@ -91,13 +98,14 @@ const Header: FC<LocationHeaderProps> = ({
           {showGoBackBtn && (
             <div
               style={{
-                marginLeft: -8,
                 paddingTop: 0,
                 width: 40,
                 height: 40,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                borderRadius: 8,
+                backgroundColor: c.controlColor,
                 cursor: "pointer",
               }}
               onClick={onGoBack}

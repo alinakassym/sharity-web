@@ -7,17 +7,29 @@ import { Colors } from "@/theme/colors";
 import VuesaxIcon from "./icons/VuesaxIcon";
 import { CloseWebViewButton } from "./CloseWebViewButton";
 import { isTelegramApp } from "@/lib/telegram";
+import LocationButton from "./LocationButton";
+import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
 
 interface ProductHeaderProps {
+  location?: string;
   onGoBack?: () => void;
   backTo?: string; // Путь страницы, на которую возвращаемся при закрытии
+  onLocationClick?: () => void;
 }
 
-const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack, backTo }) => {
+const ProductHeader: FC<ProductHeaderProps> = ({
+  location = "Астана",
+  onGoBack,
+  backTo,
+  onLocationClick,
+}) => {
   const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
+  const safeArea = useTelegramSafeArea();
   const isTelegram = isTelegramApp();
+
+  const topPadding = isTelegram ? (safeArea.top > 0 ? safeArea.top + 0 : 0) : 0;
 
   const handleClose = () => {
     // Переходим на указанную страницу или на главную по умолчанию
@@ -37,6 +49,25 @@ const ProductHeader: FC<ProductHeaderProps> = ({ onGoBack, backTo }) => {
         zIndex: 100,
       }}
     >
+      {/* Location */}
+      <div
+        style={{
+          position: "absolute",
+          top: topPadding,
+          left: "50%",
+          transform: "translateX(-50%)",
+          paddingLeft: 16,
+          paddingRight: 16,
+          height: isTelegram ? 48 : 44,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          // backgroundColor: c.background,
+        }}
+      >
+        <LocationButton location={location} onClick={onLocationClick} />
+      </div>
       <div
         style={{
           paddingLeft: 16,
