@@ -1,3 +1,5 @@
+// sharity-web/src/pages/sharity-web/Add.tsx
+
 import { useEffect } from "react";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
@@ -5,6 +7,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   useSafePaddingTop,
   useSafePlatform,
+  useTelegramSafeArea,
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
 import Container from "@/components/Container";
@@ -63,6 +66,7 @@ const Add: FC = () => {
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
   const platformName = useSafePlatform();
+  const safeArea = useTelegramSafeArea();
   const { userData, isLoading } = useCurrentUser();
 
   // Защита: перенаправляем на /auth-required если isConfirmed === false
@@ -83,7 +87,7 @@ const Add: FC = () => {
 
   return (
     <Container
-      showLocationHeader
+      showLocationHeader={safeArea.top > 0}
       paddingTop={platformName === "desktop" ? 48 : paddingTop}
     >
       {/* Main Content */}
