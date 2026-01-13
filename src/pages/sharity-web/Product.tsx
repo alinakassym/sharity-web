@@ -10,6 +10,7 @@ import ProductHeader from "@/components/ProductHeader";
 import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import Container from "@/components/Container";
+import Carousel from "@/components/Carousel";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,8 +45,7 @@ const Product: FC = () => {
           image:
             productData.imagesArray && productData.imagesArray.length > 0
               ? productData.imagesArray[0]
-              : productData.image ||
-                `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+              : "",
           category: productData.category || "",
         },
       },
@@ -59,17 +59,6 @@ const Product: FC = () => {
     maximumFractionDigits: 0,
   });
 
-  // Генерируем стабильный индекс для fallback картинки на основе ID
-  const getImageIndex = (id: string) => {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      const char = id.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash % 1000) + 1;
-  };
-
   // Функция для поиска роста по размеру купальника
   const getHeightForSize = (size: number): string | undefined => {
     const sizeData = leotardSizes.find((s) => s.size === size);
@@ -79,16 +68,12 @@ const Product: FC = () => {
   const product = productData
     ? {
         id: productData.id,
-        image:
-          // Приоритет отображения изображений:
-          // 1. Первое изображение из imagesArray
-          // 2. Параметр image из URL
-          // 3. Поле image (для совместимости)
-          // 4. Fallback заглушка
-          productData.imagesArray && productData.imagesArray.length > 0
-            ? productData.imagesArray[0]
-            : productData.image ||
-              `https://picsum.photos/600?${getImageIndex(productData.id)}`,
+        images:
+          productData.imagesArray?.map((imageUrl, index) => ({
+            id: `${productData.id}-${index}`,
+            image: imageUrl,
+            alt: productData.name,
+          })) || [],
         category: productData.category || "",
         subcategory: productData.subcategory || "",
         size: productData.productSize,
@@ -135,39 +120,38 @@ const Product: FC = () => {
   }
 
   return (
-    <Container paddingTop={isTelegram ? 112 : 64}>
+    <Container paddingTop={isTelegram ? 110 : 64}>
       {/* Header с кнопкой назад */}
       <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
 
       {/* Контент продукта */}
       <div
         style={{
-          padding: 16,
           display: "flex",
           flexDirection: "column",
-          gap: 8,
           height: "calc(100vh - 90px)",
           overflowY: "auto",
           boxSizing: "border-box",
         }}
       >
         {/* Изображение */}
-        <div style={{}}>
-          <img
-            src={product.image}
-            alt={product.title}
-            style={{
-              width: "100%",
-              aspectRatio: "1 / 1",
-              objectFit: "cover",
-              borderRadius: "12px",
-              border: `1px solid ${c.border}`,
-            }}
+        <div>
+          <Carousel
+            items={product.images}
+            aspectRatio={320 / 360}
+            autoPlay={false}
           />
         </div>
 
         {/* Информация о товаре */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div
+          style={{
+            padding: 16,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
           <div
             style={{
               fontSize: 14,
@@ -228,11 +212,11 @@ const Product: FC = () => {
         {/* Кнопки действий */}
         <div
           style={{
+            paddingLeft: 16,
+            paddingRight: 16,
             display: "flex",
             flexDirection: "column",
             gap: 8,
-            marginTop: 16,
-            paddingBottom: 48,
           }}
         >
           {/* Кнопка покупки */}

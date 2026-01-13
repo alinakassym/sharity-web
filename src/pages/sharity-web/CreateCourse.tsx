@@ -699,6 +699,8 @@ const CreateCourse: FC = () => {
                 onChange={(e) => setTempLocation(e.target.value)}
                 fullWidth
                 aria-readonly
+                multiline
+                rows={4}
                 sx={{
                   "& .MuiFormLabel-root": {
                     backgroundColor: c.surfaceColor,

@@ -425,28 +425,6 @@ const CreateEvent: FC = () => {
 
         {currentStep === "review" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <h3
-                style={{
-                  fontSize: 18,
-                  fontWeight: 600,
-                  color: c.text,
-                  margin: "0 0 8px",
-                }}
-              >
-                Предпросмотр
-              </h3>
-              <p
-                style={{
-                  fontSize: 14,
-                  color: c.lightText,
-                  margin: 0,
-                }}
-              >
-                Проверьте, как будет выглядеть публикация
-              </p>
-            </div>
-
             <div style={{ display: "flex", justifyContent: "center" }}>
               <EventCard
                 image={

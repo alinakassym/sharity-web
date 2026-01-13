@@ -13,6 +13,7 @@ interface CourseFromDB {
   category?: string;
   price?: number;
   description?: string;
+  shortDescription?: string;
   image?: string;
   imagesArray?: string[];
   isFavorite?: boolean;

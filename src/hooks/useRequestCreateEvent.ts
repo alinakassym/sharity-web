@@ -6,7 +6,7 @@ export interface CreateEventData {
   name: string;
   category: string;
   date: Date;
-  time: string;
+  time?: string;
   url?: string;
   description?: string;
   isFavorite?: boolean;

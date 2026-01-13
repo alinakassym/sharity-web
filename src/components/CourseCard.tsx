@@ -207,43 +207,43 @@ const CourseCard: FC<Props> = ({
               {priceText && <div style={chipStyle}>{priceText}</div>}
             </div>
           )}
-
-          {/* Meta (адрес) */}
-          {course.location && (
-            <div
-              style={{
-                fontSize: 12,
-                lineHeight: "18px",
-                color: c.lightText,
-                display: "flex",
-                gap: 4,
-                flexWrap: "wrap",
-              }}
-            >
-              <span style={{ paddingTop: 2 }}>
-                <VuesaxIcon name="location" size={12} />
-              </span>
-              <span>{course.location}</span>
-            </div>
-          )}
         </div>
       </Link>
 
-      {course?.shortDescription && (
-        <div
-          style={{
-            display: "flex",
-            gap: 4,
-            flexWrap: "wrap",
-            fontSize: 12,
-            fontWeight: 500,
-            lineHeight: "16px",
-          }}
-        >
-          {course.shortDescription}
-        </div>
-      )}
-
+      <div>
+        {/* Meta (адрес) */}
+        {course.location && (
+          <div
+            style={{
+              fontSize: 12,
+              lineHeight: "18px",
+              color: c.lightText,
+              display: "flex",
+              gap: 4,
+              flexWrap: "wrap",
+            }}
+          >
+            <span style={{ paddingTop: 2 }}>
+              <VuesaxIcon name="location" size={12} />
+            </span>
+            <span>{course.location}</span>
+          </div>
+        )}
+        {course?.shortDescription && (
+          <div
+            style={{
+              display: "flex",
+              gap: 4,
+              flexWrap: "wrap",
+              fontSize: 12,
+              fontWeight: 500,
+              lineHeight: "16px",
+            }}
+          >
+            {course.shortDescription}
+          </div>
+        )}
+      </div>
       {/* Actions row (кнопки контактов) - ВНЕ Link! */}
       {(whatsappLink || course.phone || telegramLink) && (
         <div

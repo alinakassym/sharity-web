@@ -9,6 +9,7 @@ import {
 
 export type EventCategory =
   | "Турниры"
+  | "Конкурсы"
   | "Мастер-классы"
   | "Развлечения"
   | "Другое";
@@ -30,6 +31,7 @@ const EventCategoryPicker: FC<EventCategoryPickerProps> = ({
 }) => {
   const categories: EventCategory[] = [
     "Турниры",
+    "Конкурсы",
     "Мастер-классы",
     "Развлечения",
     "Другое",
