@@ -129,8 +129,6 @@ const Product: FC = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          height: "calc(100vh - 90px)",
-          overflowY: "auto",
           boxSizing: "border-box",
         }}
       >

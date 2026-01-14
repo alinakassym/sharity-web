@@ -3,7 +3,7 @@
 import type { FC } from "react";
 import type { Dispatch } from "react";
 import { TextField } from "@mui/material";
-import CustomSelect from "@/components/CustomSelect";
+import ModalSelect from "./ModalSelect";
 
 type CreateFormAction = {
   type: "SET_FIELD";
@@ -39,7 +39,7 @@ export const StepDetails: FC<StepDetailsProps> = ({ form, dispatch }) => {
         variant="outlined"
       />
 
-      <CustomSelect
+      <ModalSelect
         label="Состояние"
         value={form.condition}
         onChange={(value) =>

@@ -154,7 +154,6 @@ const ModalSelect: FC<ModalSelectProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 2,
           }}
         >
           <Typography variant="h6" sx={{ m: 0 }}>
@@ -166,7 +165,7 @@ const ModalSelect: FC<ModalSelectProps> = ({
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ pt: 1, px: 0 }}>
+        <DialogContent sx={{ px: 0, pt: 0, pb: 0 }}>
           {searchable && (
             <Box sx={{ px: 2, my: 0.8 }}>
               <TextField
@@ -181,10 +180,8 @@ const ModalSelect: FC<ModalSelectProps> = ({
           )}
 
           <List
-            dense
             sx={{
               maxHeight: "70vh",
-              overflowY: "auto",
             }}
           >
             {filteredOptions.length === 0 ? (
@@ -216,24 +213,24 @@ const ModalSelect: FC<ModalSelectProps> = ({
                 );
               })
             )}
-          </List>
 
-          {/* опционально: быстрый сброс */}
-          {value && (
-            <Typography
-              variant="h6"
+            <ListItemButton
+              key={"__none__modal_select_reset"}
               onClick={() => handlePick("")}
               sx={{
-                mt: 2,
+                pt: 2,
+                pb: 2,
                 px: 3,
-                cursor: "pointer",
-                userSelect: "none",
-                color: "primary.main",
+                "& .MuiListItemText-primary": {
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "primary.main",
+                },
               }}
             >
-              Сбросить выбор
-            </Typography>
-          )}
+              <ListItemText primary="Сбросить выбор" />
+            </ListItemButton>
+          </List>
         </DialogContent>
       </Dialog>
     </>
