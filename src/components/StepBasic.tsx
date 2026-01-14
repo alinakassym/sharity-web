@@ -3,7 +3,7 @@
 import type { FC, RefObject } from "react";
 import type { Dispatch } from "react";
 import { TextField } from "@mui/material";
-import CustomSelect from "@/components/CustomSelect";
+import ModalSelect from "@/components/ModalSelect";
 
 type SelectOption = { value: string; label: string };
 
@@ -89,7 +89,8 @@ export const StepBasic: FC<StepBasicProps> = ({
         variant="outlined"
       />
 
-      <CustomSelect
+      <ModalSelect
+        searchable
         label="Категория"
         value={form.category}
         onChange={handleCategoryChange}
@@ -105,7 +106,8 @@ export const StepBasic: FC<StepBasicProps> = ({
 
       {form.category === "Гимнастика" && (
         <>
-          <CustomSelect
+          <ModalSelect
+            searchable
             label="Подкатегория"
             value={form.subcategory}
             onChange={handleSubcategoryChange}
@@ -125,7 +127,7 @@ export const StepBasic: FC<StepBasicProps> = ({
 
       {form.category === "Гимнастика" && form.subcategory === "Купальник" && (
         <>
-          <CustomSelect
+          <ModalSelect
             label="Размер"
             value={form.productSize}
             onChange={(value) => {
