@@ -75,7 +75,7 @@ export const StepBasic: FC<StepBasicProps> = ({
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <TextField
         label="Название товара *"
-        placeholder="Введите название товара"
+        placeholder="Например: Купальник для гимнастики"
         value={form.productName}
         onChange={(e) => {
           clearBasicError("productName");

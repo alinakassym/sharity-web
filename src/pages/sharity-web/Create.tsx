@@ -282,8 +282,12 @@ const Create: FC = () => {
         nextErrors.productSize = "Выберите размер";
       }
 
-      if (!form.price.trim() || Number(form.price) <= 0) {
-        nextErrors.price = "Укажите цену больше 0";
+      const price = Number(form.price);
+
+      if (!form.price.trim()) {
+        nextErrors.price = "Укажите цену";
+      } else if (Number.isNaN(price) || price < 2500) {
+        nextErrors.price = "Минимальная цена — 2500 ₸";
       }
 
       setBasicErrors(nextErrors);
