@@ -11,6 +11,8 @@ interface StepPhotosProps {
   filePreviews: Array<{ file: File; url: string }>;
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveFile: (index: number) => void;
+  coverImageIndex: number;
+  onSetCoverImage: (index: number) => void;
 }
 
 export const StepPhotos: FC<StepPhotosProps> = ({
@@ -18,6 +20,8 @@ export const StepPhotos: FC<StepPhotosProps> = ({
   filePreviews,
   onFileChange,
   onRemoveFile,
+  coverImageIndex,
+  onSetCoverImage,
 }) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
@@ -82,46 +86,73 @@ export const StepPhotos: FC<StepPhotosProps> = ({
               gap: 8,
             }}
           >
-            {selectedFiles.map((file, index) => (
-              <div
-                key={index}
-                style={{
-                  position: "relative",
-                  width: 80,
-                  height: 80,
-                  borderRadius: 8,
-                  overflow: "hidden",
-                  backgroundColor: c.controlColor,
-                }}
-              >
-                <img
-                  src={filePreviews[index]?.url}
-                  alt={file.name}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+            {selectedFiles.map((file, index) => {
+              const isCover = index === coverImageIndex;
 
-                <IconButton
-                  onClick={() => onRemoveFile(index)}
-                  size="small"
-                  sx={{
-                    position: "absolute",
-                    top: 4,
-                    right: 4,
-                    borderColor: c.error,
-                    borderWidth: 1,
-                    borderStyle: "solid",
-                    boxSizing: "content-box",
-                    backgroundColor: `${c.error}40`,
+              return (
+                <div
+                  key={index}
+                  onClick={() => onSetCoverImage(index)}
+                  style={{
+                    position: "relative",
+                    width: 80,
+                    height: 80,
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    backgroundColor: c.controlColor,
+                    cursor: "pointer",
                   }}
                 >
-                  <VuesaxIcon name="close" size={6} color={c.error} />
-                </IconButton>
-              </div>
-            ))}
+                  <img
+                    src={filePreviews[index]?.url}
+                    alt={file.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+
+                  {isCover && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 4,
+                        left: 4,
+                        backgroundColor: c.primary,
+                        color: c.lighter,
+                        fontSize: 10,
+                        fontWeight: 600,
+                        padding: "2px 6px",
+                        borderRadius: 4,
+                      }}
+                    >
+                      Главная
+                    </div>
+                  )}
+
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveFile(index);
+                    }}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      borderColor: c.error,
+                      borderWidth: 1,
+                      borderStyle: "solid",
+                      boxSizing: "content-box",
+                      backgroundColor: `${c.error}40`,
+                    }}
+                  >
+                    <VuesaxIcon name="close" size={6} color={c.error} />
+                  </IconButton>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

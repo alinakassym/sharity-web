@@ -107,6 +107,7 @@ const Create: FC = () => {
   const [filePreviews, setFilePreviews] = useState<
     Array<{ file: File; url: string }>
   >([]);
+  const [coverImageIndex, setCoverImageIndex] = useState<number>(0);
 
   const clearBasicError = (field: keyof typeof basicErrors) => {
     setBasicErrors((prev) => {
@@ -317,6 +318,9 @@ const Create: FC = () => {
       const { user } = getTelegramUser();
       const createdBy = user?.username || user?.first_name || undefined;
 
+      const imagesArrayForUpload: string[] = [...imagesArray];
+      const [cover] = imagesArray.splice(coverImageIndex, 1);
+      imagesArray.unshift(cover);
       const productData = {
         name: form.productName.trim(),
         category: form.category,
@@ -326,7 +330,7 @@ const Create: FC = () => {
         description: form.description.trim() || undefined,
         condition: form.condition || undefined,
         isFavorite: false,
-        imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
+        imagesArray: imagesArray.length > 0 ? imagesArrayForUpload : undefined,
         createdBy,
       };
 
@@ -358,10 +362,20 @@ const Create: FC = () => {
     );
 
     dispatch({ type: "ADD_FILES", files: imageFiles });
+    if (form.selectedFiles.length === 0) setCoverImageIndex(0);
+    event.target.value = "";
   };
 
-  const removeFile = (indexToRemove: number) => {
-    dispatch({ type: "REMOVE_FILE", index: indexToRemove });
+  const removeFile = (index: number) => {
+    dispatch({ type: "REMOVE_FILE", index });
+
+    setFilePreviews((prev) => prev.filter((_, i) => i !== index));
+
+    setCoverImageIndex((prevCover) => {
+      if (index === prevCover) return 0;
+      if (index < prevCover) return Math.max(prevCover - 1, 0);
+      return prevCover;
+    });
   };
 
   return (
@@ -491,6 +505,8 @@ const Create: FC = () => {
                 filePreviews={filePreviews}
                 onFileChange={handleFileChange}
                 onRemoveFile={removeFile}
+                coverImageIndex={coverImageIndex}
+                onSetCoverImage={setCoverImageIndex}
               />
             )}
 
