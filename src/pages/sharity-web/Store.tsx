@@ -137,7 +137,10 @@ const Store: FC = () => {
       />
       <div
         style={{
-          padding: 16,
+          paddingTop: 16,
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingBottom: 80,
           display: "flex",
           flexDirection: "column",
           gap: 16,

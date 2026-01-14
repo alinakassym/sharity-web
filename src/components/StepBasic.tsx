@@ -50,6 +50,7 @@ interface StepBasicProps {
   subcategoryInputRef: RefObject<HTMLInputElement | null>;
   sizeInputRef: RefObject<HTMLInputElement | null>;
   priceInputRef: RefObject<HTMLInputElement | null>;
+  contentRef: RefObject<HTMLDivElement | null>;
 }
 
 export const StepBasic: FC<StepBasicProps> = ({
@@ -68,6 +69,7 @@ export const StepBasic: FC<StepBasicProps> = ({
   subcategoryInputRef,
   sizeInputRef,
   priceInputRef,
+  contentRef,
 }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -170,6 +172,12 @@ export const StepBasic: FC<StepBasicProps> = ({
         fullWidth
         variant="outlined"
         inputRef={priceInputRef}
+        onFocus={() => {
+          // даём клавиатуре открыться, иначе скролл часто “съедается”
+          setTimeout(() => {
+            contentRef.current?.scrollBy({ top: 124, behavior: "smooth" });
+          }, 1850);
+        }}
       />
     </div>
   );

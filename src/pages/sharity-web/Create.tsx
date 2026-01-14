@@ -93,6 +93,8 @@ const formReducer = (
 };
 
 const Create: FC = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const [currentStep, setCurrentStep] = useState<StepType>("basic");
   const [isPublishing, setIsPublishing] = useState(false);
   const [basicErrors, setBasicErrors] = useState<{
@@ -367,159 +369,178 @@ const Create: FC = () => {
       {/* Header */}
       <Header title="Размещение: Продажа" showGoBackBtn />
 
-      {/* Progress Bar */}
       <div
         style={{
-          padding: "16px 16px 8px",
-          backgroundColor: c.background,
-        }}
-      >
-        <Stepper
-          activeStep={currentStepIndex}
-          alternativeLabel
-          aria-label="Шаги создания объявления"
-        >
-          {steps.map((step) => (
-            <Step key={step.id}>
-              <StepLabel
-                sx={{
-                  "& .MuiStepLabel-label": {
-                    position: "absolute",
-                    width: 1,
-                    height: 1,
-                    padding: 0,
-                    margin: -1,
-                    overflow: "hidden",
-                    clip: "rect(0, 0, 0, 0)",
-                    whiteSpace: "nowrap",
-                    border: 0,
-                  },
-                }}
-              >
-                {step.title}
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-
-        <div style={{ textAlign: "center", marginTop: 16 }}>
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: "600",
-              color: c.lightText,
-              margin: 0,
-            }}
-          >
-            {steps[currentStepIndex].title}
-          </p>
-          <p
-            style={{
-              fontSize: 14,
-              color: c.lightText,
-              margin: 0,
-            }}
-          >
-            {steps[currentStepIndex].description}
-          </p>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div
-        style={{
-          padding: "16px 16px 100px",
-          height: "calc(100vh - 290px)",
-          overflowY: "auto",
-          backgroundColor: c.background,
-        }}
-      >
-        {currentStep === "basic" && (
-          <StepBasic
-            form={form}
-            dispatch={dispatch}
-            basicErrors={basicErrors}
-            clearBasicError={clearBasicError}
-            categoryOptions={categoryOptions.map((cat) => ({
-              value: cat.name_ru,
-              label: cat.name_ru,
-            }))}
-            gymnasticsSubcategoryOptions={gymnasticsSubcategoryOptions.map(
-              (cat) => ({
-                value: cat.name_ru,
-                label: cat.name_ru,
-              }),
-            )}
-            leotardSizeOptions={leotardSizeOptions}
-            isLoadingCategories={isLoadingCategories}
-            isLoadingGymnasticsCategories={isLoadingGymnasticsCategories}
-            isLoadingLeotardSizes={isLoadingLeotardSizes}
-            handleCategoryChange={handleCategoryChange}
-            handleSubcategoryChange={handleSubcategoryChange}
-            subcategoryInputRef={subcategoryInputRef}
-            sizeInputRef={sizeInputRef}
-            priceInputRef={priceInputRef}
-          />
-        )}
-
-        {currentStep === "photos" && (
-          <StepPhotos
-            selectedFiles={form.selectedFiles}
-            filePreviews={filePreviews}
-            onFileChange={handleFileChange}
-            onRemoveFile={removeFile}
-          />
-        )}
-
-        {currentStep === "details" && (
-          <StepDetails form={form} dispatch={dispatch} />
-        )}
-
-        {currentStep === "review" && (
-          <StepReview form={form} filePreviews={filePreviews} />
-        )}
-      </div>
-
-      {/* Bottom Navigation */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
+          position: "absolute",
+          top: 0,
           left: 0,
           right: 0,
-          padding: "16px 16px 32px",
-          backgroundColor: c.background,
-          borderTop: `1px solid ${c.surfaceColor}`,
+          bottom: 0,
+          paddingTop:
+            platformName === "desktop" ? paddingTop + 92 : paddingTop + 64,
           display: "flex",
-          alignItems: "flex-start",
+          flexDirection: "column",
           justifyContent: "space-between",
-          gap: 8,
-          zIndex: 99,
+          height: "100%",
+          backgroundColor: c.background,
         }}
       >
-        {currentStepIndex > 0 && (
+        <div>
+          {/* Progress Bar */}
+          <div
+            style={{
+              padding: "16px 16px 8px",
+              backgroundColor: c.background,
+            }}
+          >
+            <Stepper
+              activeStep={currentStepIndex}
+              alternativeLabel
+              aria-label="Шаги создания объявления"
+            >
+              {steps.map((step) => (
+                <Step key={step.id}>
+                  <StepLabel
+                    sx={{
+                      "& .MuiStepLabel-label": {
+                        position: "absolute",
+                        width: 1,
+                        height: 1,
+                        padding: 0,
+                        margin: -1,
+                        overflow: "hidden",
+                        clip: "rect(0, 0, 0, 0)",
+                        whiteSpace: "nowrap",
+                        border: 0,
+                      },
+                    }}
+                  >
+                    {step.title}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color: c.lightText,
+                  margin: 0,
+                }}
+              >
+                {steps[currentStepIndex].title}
+              </p>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: c.lightText,
+                  margin: 0,
+                }}
+              >
+                {steps[currentStepIndex].description}
+              </p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div
+            ref={contentRef}
+            style={{
+              padding: 16,
+              backgroundColor: c.background,
+            }}
+          >
+            {currentStep === "basic" && (
+              <StepBasic
+                contentRef={contentRef}
+                form={form}
+                dispatch={dispatch}
+                basicErrors={basicErrors}
+                clearBasicError={clearBasicError}
+                categoryOptions={categoryOptions.map((cat) => ({
+                  value: cat.name_ru,
+                  label: cat.name_ru,
+                }))}
+                gymnasticsSubcategoryOptions={gymnasticsSubcategoryOptions.map(
+                  (cat) => ({
+                    value: cat.name_ru,
+                    label: cat.name_ru,
+                  }),
+                )}
+                leotardSizeOptions={leotardSizeOptions}
+                isLoadingCategories={isLoadingCategories}
+                isLoadingGymnasticsCategories={isLoadingGymnasticsCategories}
+                isLoadingLeotardSizes={isLoadingLeotardSizes}
+                handleCategoryChange={handleCategoryChange}
+                handleSubcategoryChange={handleSubcategoryChange}
+                subcategoryInputRef={subcategoryInputRef}
+                sizeInputRef={sizeInputRef}
+                priceInputRef={priceInputRef}
+              />
+            )}
+
+            {currentStep === "photos" && (
+              <StepPhotos
+                selectedFiles={form.selectedFiles}
+                filePreviews={filePreviews}
+                onFileChange={handleFileChange}
+                onRemoveFile={removeFile}
+              />
+            )}
+
+            {currentStep === "details" && (
+              <StepDetails form={form} dispatch={dispatch} />
+            )}
+
+            {currentStep === "review" && (
+              <StepReview form={form} filePreviews={filePreviews} />
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Navigation */}
+        <div
+          style={{
+            position: "relative",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: "16px 16px 32px",
+            backgroundColor: c.background,
+            borderTop: `1px solid ${c.surfaceColor}`,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 8,
+            zIndex: 99,
+          }}
+        >
+          {currentStepIndex > 0 && (
+            <Button
+              size="large"
+              fullWidth={true}
+              variant="outlined"
+              onClick={handleBack}
+            >
+              Назад
+            </Button>
+          )}
           <Button
             size="large"
-            fullWidth={true}
-            variant="outlined"
-            onClick={handleBack}
+            fullWidth
+            variant="contained"
+            onClick={handleNext}
+            disabled={isPublishing}
           >
-            Назад
+            {currentStepIndex === steps.length - 1
+              ? isPublishing
+                ? "Публикуем..."
+                : "Опубликовать"
+              : "Далее"}
           </Button>
-        )}
-        <Button
-          size="large"
-          fullWidth
-          variant="contained"
-          onClick={handleNext}
-          disabled={isPublishing}
-        >
-          {currentStepIndex === steps.length - 1
-            ? isPublishing
-              ? "Публикуем..."
-              : "Опубликовать"
-            : "Далее"}
-        </Button>
+        </div>
       </div>
     </Container>
   );

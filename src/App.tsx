@@ -33,6 +33,8 @@ import PaymentMethods from "./pages/sharity-web/PaymentMethods";
 import AddCard from "./pages/sharity-web/AddCard";
 import { isTelegramApp } from "./lib/telegram";
 
+import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
+
 const AppContent: FC = () => {
   const isTelegram = isTelegramApp();
   const { pathname } = useLocation();
@@ -41,9 +43,16 @@ const AppContent: FC = () => {
   const showStoreTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
     path,
   );
+  const safeArea = useTelegramSafeArea();
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100vw",
+        height: `calc(100vh - ${safeArea.top})`,
+      }}
+    >
       {/* Инициализация пользователя Telegram при старте */}
       {isTelegram && <TelegramUserInit />}
 
