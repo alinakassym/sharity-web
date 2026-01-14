@@ -15,14 +15,22 @@ interface StepReviewProps {
     selectedFiles: File[];
   };
   filePreviews: Array<{ file: File; url: string }>;
+  coverImageIndex: number;
 }
 
-export const StepReview: FC<StepReviewProps> = ({ form, filePreviews }) => {
+export const StepReview: FC<StepReviewProps> = ({
+  form,
+  filePreviews,
+  coverImageIndex,
+}) => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const previewImage =
-    filePreviews[0]?.url ?? "https://picsum.photos/600?preview";
-  const additionalPreviews = filePreviews.slice(1);
+    filePreviews[coverImageIndex]?.url ?? "https://picsum.photos/600?preview";
+  const additionalPreviews = [
+    ...filePreviews.slice(0, coverImageIndex),
+    ...filePreviews.slice(coverImageIndex + 1),
+  ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

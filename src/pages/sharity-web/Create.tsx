@@ -26,6 +26,8 @@ import { getTelegramUser } from "@/lib/telegram";
 import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
 import { useNavigate } from "react-router-dom";
 
+import { moveSelectedToStart } from "@/utils";
+
 type StepType = "basic" | "photos" | "details" | "review";
 
 type CreateFormState = {
@@ -318,9 +320,6 @@ const Create: FC = () => {
       const { user } = getTelegramUser();
       const createdBy = user?.username || user?.first_name || undefined;
 
-      const imagesArrayForUpload: string[] = [...imagesArray];
-      const [cover] = imagesArray.splice(coverImageIndex, 1);
-      imagesArray.unshift(cover);
       const productData = {
         name: form.productName.trim(),
         category: form.category,
@@ -330,7 +329,10 @@ const Create: FC = () => {
         description: form.description.trim() || undefined,
         condition: form.condition || undefined,
         isFavorite: false,
-        imagesArray: imagesArray.length > 0 ? imagesArrayForUpload : undefined,
+        imagesArray:
+          imagesArray.length > 0
+            ? moveSelectedToStart(imagesArray, coverImageIndex)
+            : undefined,
         createdBy,
       };
 
@@ -515,7 +517,11 @@ const Create: FC = () => {
             )}
 
             {currentStep === "review" && (
-              <StepReview form={form} filePreviews={filePreviews} />
+              <StepReview
+                form={form}
+                filePreviews={filePreviews}
+                coverImageIndex={coverImageIndex}
+              />
             )}
           </div>
         </div>
