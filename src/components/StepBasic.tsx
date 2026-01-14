@@ -4,6 +4,7 @@ import type { FC, RefObject } from "react";
 import type { Dispatch } from "react";
 import { TextField } from "@mui/material";
 import ModalSelect from "@/components/ModalSelect";
+import { CustomTextField } from "./CustomTextField";
 
 type SelectOption = { value: string; label: string };
 
@@ -73,7 +74,8 @@ export const StepBasic: FC<StepBasicProps> = ({
 }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <TextField
+      <CustomTextField
+        maxSymbols={50}
         label="Название товара *"
         placeholder="Например: Купальник для гимнастики"
         value={form.productName}

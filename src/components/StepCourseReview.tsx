@@ -1,10 +1,11 @@
 // shirarity-web/src/components/StepCourseReview.tsx
 
 import { type FC, type Dispatch, useState } from "react";
-import { Switch, TextField, FormControlLabel } from "@mui/material";
+import { Switch, FormControlLabel } from "@mui/material";
 import CourseCard from "@/components/CourseCard";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import { CustomTextField } from "./CustomTextField";
 
 type CreateCourseSetFieldAction = {
   type: "SET_FIELD";
@@ -124,7 +125,8 @@ export const StepCourseReview: FC<StepCourseReviewProps> = ({
 
         {showShortDescription && (
           <div style={{ marginTop: 16 }}>
-            <TextField
+            <CustomTextField
+              maxSymbols={100}
               fullWidth
               multiline
               rows={3}

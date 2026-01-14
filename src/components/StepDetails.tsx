@@ -2,8 +2,8 @@
 
 import type { FC } from "react";
 import type { Dispatch } from "react";
-import { TextField } from "@mui/material";
 import ModalSelect from "./ModalSelect";
+import { CustomTextField } from "./CustomTextField";
 
 type CreateFormAction = {
   type: "SET_FIELD";
@@ -22,7 +22,8 @@ interface StepDetailsProps {
 export const StepDetails: FC<StepDetailsProps> = ({ form, dispatch }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <TextField
+      <CustomTextField
+        maxSymbols={500}
         label="Описание товара"
         placeholder="Опишите товар подробно: состояние, размер, особенности..."
         value={form.description}

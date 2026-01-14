@@ -4,6 +4,7 @@ import type { Dispatch, FC, SetStateAction } from "react";
 import { TextField } from "@mui/material";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
+import { CustomTextField } from "./CustomTextField";
 
 type CreateCourseSetFieldAction = {
   type: "SET_FIELD";
@@ -53,7 +54,8 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
   const c = Colors[scheme];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <TextField
+      <CustomTextField
+        maxRows={500}
         label="Описание"
         placeholder="Опишите подробно"
         value={form.description}
@@ -92,7 +94,8 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
           Возрастная группа
         </h3>
         <div style={{ display: "flex", gap: 16 }}>
-          <TextField
+          <CustomTextField
+            maxSymbols={10}
             label="От (лет)"
             type="number"
             placeholder="5"
@@ -103,7 +106,8 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
             variant="outlined"
             style={{ flex: 1 }}
           />
-          <TextField
+          <CustomTextField
+            maxSymbols={10}
             label="До (лет)"
             type="number"
             placeholder="12"
@@ -147,7 +151,8 @@ export const StepCourseDetails: FC<StepCourseDetailsProps> = ({
           variant="outlined"
           style={{ marginBottom: 16 }}
         />
-        <TextField
+        <CustomTextField
+          maxSymbols={50}
           label="Описание цены (опционально)"
           placeholder="Например: абонемент 25 000₸/мес или цена по запросу"
           value={form.priceText}

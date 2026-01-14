@@ -28,6 +28,7 @@ import EventCategoryPicker, {
 } from "@/components/EventCategoryPicker";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
+import { CustomTextField } from "@/components/CustomTextField";
 
 type StepType = "basic" | "location" | "photos" | "details" | "review";
 
@@ -233,7 +234,8 @@ const CreateEvent: FC = () => {
       >
         {currentStep === "basic" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <TextField
+            <CustomTextField
+              maxSymbols={50}
               label="Заголовок *"
               placeholder="Введите заголовок"
               value={eventName}
@@ -401,7 +403,8 @@ const CreateEvent: FC = () => {
 
         {currentStep === "details" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <TextField
+            <CustomTextField
+              maxSymbols={1000}
               label="Описание"
               placeholder="Опишите подробно"
               value={description}

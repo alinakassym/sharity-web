@@ -1,8 +1,8 @@
 // sharity-web/src/components/StepCourseBasic.tsx
 
 import type { Dispatch, FC } from "react";
-import { TextField } from "@mui/material";
 import CustomSelect from "@/components/CustomSelect";
+import { CustomTextField } from "./CustomTextField";
 
 type CreateCourseSetFieldAction = {
   type: "SET_FIELD";
@@ -33,7 +33,8 @@ export const StepCourseBasic: FC<StepCourseBasicProps> = ({
 }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <TextField
+      <CustomTextField
+        maxSymbols={50}
         label="Название *"
         placeholder="Введите название"
         value={form.courseName}
