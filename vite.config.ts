@@ -7,7 +7,7 @@ const isVercel = !!process.env.VERCEL;
 export default defineConfig({
   base: "/",
   plugins: [react()],
-  assetsInclude: ["**/*.html"],
+  // assetsInclude: ["**/*.html"],
   resolve: {
     dedupe: ["react", "react-dom"],
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
