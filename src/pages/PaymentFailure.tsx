@@ -1,3 +1,5 @@
+// src/pages/PaymentFailure.tsx
+
 import { useEffect } from "react";
 import type { FC } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";

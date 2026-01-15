@@ -31,6 +31,7 @@ import PaymentFailure from "./pages/PaymentFailure";
 import Checkout from "./pages/Checkout";
 import PaymentMethods from "./pages/PaymentMethods";
 import AddCard from "./pages/AddCard";
+import PaymentWidget from "./pages/PaymentWidget";
 import { isTelegramApp } from "./lib/telegram";
 
 import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
@@ -80,6 +81,7 @@ const AppContent: FC = () => {
         <Route path="payment/success" element={<PaymentSuccess />} />
         <Route path="payment/failure" element={<PaymentFailure />} />
         <Route path="payment-methods" element={<PaymentMethods />} />
+        <Route path="/payment" element={<PaymentWidget />} />
         <Route path="add-card" element={<AddCard />} />
       </Routes>
       {showMainTabBar && <MainTabBar />}

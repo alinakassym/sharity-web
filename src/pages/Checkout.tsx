@@ -28,7 +28,7 @@ const Checkout: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const { userData } = useCurrentUser();
-  const { initiatePayment, isLoading: isPaymentLoading } = useEpayPayment();
+  const { isLoading: isPaymentLoading } = useEpayPayment();
   const { savePendingOrder } = useRequestSavePendingOrder();
 
   const handleBackClick = () => {
@@ -115,6 +115,11 @@ const Checkout: FC = () => {
     // Сохраняем данные заказа в Firestore (вместо sessionStorage)
     const saveResult = await savePendingOrder(invoiceId, orderData);
 
+    if (saveResult.success) {
+      navigate(`/payment?invoiceId=${invoiceId}`);
+      return;
+    }
+
     if (!saveResult.success) {
       alert("Ошибка при сохранении данных заказа");
       return;
@@ -128,28 +133,6 @@ const Checkout: FC = () => {
         invoiceId,
       }),
     );
-
-    const paymentResult = await initiatePayment({
-      amount: totalAmount,
-      description: `Покупка: ${product.name}`,
-      invoiceId, // Передаём invoiceId в платёжную систему
-      accountId: userData?.telegramId?.toString() || "guest",
-      payerName:
-        `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim() ||
-        "Покупатель",
-    });
-
-    // Проверяем результат оплаты
-    if (paymentResult.success) {
-      // Оплата прошла успешно - переходим на страницу успеха
-      console.log("Payment successful, navigating to success page");
-      navigate(`/payment/success?invoiceId=${invoiceId}`);
-    } else {
-      // Оплата не прошла или виджет закрыт - остаёмся на этой странице
-      console.log("Payment was not successful or widget closed");
-      // Очищаем данные заказа
-      sessionStorage.removeItem("pendingOrder");
-    }
   };
 
   return (

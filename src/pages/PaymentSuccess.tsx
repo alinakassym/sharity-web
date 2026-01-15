@@ -1,3 +1,5 @@
+// src/pages/PaymentSuccess.tsx
+
 import { useEffect, useState } from "react";
 import type { FC } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
