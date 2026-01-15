@@ -30,7 +30,7 @@ const Home: FC = () => {
     {
       id: "1",
       image: bannerImage,
-      alt: "INTERTOP - Мечтай. Играй. Побеждай!",
+      alt: "IZUMRUD - школа гимнастики",
     },
     {
       id: "2",
