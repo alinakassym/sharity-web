@@ -1,4 +1,4 @@
-// sharity-web/src/lib/minio.ts
+// src/lib/minio.ts
 
 import {
   S3Client,

@@ -1,4 +1,4 @@
-// sharity-web/src/lib/telegram.ts
+// src/lib/telegram.ts
 
 export type TGUser = {
   id: number;

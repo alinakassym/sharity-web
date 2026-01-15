@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/PaymentMethods.tsx
+// src/pages/PaymentMethods.tsx
 
 import { useState } from "react";
 import type { FC } from "react";

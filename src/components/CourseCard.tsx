@@ -1,4 +1,4 @@
-// sharity-web/src/components/CourseCard.tsx
+// src/components/CourseCard.tsx
 
 import { type FC } from "react";
 import { Link } from "react-router-dom";

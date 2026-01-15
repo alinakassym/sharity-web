@@ -1,4 +1,4 @@
-// sharity-web/src/components/Container.tsx
+// src/components/Container.tsx
 
 import type { FC, ReactNode } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";

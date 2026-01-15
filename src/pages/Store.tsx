@@ -1,25 +1,34 @@
-// sharity-web/src/pages/sharity-web/Courses.tsx
+// src/pages/Store.tsx
 
 import type { FC } from "react";
 import { useState, useMemo } from "react";
-import { Colors } from "@/theme/colors";
+import { useLocation } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
 import {
   useSafePaddingTop,
   useSafePlatform,
 } from "@/hooks/useTelegramSafeArea";
-import { useRequestGetCourses } from "@/hooks/useRequestGetCourses";
-import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
-import { useFavorites } from "@/hooks/useFavorites";
 import SearchHeader from "@/components/SearchHeader";
 import CategoryFilter, { type Category } from "@/components/CategoryFilter";
 import CategoryFilterSkeleton from "@/components/CategoryFilterSkeleton";
-import CourseGrid from "@/components/CourseGrid";
-import CourseCardSkeleton from "@/components/CourseCardSkeleton";
-import { type CourseData } from "@/components/CourseCard";
+import ProductGrid from "@/components/ProductGrid";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import type { ProductData } from "@/components/ProductCard";
+import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
+import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
+import { useFavorites } from "@/hooks/useFavorites";
 import Container from "@/components/Container";
 
-const Courses: FC = () => {
+const KZT = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "KZT",
+  maximumFractionDigits: 0,
+});
+
+const Store: FC = () => {
+  const location = useLocation();
+
   const scheme = useColorScheme();
   const c = Colors[scheme];
 
@@ -29,12 +38,16 @@ const Courses: FC = () => {
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
-  const { courses: rows, isLoading: isLoadingCourses } = useRequestGetCourses();
+  const { products: rows, isLoading: isLoadingProducts } =
+    useRequestGetProducts();
   const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
     useRequestGetCategories();
 
-  // Получаем список избранных курсов текущего пользователя
-  const { favorites: favoriteCourseIds } = useFavorites("course");
+  // Получаем список избранных продуктов текущего пользователя
+  const { favorites: favoriteProductIds } = useFavorites("product");
+
+  // Определяем, откуда была открыта страница
+  const backTo = (location.state as { from?: string })?.from || "/";
 
   // Преобразуем категории из Firebase в формат Category для CategoryFilter
   const categories: Category[] = useMemo(() => {
@@ -45,20 +58,17 @@ const Courses: FC = () => {
     }));
   }, [categoriesFromFirebase]);
 
-  // Firestore - CourseData (для грида)
-  const courses: CourseData[] = useMemo(
+  // Firestore -> ProductData (для грида)
+  const products: ProductData[] = useMemo(
     () =>
       rows.map((r, i) => {
-        // ➕ Приоритет отображения изображений:
-        // 1. coverImage (главное изображение)
-        // 2. Первое изображение из imagesArray
-        // 3. Поле image (для совместимости)
-        // 4. Fallback заглушка
+        // Приоритет отображения изображений:
+        // 1. Первое изображение из imagesArray
+        // 2. Поле image (для совместимости)
+        // 3. Fallback заглушка
         let imageUrl = `https://picsum.photos/600?${i + 1}`;
 
-        if (r.coverImage) {
-          imageUrl = r.coverImage;
-        } else if (r.imagesArray && r.imagesArray.length > 0) {
+        if (r.imagesArray && r.imagesArray.length > 0) {
           imageUrl = r.imagesArray[0];
         } else if (r.image) {
           imageUrl = r.image;
@@ -69,19 +79,8 @@ const Courses: FC = () => {
           image: imageUrl,
           category: r.category ?? "",
           title: r.name ?? "",
-          shortDescription: r.shortDescription ?? "",
+          price: KZT.format(Number(r.price) || 0),
           isFavorite: r.isFavorite ?? false,
-          ageFrom: r.ageFrom,
-          ageTo: r.ageTo,
-          priceFrom: r.priceFrom,
-          priceText: r.priceText,
-          location:
-            r.locations && r.locations.length > 0
-              ? r.locations[0].location
-              : undefined,
-          phone: r.phone,
-          whatsapp: r.whatsapp,
-          telegram: r.telegram,
         };
       }),
     [rows],
@@ -95,7 +94,7 @@ const Courses: FC = () => {
   // фильтрация по категориям и поиску
   const filtered = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
-    return courses.filter((p) => {
+    return products.filter((p) => {
       // Проверяем, выбрана ли категория "Избранное"
       const isFavoritesSelected = selectedLabels.has("Избранное");
 
@@ -103,8 +102,8 @@ const Courses: FC = () => {
       let byCat = true;
       if (selectedLabels.size > 0) {
         if (isFavoritesSelected) {
-          // Если выбрано "Избранное" - показываем только избранные курсы пользователя
-          byCat = favoriteCourseIds.has(p.id);
+          // Если выбрано "Избранное" - показываем только избранные продукты пользователя
+          byCat = favoriteProductIds.has(p.id);
         } else {
           // Иначе фильтруем по обычным категориям
           byCat = selectedLabels.has(p.category);
@@ -119,7 +118,7 @@ const Courses: FC = () => {
 
       return byCat && byQuery;
     });
-  }, [courses, selectedLabels, searchValue, favoriteCourseIds]);
+  }, [products, selectedLabels, searchValue, favoriteProductIds]);
 
   return (
     <Container
@@ -131,11 +130,17 @@ const Courses: FC = () => {
             : paddingTop + 64
       }
     >
-      <SearchHeader searchValue={searchValue} onSearchChange={setSearchValue} />
-
+      <SearchHeader
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        backTo={backTo}
+      />
       <div
         style={{
-          padding: 16,
+          paddingTop: 16,
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingBottom: 80,
           display: "flex",
           flexDirection: "column",
           gap: 16,
@@ -154,24 +159,24 @@ const Courses: FC = () => {
           />
         )}
 
-        {isLoadingCourses ? (
+        {isLoadingProducts ? (
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr",
+              gridTemplateColumns: "repeat(2, 1fr)",
               gap: 12,
             }}
           >
-            {Array.from({ length: 5 }).map((_, index) => (
-              <CourseCardSkeleton key={index} />
+            {Array.from({ length: 6 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
             ))}
           </div>
         ) : (
-          <CourseGrid courses={filtered} />
+          <ProductGrid products={filtered} fromPage={backTo} />
         )}
       </div>
     </Container>
   );
 };
 
-export default Courses;
+export default Store;

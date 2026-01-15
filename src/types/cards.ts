@@ -1,4 +1,4 @@
-// sharity-web/src/types/cards.ts
+// src/types/cards.ts
 
 import type { Timestamp } from "firebase/firestore";
 

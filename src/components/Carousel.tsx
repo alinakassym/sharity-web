@@ -1,4 +1,4 @@
-// sharity-web/src/components/Carousel.tsx
+// src/components/Carousel.tsx
 
 import type { FC } from "react";
 import { useState, useEffect, useRef, useCallback } from "react";

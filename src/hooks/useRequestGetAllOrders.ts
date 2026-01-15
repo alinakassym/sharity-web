@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestGetAllOrders.ts
+// src/hooks/useRequestGetAllOrders.ts
 
 import { useEffect, useState } from "react";
 import {

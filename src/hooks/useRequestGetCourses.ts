@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestGetCourses.ts
+// src/hooks/useRequestGetCourses.ts
 
 import { useEffect, useState } from "react";
 import {

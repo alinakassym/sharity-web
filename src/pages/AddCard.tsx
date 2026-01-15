@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/AddCard.tsx
+// src/pages/AddCard.tsx
 
 import { useState } from "react";
 import type { FC } from "react";

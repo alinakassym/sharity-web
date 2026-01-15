@@ -1,4 +1,4 @@
-// sharity-web/src/components/LocationHeader.tsx
+// src/components/LocationHeader.tsx
 
 import type { FC } from "react";
 import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";

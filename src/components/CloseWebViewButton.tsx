@@ -1,4 +1,4 @@
-// sharity-web/src/components/CloseWebViewButton.tsx
+// src/components/CloseWebViewButton.tsx
 
 import { useMemo } from "react";
 import type { FC } from "react";

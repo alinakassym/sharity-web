@@ -1,4 +1,4 @@
-// sharity-web/src/lib/mongo.ts
+// src/lib/mongo.ts
 
 import { MongoClient } from "mongodb";
 

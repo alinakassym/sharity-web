@@ -1,4 +1,4 @@
-// sharity-web/src/api/products.ts
+// src/api/products.ts
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { queryCollection } from "@/server/queryCollection";

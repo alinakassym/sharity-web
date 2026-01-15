@@ -1,4 +1,4 @@
-// sharity-web/src/components/CourseCardSkeleton.tsx
+// src/components/CourseCardSkeleton.tsx
 
 import { type FC } from "react";
 import { Skeleton } from "@mui/material";

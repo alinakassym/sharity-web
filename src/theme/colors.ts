@@ -1,4 +1,4 @@
-// sharity-web/src/theme/colors.ts
+// src/theme/colors.ts
 
 const primaryColor = "#907BE2";
 const accentColor = "#00ECBE";

@@ -1,7 +1,14 @@
-// sharity-web/src/hooks/useRequestSaveCard.ts
+// src/hooks/useRequestSaveCard.ts
 
 import { useState } from "react";
-import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export const useRequestSaveCard = () => {
@@ -23,7 +30,7 @@ export const useRequestSaveCard = () => {
       const existingCardsQuery = query(
         cardsRef,
         where("userId", "==", userId),
-        where("isDeleted", "==", false)
+        where("isDeleted", "==", false),
       );
       const snapshot = await getDocs(existingCardsQuery);
       const isFirstCard = snapshot.empty;
@@ -49,9 +56,7 @@ export const useRequestSaveCard = () => {
       return { success: true, cardId: docId };
     } catch (err) {
       const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Ошибка при сохранении карты";
+        err instanceof Error ? err.message : "Ошибка при сохранении карты";
       setError(errorMessage);
       setIsLoading(false);
       return { success: false, error: errorMessage };

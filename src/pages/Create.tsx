@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/Create.tsx
+// src/pages/Create.tsx
 
 import type { FC } from "react";
 import { useState, useEffect, useMemo, useRef, useReducer } from "react";

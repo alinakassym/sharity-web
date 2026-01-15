@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/Home.tsx
+// src/pages/Home.tsx
 
 import type { FC } from "react";
 import { useMemo } from "react";

@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from "node:url";
 const isVercel = !!process.env.VERCEL;
 
 export default defineConfig({
-  base: isVercel ? "/" : "/sharity-web/",
+  base: "/",
   plugins: [react()],
   resolve: {
     dedupe: ["react", "react-dom"],

@@ -1,4 +1,4 @@
-// sharity-web/api/payment/callback.ts
+// api/payment/callback.ts
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { initializeApp, getApps, cert } from "firebase-admin/app";

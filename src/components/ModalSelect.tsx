@@ -1,4 +1,4 @@
-// sharity-web/src/components/ModalSelect.tsx
+// src/components/ModalSelect.tsx
 
 import type { FC, RefObject } from "react";
 import { useId, useMemo, useState } from "react";

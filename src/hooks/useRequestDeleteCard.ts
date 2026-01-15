@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestDeleteCard.ts
+// src/hooks/useRequestDeleteCard.ts
 
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
@@ -25,9 +25,7 @@ export const useRequestDeleteCard = () => {
       return { success: true };
     } catch (err) {
       const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Ошибка при удалении карты";
+        err instanceof Error ? err.message : "Ошибка при удалении карты";
       setError(errorMessage);
       setIsLoading(false);
       return { success: false, error: errorMessage };

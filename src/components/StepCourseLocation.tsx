@@ -1,4 +1,4 @@
-// sharity-web/src/components/StepCourseLocation.tsx
+// src/components/StepCourseLocation.tsx
 
 import type { FC } from "react";
 import { forwardRef } from "react";

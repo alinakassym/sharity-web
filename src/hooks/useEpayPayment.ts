@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useEpayPayment.ts
+// src/hooks/useEpayPayment.ts
 
 import { useState, useCallback } from "react";
 import { completeOrderFromPending } from "@/lib/orders";
@@ -261,7 +261,12 @@ export const useEpayPayment = () => {
         const currency = params.currency || EPAY_CONFIG.currency;
 
         // Получаем токен с той же валютой, что и платёж
-        const token = await getToken(invoiceId, params.amount, secretHash, currency);
+        const token = await getToken(
+          invoiceId,
+          params.amount,
+          secretHash,
+          currency,
+        );
 
         // Загружаем библиотеку
         await loadPaymentLib();
@@ -304,7 +309,10 @@ export const useEpayPayment = () => {
 
           window.halyk.showPaymentWidget(paymentObject, async (result) => {
             console.log("Payment widget callback:", result);
-            console.log("Payment widget callback - full result stringified:", JSON.stringify(result, null, 2));
+            console.log(
+              "Payment widget callback - full result stringified:",
+              JSON.stringify(result, null, 2),
+            );
 
             // Проверяем результат оплаты
             // EPAY виджет может вернуть разные форматы результата:
@@ -321,7 +329,9 @@ export const useEpayPayment = () => {
               }
               // Или проверяем поле status
               else if ("status" in resultObj) {
-                paymentSuccess = resultObj.status === "success" || resultObj.status === "APPROVED";
+                paymentSuccess =
+                  resultObj.status === "success" ||
+                  resultObj.status === "APPROVED";
               }
             }
 
@@ -340,20 +350,30 @@ export const useEpayPayment = () => {
             if (paymentSuccess) {
               // Если это обычный платёж (не сохранение карты) - создаём заказ
               if (!params.cardSave) {
-                console.log("Payment successful, creating order immediately...");
+                console.log(
+                  "Payment successful, creating order immediately...",
+                );
                 try {
                   const orderResult = await completeOrderFromPending(invoiceId);
                   if (orderResult.success) {
-                    console.log(`Order created successfully: ${orderResult.orderId}`);
+                    console.log(
+                      `Order created successfully: ${orderResult.orderId}`,
+                    );
                   } else {
-                    console.error(`Failed to create order: ${orderResult.error}`);
+                    console.error(
+                      `Failed to create order: ${orderResult.error}`,
+                    );
                   }
                 } catch (err) {
                   console.error("Error creating order:", err);
                 }
               } else {
                 // Это Card Verification - логируем данные карты
-                console.log("Card verification successful:", { cardId, cardMask, cardType });
+                console.log("Card verification successful:", {
+                  cardId,
+                  cardMask,
+                  cardType,
+                });
               }
             } else {
               console.log("Payment was not successful, order not created");

@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestGetGymnasticsCategories.ts
+// src/hooks/useRequestGetGymnasticsCategories.ts
 
 import { useState, useEffect } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";

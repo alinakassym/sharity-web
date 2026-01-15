@@ -1,4 +1,4 @@
-// sharity-web/src/lib/firebase.ts
+// src/lib/firebase.ts
 
 import { initializeApp, getApp } from "firebase/app";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";

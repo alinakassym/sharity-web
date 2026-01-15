@@ -1,4 +1,4 @@
-// sharity-web/src/components/SavedCardItem.tsx
+// src/components/SavedCardItem.tsx
 
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";

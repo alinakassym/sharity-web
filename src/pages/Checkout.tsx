@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/Checkout.tsx
+// src/pages/Checkout.tsx
 
 import { useState, useEffect } from "react";
 import type { FC } from "react";

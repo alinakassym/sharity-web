@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useFavorites.ts
+// src/hooks/useFavorites.ts
 
 import { useEffect, useState, useCallback } from "react";
 import {

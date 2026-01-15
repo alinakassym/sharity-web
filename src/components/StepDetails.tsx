@@ -1,4 +1,4 @@
-// sharity-web/src/components/StepDetails.tsx
+// src/components/StepDetails.tsx
 
 import type { FC } from "react";
 import type { Dispatch } from "react";

@@ -1,4 +1,4 @@
-// sharity-web/src/components/Header.tsx
+// src/components/Header.tsx
 
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";

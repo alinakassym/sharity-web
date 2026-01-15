@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/Product.tsx
+// src/pages/Product.tsx
 
 import type { FC } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";

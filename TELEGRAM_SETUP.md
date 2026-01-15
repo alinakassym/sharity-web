@@ -17,7 +17,7 @@
 Добавлен скрипт: `https://telegram.org/js/telegram-web-app.js`
 
 ### 3. Интегрирован с Profile
-Файл: `src/pages/sharity-web/Profile.tsx`
+Файл: `src/pages/Profile.tsx`
 
 Страница профиля теперь показывает:
 - Имя пользователя из Telegram

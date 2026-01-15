@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/Add.tsx
+// src/pages/Add.tsx
 
 import { useEffect } from "react";
 import type { FC } from "react";

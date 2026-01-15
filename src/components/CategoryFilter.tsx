@@ -1,4 +1,4 @@
-// sharity-web/src/components/CategoryFilter.tsx
+// src/components/CategoryFilter.tsx
 import { useMemo } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "../hooks/useColorScheme";

@@ -1,4 +1,4 @@
-// sharity-web/src/components/CustomSelect.tsx
+// src/components/CustomSelect.tsx
 
 import type { FC, RefObject } from "react";
 import {

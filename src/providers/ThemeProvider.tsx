@@ -1,4 +1,4 @@
-// sharity-web/src/providers/ThemeProvider.tsx
+// src/providers/ThemeProvider.tsx
 
 import type { FC, ReactNode } from "react";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";

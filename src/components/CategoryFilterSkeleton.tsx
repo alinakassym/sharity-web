@@ -1,4 +1,4 @@
-// sharity-web/src/components/CategoryFilterSkeleton.tsx
+// src/components/CategoryFilterSkeleton.tsx
 
 import { type FC } from "react";
 import { Skeleton } from "@mui/material";

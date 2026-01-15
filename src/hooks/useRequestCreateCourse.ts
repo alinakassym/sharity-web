@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestCreateCourse.ts
+// src/hooks/useRequestCreateCourse.ts
 
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";

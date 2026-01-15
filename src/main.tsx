@@ -1,4 +1,4 @@
-// sharity-web/src/main.tsx
+// src/main.tsx
 
 import { useEffect } from "react";
 import { StrictMode } from "react";

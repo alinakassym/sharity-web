@@ -1,6 +1,6 @@
-import type { FC } from 'react';
-import { useColorScheme } from '../../hooks/useColorScheme';
-import { Colors } from "../../theme/colors";
+import type { FC } from "react";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { Colors } from "../theme/colors";
 
 const Cart: FC = () => {
   const scheme = useColorScheme();

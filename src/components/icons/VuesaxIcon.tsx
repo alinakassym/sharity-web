@@ -1,4 +1,4 @@
-// sharity-web/src/components/icons/VuesaxIcon.tsx
+// src/components/icons/VuesaxIcon.tsx
 
 import type { FC } from "react";
 

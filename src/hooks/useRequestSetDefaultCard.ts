@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestSetDefaultCard.ts
+// src/hooks/useRequestSetDefaultCard.ts
 
 import { useState } from "react";
 import {

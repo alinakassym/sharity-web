@@ -1,4 +1,4 @@
-// sharity-web/src/components/StepCoursePhotos.tsx
+// src/components/StepCoursePhotos.tsx
 
 import type { FC } from "react";
 import { Button, IconButton } from "@mui/material";

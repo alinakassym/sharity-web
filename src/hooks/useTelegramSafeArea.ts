@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useTelegramSafeArea.ts
+// src/hooks/useTelegramSafeArea.ts
 
 import { useState, useEffect } from "react";
 import { getTG, isTelegramApp } from "@/lib/telegram";

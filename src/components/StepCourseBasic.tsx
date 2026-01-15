@@ -1,4 +1,4 @@
-// sharity-web/src/components/StepCourseBasic.tsx
+// src/components/StepCourseBasic.tsx
 
 import type { Dispatch, FC } from "react";
 import CustomSelect from "@/components/CustomSelect";

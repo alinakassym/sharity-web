@@ -1,4 +1,4 @@
-// sharity-web/src/components/LocationButton.tsx
+// src/components/LocationButton.tsx
 
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";

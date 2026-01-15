@@ -1,4 +1,4 @@
-// sharity-web/src/server/queryCollection.ts
+// src/server/queryCollection.ts
 
 import type { Document, Filter, Sort, WithId } from "mongodb";
 import { getDb } from "@/lib/mongo";

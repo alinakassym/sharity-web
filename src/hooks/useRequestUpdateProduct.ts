@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestUpdateProduct.ts
+// src/hooks/useRequestUpdateProduct.ts
 
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";

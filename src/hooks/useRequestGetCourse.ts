@@ -1,4 +1,4 @@
-// sharity-web/src/hooks/useRequestGetCourse.ts
+// src/hooks/useRequestGetCourse.ts
 
 import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";

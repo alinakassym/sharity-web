@@ -1,43 +1,22 @@
-// sharity-web/src/pages/sharity-web/Orders.tsx
+// src/pages/MyOrders.tsx
 
 import type { FC } from "react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Timestamp } from "firebase/firestore";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import {
-  useSafePaddingTop,
-  useSafePlatform,
-} from "@/hooks/useTelegramSafeArea";
+import { isTelegramApp } from "@/lib/telegram";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useRequestGetAllOrders } from "@/hooks/useRequestGetAllOrders";
+import { useRequestGetOrders } from "@/hooks/useRequestGetOrders";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
-import LoadingScreen from "@/components/LoadingScreen";
-import Container from "@/components/Container";
-import PageHeader from "@/components/PageHeader";
 
-const Orders: FC = () => {
-  const navigate = useNavigate();
+const MyOrders: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const paddingTop = useSafePaddingTop(48, 0);
-  const platformName = useSafePlatform();
-  const { userData, isLoading: isLoadingUser } = useCurrentUser();
-
-  // Получаем все заказы (без фильтра по пользователю)
-  const { orders, isLoading: isLoadingOrders } = useRequestGetAllOrders();
-
-  // Проверяем права доступа
-  const isManagerOrAdmin =
-    userData?.role === "manager" || userData?.role === "admin";
-
-  // Перенаправляем, если нет прав доступа
-  useEffect(() => {
-    if (!isLoadingUser && !isManagerOrAdmin) {
-      navigate("/", { replace: true });
-    }
-  }, [isLoadingUser, isManagerOrAdmin, navigate]);
+  const isTelegram = isTelegramApp();
+  const { userData } = useCurrentUser();
+  const { orders, isLoading } = useRequestGetOrders(
+    userData?.telegramId?.toString(),
+  );
 
   // Форматирование цены
   const KZT = new Intl.NumberFormat("ru-RU", {
@@ -50,12 +29,14 @@ const Orders: FC = () => {
   const formatDate = (date?: Date | Timestamp) => {
     if (!date) return "";
 
+    // Если это Firestore Timestamp, конвертируем в Date
     let d: Date;
     if (date instanceof Timestamp) {
       d = date.toDate();
     } else if (date instanceof Date) {
       d = date;
     } else {
+      // Если это что-то другое (например, объект с секундами)
       d = new Date(date as unknown as string);
     }
 
@@ -84,19 +65,14 @@ const Orders: FC = () => {
     }
   };
 
-  if (isLoadingUser || !isManagerOrAdmin) {
-    return <LoadingScreen />;
-  }
-
   return (
-    <Container
-      paddingTop={
-        platformName === "desktop"
-          ? 64
-          : platformName === "unknown"
-            ? 64
-            : paddingTop + 64
-      }
+    <section
+      style={{
+        paddingTop: isTelegram ? 48 : 44,
+        minHeight: "100vh",
+        paddingBottom: "160px",
+        backgroundColor: c.background,
+      }}
     >
       <div
         style={{
@@ -106,10 +82,20 @@ const Orders: FC = () => {
           gap: 16,
         }}
       >
-        <PageHeader title="Заказы" backTo="/profile" />
+        {/* Header */}
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: c.text,
+            margin: 0,
+          }}
+        >
+          Мои заказы
+        </h1>
 
         {/* Loading */}
-        {isLoadingOrders && (
+        {isLoading && (
           <div
             style={{
               display: "flex",
@@ -124,7 +110,7 @@ const Orders: FC = () => {
         )}
 
         {/* Empty state */}
-        {!isLoadingOrders && orders.length === 0 && (
+        {!isLoading && orders.length === 0 && (
           <div
             style={{
               display: "flex",
@@ -143,13 +129,13 @@ const Orders: FC = () => {
                 margin: 0,
               }}
             >
-              Пока нет заказов
+              У вас пока нет заказов
             </p>
           </div>
         )}
 
         {/* Orders list */}
-        {!isLoadingOrders &&
+        {!isLoading &&
           orders.map((order) => {
             const statusInfo = getStatusLabel(order.status);
             return (
@@ -246,14 +232,6 @@ const Orders: FC = () => {
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <span style={{ color: c.lightText }}>Покупатель</span>
-                    <span style={{ color: c.text }}>
-                      {order.buyerName || "Не указан"}
-                    </span>
-                  </div>
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
                     <span style={{ color: c.lightText }}>Дата заказа</span>
                     <span style={{ color: c.text }}>
                       {formatDate(order.createdAt)}
@@ -290,8 +268,8 @@ const Orders: FC = () => {
             );
           })}
       </div>
-    </Container>
+    </section>
   );
 };
 
-export default Orders;
+export default MyOrders;

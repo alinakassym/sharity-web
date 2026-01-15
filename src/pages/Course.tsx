@@ -1,4 +1,4 @@
-// sharity-web/src/pages/sharity-web/Course.tsx
+// src/pages/Course.tsx
 
 import type { FC } from "react";
 import { useParams } from "react-router-dom";

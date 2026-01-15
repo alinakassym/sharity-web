@@ -1,4 +1,4 @@
-// sharity-web/src/theme/muiTheme.ts
+// src/theme/muiTheme.ts
 
 import { createTheme } from "@mui/material/styles";
 import type { Theme } from "@mui/material/styles";

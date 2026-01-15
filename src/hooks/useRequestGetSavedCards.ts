@@ -1,12 +1,7 @@
-// sharity-web/src/hooks/useRequestGetSavedCards.ts
+// src/hooks/useRequestGetSavedCards.ts
 
 import { useEffect, useState } from "react";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { SavedCard } from "@/types/cards";
 
@@ -25,7 +20,7 @@ export const useRequestGetSavedCards = (userId?: string) => {
     const q = query(
       cardsRef,
       where("userId", "==", userId),
-      where("isDeleted", "==", false)
+      where("isDeleted", "==", false),
     );
 
     const unsubscribe = onSnapshot(
@@ -50,7 +45,7 @@ export const useRequestGetSavedCards = (userId?: string) => {
         console.error("Error fetching cards:", err);
         setError(err.message);
         setIsLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();

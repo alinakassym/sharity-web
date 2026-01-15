@@ -1,4 +1,4 @@
-// sharity-web/src/components/CourseGrid.tsx
+// src/components/CourseGrid.tsx
 
 import type { FC } from "react";
 import CourseCard, { type CourseData } from "@/components/CourseCard";
