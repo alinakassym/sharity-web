@@ -1,7 +1,6 @@
 // src/hooks/useEpayPayment.ts
 
 import { useState, useCallback } from "react";
-import { completeOrderFromPending } from "@/lib/orders";
 
 // EPAY Configuration (тестовая среда)
 const EPAY_CONFIG = {
@@ -68,6 +67,8 @@ declare global {
     };
   }
 }
+
+const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
 
 export const useEpayPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -275,10 +276,10 @@ export const useEpayPayment = () => {
         const paymentObject = {
           invoiceId,
           invoiceIdAlt: invoiceId,
-          backLink: `${window.location.origin}/payment/success`,
-          failureBackLink: `${window.location.origin}/payment/failure`,
-          postLink: `${window.location.origin}/api/payment/callback`, // Webhook для успешной оплаты
-          failurePostLink: `${window.location.origin}/api/payment/callback`, // Тот же endpoint обработает ошибки
+          backLink: `${APP_BASE_URL}/payment/success?invoiceId=${invoiceId}`,
+          failureBackLink: `${APP_BASE_URL}/payment/failure?invoiceId=${invoiceId}`,
+          postLink: `${APP_BASE_URL}/api/payment/callback`,
+          failurePostLink: `${APP_BASE_URL}/api/payment/callback`,
           language: "RUS",
           description: params.description,
           accountId: params.accountId || "guest",
@@ -306,6 +307,11 @@ export const useEpayPayment = () => {
             });
             return;
           }
+
+          console.log("EPAY LINKS", {
+            backLink: `${APP_BASE_URL}/payment/success?invoiceId=${invoiceId}`,
+            postLink: `${APP_BASE_URL}/api/payment/callback`,
+          });
 
           window.halyk.showPaymentWidget(paymentObject, async (result) => {
             console.log("Payment widget callback:", result);
@@ -348,35 +354,11 @@ export const useEpayPayment = () => {
             const cardType = resultObj.cardType as string | undefined;
 
             if (paymentSuccess) {
-              // Если это обычный платёж (не сохранение карты) - создаём заказ
-              if (!params.cardSave) {
-                console.log(
-                  "Payment successful, creating order immediately...",
-                );
-                try {
-                  const orderResult = await completeOrderFromPending(invoiceId);
-                  if (orderResult.success) {
-                    console.log(
-                      `Order created successfully: ${orderResult.orderId}`,
-                    );
-                  } else {
-                    console.error(
-                      `Failed to create order: ${orderResult.error}`,
-                    );
-                  }
-                } catch (err) {
-                  console.error("Error creating order:", err);
-                }
-              } else {
-                // Это Card Verification - логируем данные карты
-                console.log("Card verification successful:", {
-                  cardId,
-                  cardMask,
-                  cardType,
-                });
-              }
+              console.log(
+                "Payment successful. Waiting for server callback (postLink)...",
+              );
             } else {
-              console.log("Payment was not successful, order not created");
+              console.log("Payment was not successful");
             }
 
             setIsLoading(false);

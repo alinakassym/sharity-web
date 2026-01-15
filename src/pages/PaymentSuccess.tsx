@@ -1,166 +1,110 @@
 // src/pages/PaymentSuccess.tsx
 
-import { useEffect, useState } from "react";
 import type { FC } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
-import Container from "@/components/Container";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
+import { doc, getDoc } from "firebase/firestore";
+
+import { db } from "@/lib/firebase";
+
+type PendingOrder = {
+  orderNumber?: string;
+  totalAmount?: number;
+  productName?: string;
+  paymentStatus?: "paid" | "failed" | "pending";
+};
 
 const PaymentSuccess: FC = () => {
   const navigate = useNavigate();
-  const scheme = useColorScheme();
-  const c = Colors[scheme];
   const [searchParams] = useSearchParams();
 
-  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const invoiceId = useMemo(() => {
+    const value = searchParams.get("invoiceId");
+    return value?.trim() || "";
+  }, [searchParams]);
 
-  // Получаем параметры из URL (переданные от EPAY)
-  const invoiceId = searchParams.get("invoiceId");
+  const [pendingOrder, setPendingOrder] = useState<PendingOrder | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Просто получаем orderNumber из sessionStorage для отображения
-    const pendingOrderData = sessionStorage.getItem("pendingOrder");
-    if (pendingOrderData) {
-      const orderData = JSON.parse(pendingOrderData);
-      if (orderData.orderNumber) {
-        setOrderNumber(orderData.orderNumber);
-      }
-    }
+    const load = async () => {
+      if (!invoiceId) return;
 
-    // НЕ создаём заказ здесь - заказ будет создан автоматически через 30 секунд после открытия виджета
-    // Эта страница теперь только показывает успешный результат
-  }, []);
+      try {
+        setLoading(true);
+        setLoadError(null);
+
+        const ref = doc(db, "pendingOrders", invoiceId);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          setPendingOrder(null);
+          setLoadError("pendingOrder не найден по invoiceId");
+          return;
+        }
+
+        setPendingOrder(snap.data() as PendingOrder);
+      } catch (e) {
+        setLoadError(e instanceof Error ? e.message : "Ошибка загрузки");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
+  }, [invoiceId]);
+
+  const orderNumber = pendingOrder?.orderNumber || "—";
+  const status = pendingOrder?.paymentStatus;
 
   return (
-    <Container paddingTop={64}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "60vh",
-          padding: 24,
-          textAlign: "center",
-        }}
-      >
-        {/* Success icon */}
-        <div
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            backgroundColor: `${c.primary}20`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 24,
-          }}
-        >
-          <VuesaxIcon name="tick-circle" size={48} color={c.primary} />
+    <div style={{ padding: 16 }}>
+      <h2 style={{ margin: 0 }}>Оплата завершена</h2>
+
+      <div style={{ marginTop: 12, fontSize: 14 }}>
+        <div>
+          <b>invoiceId:</b> {invoiceId || "—"}
+        </div>
+        <div style={{ marginTop: 6 }}>
+          <b>Номер заказа:</b> {orderNumber}
         </div>
 
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: c.text,
-            margin: "0 0 12px",
-          }}
-        >
-          Оплата прошла успешно!
-        </h1>
+        {loading && <div style={{ marginTop: 8 }}>Проверяю статус…</div>}
 
-        <p
-          style={{
-            fontSize: 16,
-            color: c.lightText,
-            margin: "0 0 8px",
-            lineHeight: 1.5,
-          }}
-        >
-          Спасибо за покупку! Ваш платеж успешно обработан.
-        </p>
-
-        {orderNumber && (
-          <p
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              color: c.primary,
-              margin: "8px 0 16px",
-            }}
-          >
-            Номер заказа: {orderNumber}
-          </p>
+        {loadError && (
+          <div style={{ marginTop: 8, color: "#FF6B6B" }}>{loadError}</div>
         )}
 
-        {/* Debug info */}
-        <div
-          style={{
-            fontSize: 12,
-            color: c.lightText,
-            margin: "8px 0 16px",
-            padding: 12,
-            backgroundColor: c.surfaceColor,
-            borderRadius: 8,
-            textAlign: "left",
-            maxWidth: 400,
-          }}
-        >
-          <div>Debug info:</div>
-          <div>- Order number: {orderNumber || "null"}</div>
-          <div>- Invoice ID: {invoiceId || "null"}</div>
-          <div>
-            Заказ будет автоматически создан через 30 секунд после оплаты
+        {!loading && !loadError && (
+          <div style={{ marginTop: 8 }}>
+            {status === "paid" && <div>✅ Оплата подтверждена. Спасибо!</div>}
+
+            {status === "failed" && (
+              <div>⚠️ Оплата отмечена как неуспешная.</div>
+            )}
+
+            {!status || status === "pending" ? (
+              <div>
+                ⏳ Оплата ещё не подтверждена сервером. Если ты только что
+                оплатила — подожди пару секунд и обнови страницу.
+              </div>
+            ) : null}
           </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            width: "100%",
-            maxWidth: 300,
-          }}
-        >
-          <button
-            onClick={() => navigate("/orders")}
-            style={{
-              padding: "16px",
-              backgroundColor: c.primary,
-              color: c.lighter,
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Мои заказы
-          </button>
-
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              padding: "16px",
-              backgroundColor: c.controlColor,
-              color: c.text,
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            На главную
-          </button>
-        </div>
+        )}
       </div>
-    </Container>
+
+      <div style={{ marginTop: 16, display: "flex", gap: 12 }}>
+        <Button variant="outlined" onClick={() => navigate("/")}>
+          На главную
+        </Button>
+
+        <Button variant="contained" onClick={() => window.location.reload()}>
+          Обновить статус
+        </Button>
+      </div>
+    </div>
   );
 };
 

@@ -2,117 +2,179 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-// Инициализация Firebase Admin (только один раз)
+// Firebase Admin init (один раз)
 if (!getApps().length) {
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+  const privateKeyRaw = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+
+  if (!projectId || !clientEmail || !privateKeyRaw) {
+    throw new Error(
+      "Missing Firebase Admin env vars: FIREBASE_PROJECT_ID / FIREBASE_ADMIN_CLIENT_EMAIL / FIREBASE_ADMIN_PRIVATE_KEY",
+    );
+  }
+
+  const privateKey = privateKeyRaw.replace(/\\n/g, "\n");
+
   initializeApp({
     credential: cert({
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      projectId,
+      clientEmail,
+      privateKey,
     }),
   });
 }
 
 const db = getFirestore();
 
+type PaymentStatus = "pending" | "paid" | "failed";
+
 interface EpayCallbackData {
-  invoiceId?: string;
+  // платеж
+  invoiceId?: string; // иногда может прийти как invoiceID — проверим ниже тоже
+  invoiceID?: string;
   amount?: number;
   currency?: string;
   terminal?: string;
-  status?: string; // Для платежей
-  code?: string; // Для Card Verification (ok/error)
-  accountId?: string; // Account ID для верификации карт
-  // Поля для сохранённой карты (Card Verification)
+
+  status?: string; // например "CHARGE"
+  code?: string | number; // например 0
+  reason?: string;
+  reference?: string;
+
+  // card verification
+  accountId?: string;
   cardId?: string;
   cardMask?: string;
   cardType?: string;
-  card_id?: string; // Альтернативные названия полей
+
+  // альтернативные варианты полей (иногда так приходит)
+  card_id?: string;
   card_mask?: string;
   card_type?: string;
-  // Добавьте другие поля согласно документации EPAY
 }
 
+const toUpper = (v: unknown) =>
+  String(v ?? "")
+    .trim()
+    .toUpperCase();
+const toLower = (v: unknown) =>
+  String(v ?? "")
+    .trim()
+    .toLowerCase();
+
+/**
+ * Успешная операция по платежу в твоих данных:
+ * status = "CHARGE"
+ * code = 0
+ */
+const isSuccessfulPayment = (status: unknown, code: unknown): boolean => {
+  const s = toUpper(status);
+  const c = String(code ?? "").trim();
+
+  // code 0/00 — success (встречается как number 0 или string "0")
+  const codeOk = c === "0" || c === "00";
+
+  // статусы успеха (под твою реальность)
+  const statusOk = ["CHARGE", "APPROVED", "SUCCESS"].includes(s);
+
+  return codeOk && statusOk;
+};
+
+const isSuccessfulCardVerification = (code: unknown): boolean => {
+  // иногда приходит как "ok"
+  return toLower(code) === "ok";
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Разрешаем только POST запросы
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+  console.log("CALLBACK HIT", new Date().toISOString());
 
   try {
+    const callbackData = (req.body || {}) as EpayCallbackData;
+
+    const invoiceId =
+      String(callbackData.invoiceId || callbackData.invoiceID || "").trim() ||
+      undefined;
+
+    const status = callbackData.status;
+    const code = callbackData.code;
+
     console.log("=== EPAY CALLBACK START ===");
-    console.log("EPAY callback received:", JSON.stringify(req.body, null, 2));
-    console.log("EPAY callback - all keys:", Object.keys(req.body));
-    console.log("Request headers:", JSON.stringify(req.headers, null, 2));
+    console.log("invoiceId:", invoiceId);
+    console.log("status:", status, "code:", code);
+    console.log("body keys:", Object.keys(callbackData));
 
-    const callbackData = req.body as EpayCallbackData;
-    const {
-      invoiceId,
-      status,
-      code,
-      cardId,
-      cardMask,
-      cardType,
-      card_id,
-      card_mask,
-      card_type,
-      accountId,
-    } = callbackData;
+    const paymentSuccess = isSuccessfulPayment(status, code);
+    const cardVerificationSuccess = isSuccessfulCardVerification(code);
+    const isSuccess = paymentSuccess || cardVerificationSuccess;
 
-    console.log("Card data in webhook:", {
-      cardId: cardId || card_id,
-      cardMask: cardMask || card_mask,
-      cardType: cardType || card_type,
-      accountId,
-      status,
-      code,
-    });
+    // --- ВЕТКА: НЕУСПЕХ ---
+    if (!isSuccess) {
+      console.log(`❌ Operation not successful. status=${status} code=${code}`);
 
-    // Проверяем успешность:
-    // - Для платежей: status === "success" или "APPROVED"
-    // - Для Card Verification: code === "ok"
-    const isPaymentSuccess = status === "success" || status === "APPROVED";
-    const isCardVerificationSuccess = code === "ok";
+      if (invoiceId) {
+        const pendingRef = db.collection("pendingOrders").doc(invoiceId);
+        const pendingSnap = await pendingRef.get();
 
-    if (!isPaymentSuccess && !isCardVerificationSuccess) {
-      console.log(
-        `❌ Operation not successful. Status: ${status}, Code: ${code}`,
-      );
-      return res.status(200).json({ message: "Operation not successful" });
+        if (pendingSnap.exists) {
+          await pendingRef.set(
+            {
+              paymentStatus: "failed" as PaymentStatus,
+              paymentError: {
+                status: status ?? null,
+                code: code ?? null,
+                reason: callbackData.reason ?? null,
+              },
+              updatedAt: FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+          );
+
+          console.log(`Pending order ${invoiceId} marked as failed`);
+        } else {
+          console.log(
+            `Pending order ${invoiceId} not found. Nothing to mark as failed.`,
+          );
+        }
+      }
+
+      // ePay обычно ожидает 200, чтобы не ретраить бесконечно
+      console.log("=== EPAY CALLBACK END (FAILED) ===");
+      return res
+        .status(200)
+        .json({ success: false, message: "Not successful" });
     }
 
-    console.log(`✅ Operation successful. Status: ${status}, Code: ${code}`);
+    console.log(`✅ Operation successful. status=${status} code=${code}`);
 
-    // Получаем данные из pendingOrders (если есть invoiceId)
-    const pendingOrderRef = invoiceId
+    // --- Пытаемся понять: это платеж или верификация карты ---
+    const pendingRef = invoiceId
       ? db.collection("pendingOrders").doc(invoiceId)
       : null;
-    const pendingOrderDoc = pendingOrderRef
-      ? await pendingOrderRef.get()
-      : null;
+    const pendingSnap = pendingRef ? await pendingRef.get() : null;
 
-    // Если нет pendingOrder - это верификация карты
-    if (!pendingOrderDoc || !pendingOrderDoc.exists) {
-      console.log("No pending order found - treating as card verification");
+    // --- ВЕТКА: CARD VERIFICATION (если pendingOrder не найден) ---
+    if (!pendingSnap || !pendingSnap.exists) {
+      console.log("No pending order found -> treating as card verification");
 
-      // Проверяем что есть данные карты
-      const finalCardId = cardId || card_id;
-      const finalCardMask = cardMask || card_mask;
-      const finalCardType = cardType || card_type;
+      const accountId = callbackData.accountId;
+      const finalCardId = callbackData.cardId || callbackData.card_id;
+      const finalCardMask = callbackData.cardMask || callbackData.card_mask;
+      const finalCardType = callbackData.cardType || callbackData.card_type;
 
+      if (!accountId) {
+        return res.status(400).json({ error: "Account ID missing" });
+      }
       if (!finalCardId || !finalCardMask || !finalCardType) {
-        console.error("Card data missing in webhook");
         return res.status(400).json({ error: "Card data missing" });
       }
 
-      if (!accountId) {
-        console.error("Account ID missing in webhook");
-        return res.status(400).json({ error: "Account ID missing" });
-      }
-
-      // Проверяем есть ли уже существующие карты пользователя
+      // первая карта будет default
       const existingCardsQuery = await db
         .collection("savedCards")
         .where("userId", "==", accountId)
@@ -121,63 +183,96 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const isFirstCard = existingCardsQuery.empty;
 
-      // Сохраняем карту в Firestore
       const cardDocId = `${accountId}_${finalCardId}`;
-      await db.collection("savedCards").doc(cardDocId).set({
-        userId: accountId,
-        cardId: finalCardId,
-        cardMask: finalCardMask,
-        cardType: finalCardType,
-        isDefault: isFirstCard, // Первая карта автоматически становится default
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isDeleted: false,
-      });
 
-      console.log(
-        `✅ Card ${cardDocId} saved successfully for user ${accountId}`,
+      await db.collection("savedCards").doc(cardDocId).set(
+        {
+          userId: accountId,
+          cardId: finalCardId,
+          cardMask: finalCardMask,
+          cardType: finalCardType,
+          isDefault: isFirstCard,
+          isDeleted: false,
+          createdAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
       );
-      console.log("=== EPAY CALLBACK END (Card Verification) ===");
 
+      console.log(`✅ Card saved: ${cardDocId}`);
+      console.log("=== EPAY CALLBACK END (CARD VERIFICATION) ===");
+      return res.status(200).json({ success: true, message: "Card saved" });
+    }
+
+    // --- ВЕТКА: PAYMENT (pendingOrder найден) ---
+    const pendingData = pendingSnap.data() || {};
+    const existingPaymentStatus = pendingData.paymentStatus as
+      | PaymentStatus
+      | undefined;
+    const existingOrderId = pendingData.orderId as string | undefined;
+
+    // Идемпотентность: если уже paid и есть orderId — ничего не создаём повторно
+    if (existingPaymentStatus === "paid" && existingOrderId) {
+      console.log(
+        `✅ Already paid. invoiceId=${invoiceId} orderId=${existingOrderId}`,
+      );
+      console.log("=== EPAY CALLBACK END (IDEMPOTENT) ===");
       return res.status(200).json({
         success: true,
-        message: "Card saved successfully",
+        message: "Already processed",
+        orderId: existingOrderId,
       });
     }
 
-    const orderData = pendingOrderDoc.data();
-
-    // Создаём заказ в orders
+    // Создаем заказ
     const ordersRef = db.collection("orders");
+
     const newOrder = {
-      ...orderData,
+      ...pendingData,
       invoiceId,
-      status: "paid",
+      paymentStatus: "paid",
       isDeleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      // можно хранить платежные метаданные
+      epay: {
+        status: status ?? null,
+        code: code ?? null,
+        reference: callbackData.reference ?? null,
+      },
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     };
 
     const orderRef = await ordersRef.add(newOrder);
-    console.log(`✅ Order created successfully: ${orderRef.id}`);
-    console.log("=== EPAY CALLBACK END (Order Payment) ===");
 
-    // Обновляем статус товара на "sold"
-    if (orderData?.productId) {
-      const productRef = db.collection("products").doc(orderData.productId);
-      await productRef.update({
-        status: "sold",
-        updatedAt: new Date(),
-      });
-      console.log(`Product ${orderData.productId} marked as sold`);
+    console.log(`✅ Order created: ${orderRef.id}`);
+
+    // Обновляем pendingOrders: ставим paid и сохраняем orderId (НЕ УДАЛЯЕМ)
+    await pendingRef!.set(
+      {
+        paymentStatus: "paid" as PaymentStatus,
+        orderId: orderRef.id,
+        paidAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+
+    console.log(`Pending order ${invoiceId} marked as paid`);
+
+    // Обновляем товар как sold (если есть productId)
+    const productId = pendingData.productId as string | undefined;
+    if (productId) {
+      await db.collection("products").doc(productId).set(
+        {
+          status: "sold",
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+      console.log(`Product ${productId} marked as sold`);
     }
 
-    // Удаляем запись из pendingOrders
-    if (pendingOrderRef) {
-      await pendingOrderRef.delete();
-      console.log(`Pending order ${invoiceId} deleted`);
-    }
-
+    console.log("=== EPAY CALLBACK END (PAYMENT) ===");
     return res.status(200).json({
       success: true,
       orderId: orderRef.id,
@@ -185,9 +280,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (error) {
     console.error("Error processing EPAY callback:", error);
-    return res.status(500).json({
-      error: "Internal server error",
-      message: error instanceof Error ? error.message : "Unknown error",
+
+    // Обычно ePay лучше отдавать 200, чтобы не ретраило бесконечно,
+    // но если тебе важнее видеть 500 — можешь оставить 500.
+    return res.status(200).json({
+      success: false,
+      message: "Internal error",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 }
