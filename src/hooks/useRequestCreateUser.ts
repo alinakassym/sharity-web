@@ -1,5 +1,6 @@
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { stripUndefined } from "@/utils";
 
 export interface UserData {
   telegramId: number;
@@ -41,10 +42,11 @@ export const useRequestCreateUser = () => {
       if (userSnap.exists()) {
         // Пользователь существует - обновляем переданные данные и lastLoginAt
         const existingData = userSnap.data();
-        const updateData: Record<string, unknown> = {
-          ...userData, // Включаем все переданные поля (username, firstName, lastName, photoUrl, isConfirmed и т.д.)
+
+        const updateData: Partial<UserData> = stripUndefined({
+          ...userData,
           lastLoginAt: new Date(),
-        };
+        });
 
         // Если у существующего пользователя нет роли, устанавливаем "user"
         if (!existingData.role) {
@@ -57,7 +59,8 @@ export const useRequestCreateUser = () => {
       } else {
         // Новый пользователь - создаем документ
         const dataToSave: UserData = {
-          ...userData,
+          ...stripUndefined(userData as Record<string, unknown>),
+          telegramId: userData.telegramId, // Ensure telegramId is included
           firstName: userData?.firstName ?? "",
           lastName: userData?.lastName ?? "",
           photoUrl: userData?.photoUrl ?? "",
