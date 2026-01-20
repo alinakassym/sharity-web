@@ -75,7 +75,7 @@ const PaymentMethods: FC = () => {
       }
     >
       {/* Page Header */}
-      <PageHeader title="Способы оплаты" backTo="/profile" />
+      <PageHeader title="Мои карты" backTo="/profile" />
 
       {/* Content */}
       <div
@@ -88,18 +88,6 @@ const PaymentMethods: FC = () => {
           gap: 16,
         }}
       >
-        {/* Заголовок секции */}
-        <h2
-          style={{
-            margin: "8px 0 0",
-            fontSize: 18,
-            fontWeight: 500,
-            color: c.text,
-          }}
-        >
-          Платёжные карты
-        </h2>
-
         {/* Список карт */}
         {cards.length === 0 ? (
           <div

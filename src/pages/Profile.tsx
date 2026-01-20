@@ -84,7 +84,7 @@ const Profile: FC = () => {
         {/* Кнопка перехода к способам оплаты */}
         {userData && (
           <NavigationButton
-            label="Способы оплаты"
+            label="Мои карты"
             onClick={() => handleNavigateTo("/payment-methods")}
           />
         )}
