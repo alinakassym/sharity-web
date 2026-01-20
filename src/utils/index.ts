@@ -14,3 +14,8 @@ export const moveSelectedToStart = <T>(
     ...array.slice(selectedIndex + 1),
   ];
 };
+
+export const stripUndefined = <T extends Record<string, unknown>>(obj: T) =>
+  Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined),
+  ) as T;

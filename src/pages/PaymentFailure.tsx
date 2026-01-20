@@ -1,134 +1,117 @@
 // src/pages/PaymentFailure.tsx
 
-import { useEffect } from "react";
 import type { FC } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/theme/colors";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
-import Container from "@/components/Container";
+import { Button } from "@mui/material";
+import { doc, getDoc } from "firebase/firestore";
+
+import { db } from "@/lib/firebase";
+
+type PendingOrder = {
+  orderNumber?: string;
+  totalAmount?: number;
+  productName?: string;
+  paymentStatus?: "paid" | "failed" | "pending";
+};
 
 const PaymentFailure: FC = () => {
   const navigate = useNavigate();
-  const scheme = useColorScheme();
-  const c = Colors[scheme];
   const [searchParams] = useSearchParams();
 
-  // Получаем параметры из URL (переданные от EPAY)
-  const invoiceId = searchParams.get("invoiceId");
-  const error = searchParams.get("error");
+  const invoiceId = useMemo(() => {
+    const value = searchParams.get("invoiceId");
+    return value?.trim() || "";
+  }, [searchParams]);
+
+  const reason = useMemo(() => {
+    // оставим поддержку старого параметра error
+    return searchParams.get("reason") || searchParams.get("error") || "";
+  }, [searchParams]);
+
+  const [pendingOrder, setPendingOrder] = useState<PendingOrder | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Здесь можно сохранить информацию о неуспешной транзакции
-    console.log("Payment failed:", { invoiceId, error });
-  }, [invoiceId, error]);
+    const load = async () => {
+      if (!invoiceId) return;
+
+      try {
+        setLoading(true);
+        setLoadError(null);
+
+        const ref = doc(db, "pendingOrders", invoiceId);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          setPendingOrder(null);
+          return;
+        }
+
+        setPendingOrder(snap.data() as PendingOrder);
+      } catch (e) {
+        setLoadError(e instanceof Error ? e.message : "Ошибка загрузки");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
+  }, [invoiceId]);
 
   return (
-    <Container paddingTop={64}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "60vh",
-          padding: 24,
-          textAlign: "center",
-        }}
-      >
-        {/* Error icon */}
-        <div
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            backgroundColor: "#FF6B6B20",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 24,
-          }}
-        >
-          <VuesaxIcon name="close-circle" size={48} color="#FF6B6B" />
+    <div style={{ padding: 16 }}>
+      <h2 style={{ margin: 0 }}>Оплата не прошла</h2>
+
+      <div style={{ marginTop: 12, fontSize: 14 }}>
+        <div>
+          <b>invoiceId:</b> {invoiceId || "—"}
         </div>
 
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: c.text,
-            margin: "0 0 12px",
-          }}
-        >
-          Оплата не удалась
-        </h1>
-
-        <p
-          style={{
-            fontSize: 16,
-            color: c.lightText,
-            margin: "0 0 8px",
-            lineHeight: 1.5,
-          }}
-        >
-          К сожалению, произошла ошибка при обработке платежа.
-        </p>
-
-        {error && (
-          <p
-            style={{
-              fontSize: 14,
-              color: "#FF6B6B",
-              margin: "8px 0 32px",
-            }}
-          >
-            {error}
-          </p>
+        {pendingOrder?.orderNumber && (
+          <div style={{ marginTop: 6 }}>
+            <b>Номер заказа:</b> {pendingOrder.orderNumber}
+          </div>
         )}
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            width: "100%",
-            maxWidth: 300,
-          }}
-        >
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              padding: "16px",
-              backgroundColor: c.primary,
-              color: c.lighter,
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Попробовать снова
-          </button>
+        {reason && (
+          <div style={{ marginTop: 8, color: "#FF6B6B" }}>
+            <b>Причина:</b> {reason}
+          </div>
+        )}
 
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              padding: "16px",
-              backgroundColor: c.controlColor,
-              color: c.text,
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            На главную
-          </button>
-        </div>
+        {loading && <div style={{ marginTop: 8 }}>Проверяю данные…</div>}
+        {loadError && (
+          <div style={{ marginTop: 8, color: "#FF6B6B" }}>{loadError}</div>
+        )}
+
+        {!loading && !loadError && pendingOrder?.paymentStatus === "paid" && (
+          <div style={{ marginTop: 8 }}>
+            ⚠️ Интересно: в pendingOrders статус уже <b>paid</b>. Возможно,
+            оплата прошла, но ты попала на failure по backLink. Проверь
+            success-страницу.
+          </div>
+        )}
       </div>
-    </Container>
+
+      <div style={{ marginTop: 16, display: "flex", gap: 12 }}>
+        <Button variant="outlined" onClick={() => navigate(-1)}>
+          Назад
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() =>
+            invoiceId
+              ? navigate(`/payment?invoiceId=${invoiceId}`)
+              : navigate("/")
+          }
+        >
+          Попробовать снова
+        </Button>
+      </div>
+    </div>
   );
 };
 
