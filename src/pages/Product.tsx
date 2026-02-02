@@ -84,7 +84,6 @@ const Product: FC = () => {
       }
     : null;
 
-  console.log("product: ", product);
   if (isLoading) {
     return (
       <section
