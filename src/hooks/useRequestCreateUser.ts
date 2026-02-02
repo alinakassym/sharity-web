@@ -12,7 +12,7 @@ const syncUserToMongo = async (
   userData: Omit<UserData, "createdAt" | "lastLoginAt" | "role">,
 ) => {
   try {
-    await fetch(`${API_BASE_URL}/api/users`, {
+    await fetch(new URL("/api/users", API_BASE_URL), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
