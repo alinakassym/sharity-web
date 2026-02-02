@@ -2,6 +2,27 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { stripUndefined } from "@/utils";
 
+const API_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+
+/**
+ * Параллельно сохраняет пользователя в MongoDB через бэкенд.
+ * Не блокирует основной флоу — ошибки логируются, но не пробрасываются.
+ */
+const syncUserToMongo = async (
+  userData: Omit<UserData, "createdAt" | "lastLoginAt" | "role">,
+) => {
+  try {
+    await fetch(`${API_BASE_URL}/api/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    console.log("[MongoDB] Пользователь синхронизирован:", userData.telegramId);
+  } catch (err) {
+    console.error("[MongoDB] Ошибка синхронизации пользователя:", err);
+  }
+};
+
 export interface UserData {
   telegramId: number;
   username?: string;
@@ -54,6 +75,8 @@ export const useRequestCreateUser = () => {
         }
 
         await setDoc(userRef, updateData, { merge: true });
+        // Параллельно синхронизируем в MongoDB (не блокируем основной флоу)
+        syncUserToMongo(userData);
         console.log("Пользователь обновлен:", userData.telegramId);
         return { success: true, isNewUser: false, id: userData.telegramId };
       } else {
@@ -71,6 +94,8 @@ export const useRequestCreateUser = () => {
         };
 
         await setDoc(userRef, dataToSave);
+        // Параллельно синхронизируем в MongoDB (не блокируем основной флоу)
+        syncUserToMongo(userData);
         console.log("Новый пользователь создан:", userData.telegramId);
         return { success: true, isNewUser: true, id: userData.telegramId };
       }
