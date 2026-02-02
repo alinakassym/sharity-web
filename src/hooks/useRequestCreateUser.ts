@@ -2,7 +2,10 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { stripUndefined } from "@/utils";
 
-const API_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+const API_BASE_URL = (import.meta.env.VITE_APP_BASE_URL as string).replace(
+  /\/+$/,
+  "",
+);
 
 /**
  * Параллельно сохраняет пользователя в MongoDB через бэкенд.
@@ -12,7 +15,7 @@ const syncUserToMongo = async (
   userData: Omit<UserData, "createdAt" | "lastLoginAt" | "role">,
 ) => {
   try {
-    await fetch(`${API_BASE_URL}/api/users`, {
+    await fetch(new URL("/api/users", API_BASE_URL), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
