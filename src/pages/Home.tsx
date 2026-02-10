@@ -139,6 +139,7 @@ const Home: FC = () => {
       {/* Main Content */}
       <div
         style={{
+          paddingBottom: 74,
           display: "flex",
           flexDirection: "column",
           gap: 1,
