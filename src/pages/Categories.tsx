@@ -69,6 +69,7 @@ const emptySizeForm: CreateSizeData = {
   length: undefined,
   diameter: undefined,
   foot_size: undefined,
+  circumference: undefined,
   is_active: true,
   order: undefined,
 };
@@ -360,6 +361,7 @@ const Categories: FC = () => {
       length: size.length,
       diameter: size.diameter,
       foot_size: size.foot_size,
+      circumference: size.circumference,
       is_active: size.is_active,
       order: size.order,
     });
@@ -398,6 +400,7 @@ const Categories: FC = () => {
             ? Number(sizeFormData.diameter)
             : undefined,
         foot_size: sizeFormData.foot_size?.trim() || undefined,
+        circumference: sizeFormData.circumference?.trim() || undefined,
         is_active: sizeFormData.is_active,
         order:
           sizeFormData.order !== undefined && sizeFormData.order !== null
@@ -454,6 +457,7 @@ const Categories: FC = () => {
     if (size.length != null) parts.push(`Длина: ${size.length} см`);
     if (size.diameter != null) parts.push(`Диаметр: ${size.diameter} см`);
     if (size.foot_size) parts.push(`Нога: ${size.foot_size}`);
+    if (size.circumference) parts.push(`Окружность: ${size.circumference} мм`);
     return parts.join("\n") || "Пустой размер";
   };
 
@@ -1337,17 +1341,33 @@ const Categories: FC = () => {
               fullWidth
             />
           </Box>
-          <TextField
-            label="Размер ноги"
-            value={sizeFormData.foot_size ?? ""}
-            onChange={(e) =>
-              setSizeFormData((prev) => ({
-                ...prev,
-                foot_size: e.target.value,
-              }))
-            }
-            fullWidth
-          />
+          {/* <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              label="Размер ноги"
+              value={sizeFormData.foot_size ?? ""}
+              onChange={(e) =>
+                setSizeFormData((prev) => ({
+                  ...prev,
+                  foot_size: e.target.value,
+                }))
+              }
+              fullWidth
+            />
+          </Box> */}
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              label="Длина окружности (мм)"
+              placeholder="напр. 410-430"
+              value={sizeFormData.circumference ?? ""}
+              onChange={(e) =>
+                setSizeFormData((prev) => ({
+                  ...prev,
+                  circumference: e.target.value,
+                }))
+              }
+              fullWidth
+            />
+          </Box>
 
           <TextField
             label="Порядок сортировки"
