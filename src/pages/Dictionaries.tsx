@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import {
@@ -13,6 +14,7 @@ import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 
 const Dictionaries: FC = () => {
+  const navigate = useNavigate();
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
@@ -101,10 +103,7 @@ const Dictionaries: FC = () => {
         >
           <NavigationButton
             label="Категории"
-            onClick={() => {
-              // TODO: Реализовать переход к странице управления категориями
-              console.log("Переход к категориям");
-            }}
+            onClick={() => navigate("/dictionaries/categories")}
           />
 
           <NavigationButton
