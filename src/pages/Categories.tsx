@@ -1,3 +1,5 @@
+// sharity-web/src/pages/Categories.tsx
+
 import { useState } from "react";
 import type { FC } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -12,6 +14,11 @@ import {
   type CategoryData,
   type CreateCategoryData,
 } from "@/hooks/useCategories";
+import {
+  useSubcategories,
+  type SubcategoryData,
+  type CreateSubcategoryData,
+} from "@/hooks/useSubcategories";
 import LoadingScreen from "@/components/LoadingScreen";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
@@ -29,12 +36,20 @@ import {
   IconButton,
   Typography,
   CircularProgress,
+  Collapse,
 } from "@mui/material";
 
 const emptyForm: CreateCategoryData = {
   name_ru: "",
   name_en: "",
   icon: "",
+  is_active: true,
+  order: undefined,
+};
+
+const emptySubForm: CreateSubcategoryData = {
+  name_ru: "",
+  name_en: "",
   is_active: true,
   order: undefined,
 };
@@ -55,6 +70,7 @@ const Categories: FC = () => {
     deleteCategory,
   } = useCategories();
 
+  // --- Category dialog state ---
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryData | null>(
     null,
@@ -62,6 +78,29 @@ const Categories: FC = () => {
   const [formData, setFormData] = useState<CreateCategoryData>(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  // --- Subcategory expand + CRUD state ---
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(
+    null,
+  );
+  const {
+    subcategories,
+    isLoading: isSubLoading,
+    error: subError,
+    createSubcategory,
+    updateSubcategory,
+    toggleActive: toggleSubActive,
+    deleteSubcategory,
+  } = useSubcategories(expandedCategoryId);
+
+  const [subDialogOpen, setSubDialogOpen] = useState(false);
+  const [editingSub, setEditingSub] = useState<SubcategoryData | null>(null);
+  const [subFormData, setSubFormData] =
+    useState<CreateSubcategoryData>(emptySubForm);
+  const [isSubSaving, setIsSubSaving] = useState(false);
+  const [deleteSubConfirmId, setDeleteSubConfirmId] = useState<string | null>(
+    null,
+  );
 
   if (isUserLoading) return <LoadingScreen />;
 
@@ -91,6 +130,8 @@ const Categories: FC = () => {
       </Container>
     );
   }
+
+  // --- Category handlers ---
 
   const handleOpenCreate = () => {
     setEditingCategory(null);
@@ -167,8 +208,92 @@ const Categories: FC = () => {
     }
   };
 
+  // --- Subcategory handlers ---
+
+  const handleToggleExpand = (categoryId: string) => {
+    setExpandedCategoryId((prev) =>
+      prev === categoryId ? null : categoryId,
+    );
+  };
+
+  const handleOpenSubCreate = () => {
+    setEditingSub(null);
+    setSubFormData(emptySubForm);
+    setSubDialogOpen(true);
+  };
+
+  const handleOpenSubEdit = (sub: SubcategoryData) => {
+    setEditingSub(sub);
+    setSubFormData({
+      name_ru: sub.name_ru,
+      name_en: sub.name_en,
+      is_active: sub.is_active,
+      order: sub.order,
+    });
+    setSubDialogOpen(true);
+  };
+
+  const handleSubClose = () => {
+    setSubDialogOpen(false);
+    setEditingSub(null);
+    setSubFormData(emptySubForm);
+  };
+
+  const handleSubSave = async () => {
+    setIsSubSaving(true);
+    try {
+      const dataToSave: CreateSubcategoryData = {
+        name_ru: subFormData.name_ru.trim(),
+        name_en: subFormData.name_en.trim(),
+        is_active: subFormData.is_active,
+        order:
+          subFormData.order !== undefined && subFormData.order !== null
+            ? Number(subFormData.order)
+            : undefined,
+      };
+
+      if (editingSub) {
+        await updateSubcategory(editingSub.id, dataToSave);
+      } else {
+        await createSubcategory(dataToSave);
+      }
+      handleSubClose();
+    } catch (err) {
+      alert(
+        `Ошибка: ${err instanceof Error ? err.message : "Не удалось сохранить подкатегорию"}`,
+      );
+    } finally {
+      setIsSubSaving(false);
+    }
+  };
+
+  const handleSubToggle = async (id: string) => {
+    try {
+      await toggleSubActive(id);
+    } catch (err) {
+      alert(
+        `Ошибка: ${err instanceof Error ? err.message : "Не удалось переключить"}`,
+      );
+    }
+  };
+
+  const handleSubDelete = async () => {
+    if (!deleteSubConfirmId) return;
+    try {
+      await deleteSubcategory(deleteSubConfirmId);
+      setDeleteSubConfirmId(null);
+    } catch (err) {
+      alert(
+        `Ошибка: ${err instanceof Error ? err.message : "Не удалось удалить подкатегорию"}`,
+      );
+    }
+  };
+
   const isFormValid = formData.name_ru.trim() && formData.name_en.trim();
-  const deletingCategory = categories.find((c) => c.id === deleteConfirmId);
+  const isSubFormValid =
+    subFormData.name_ru.trim() && subFormData.name_en.trim();
+  const deletingCategory = categories.find((ct) => ct.id === deleteConfirmId);
+  const deletingSub = subcategories.find((s) => s.id === deleteSubConfirmId);
 
   return (
     <Container
@@ -200,8 +325,9 @@ const Categories: FC = () => {
               lineHeight: 1.5,
             }}
           >
-            Управление категориями товаров. Добавляйте, редактируйте и
-            переключайте активность категорий.
+            Управление категориями. Добавляйте, редактируйте и переключайте
+            активность категорий. Нажмите на категорию, чтобы увидеть
+            подкатегории.
           </Typography>
         </Box>
 
@@ -245,84 +371,262 @@ const Categories: FC = () => {
           </Box>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {categories.map((cat) => (
-              <Box
-                key={cat.id}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px 16px",
-                  backgroundColor: c.surfaceColor,
-                  borderRadius: "12px",
-                  opacity: cat.is_active ? 1 : 0.5,
-                }}
-              >
-                {/* Левая часть: иконка + названия */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1.5,
-                    flex: 1,
-                    minWidth: 0,
-                  }}
-                >
-                  {cat.icon && (
-                    <VuesaxIcon name={cat.icon} size={24} color={c.text} />
-                  )}
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography
-                      sx={{
-                        fontSize: 16,
-                        fontWeight: 600,
-                        color: c.text,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {cat.name_ru}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: 12,
-                        color: c.lightText,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {cat.name_en}
-                      {cat.order !== undefined && ` · #${cat.order}`}
-                    </Typography>
-                  </Box>
-                </Box>
+            {categories.map((cat) => {
+              const isExpanded = expandedCategoryId === cat.id;
 
-                {/* Правая часть: switch + edit + delete */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Switch
-                    size="small"
-                    checked={cat.is_active}
-                    onChange={() => handleToggle(cat.id)}
-                  />
-                  <IconButton size="small" onClick={() => handleOpenEdit(cat)}>
-                    <VuesaxIcon name="edit-2" size={18} stroke={c.primary} />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => setDeleteConfirmId(cat.id)}
+              return (
+                <Box key={cat.id}>
+                  {/* Category card */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "12px 16px",
+                      backgroundColor: c.surfaceColor,
+                      borderRadius: isExpanded ? "12px 12px 0 0" : "12px",
+                      opacity: cat.is_active ? 1 : 0.5,
+                      transition: "border-radius 0.2s",
+                    }}
                   >
-                    <VuesaxIcon name="trash" size={18} stroke={c.error} />
-                  </IconButton>
+                    {/* Left: expand arrow + icon + names */}
+                    <Box
+                      onClick={() => handleToggleExpand(cat.id)}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        flex: 1,
+                        minWidth: 0,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          transition: "transform 0.2s",
+                          transform: isExpanded
+                            ? "rotate(180deg)"
+                            : "rotate(0deg)",
+                        }}
+                      >
+                        <VuesaxIcon
+                          name="arrow-down"
+                          size={18}
+                          stroke={c.lightText}
+                        />
+                      </Box>
+                      {cat.icon && (
+                        <VuesaxIcon name={cat.icon} size={24} color={c.text} />
+                      )}
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography
+                          sx={{
+                            fontSize: 16,
+                            fontWeight: 600,
+                            color: c.text,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {cat.name_ru}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontSize: 12,
+                            color: c.lightText,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {cat.name_en}
+                          {cat.order !== undefined && ` · #${cat.order}`}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Right: switch + edit + delete */}
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      <Switch
+                        size="small"
+                        checked={cat.is_active}
+                        onChange={() => handleToggle(cat.id)}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenEdit(cat)}
+                      >
+                        <VuesaxIcon
+                          name="edit-2"
+                          size={18}
+                          stroke={c.primary}
+                        />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => setDeleteConfirmId(cat.id)}
+                      >
+                        <VuesaxIcon name="trash" size={18} stroke={c.error} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+
+                  {/* Subcategories expandable section */}
+                  <Collapse in={isExpanded}>
+                    <Box
+                      sx={{
+                        backgroundColor: c.surfaceColor,
+                        borderTop: `1px solid ${c.border}`,
+                        borderRadius: "0 0 12px 12px",
+                        px: 2,
+                        pb: 1.5,
+                        pt: 1,
+                      }}
+                    >
+                      {isSubLoading ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            py: 2,
+                          }}
+                        >
+                          <CircularProgress size={24} />
+                        </Box>
+                      ) : subError ? (
+                        <Typography
+                          sx={{ color: c.error, fontSize: 13, py: 1 }}
+                        >
+                          {subError}
+                        </Typography>
+                      ) : subcategories.length === 0 ? (
+                        <Typography
+                          sx={{
+                            color: c.lightText,
+                            fontSize: 13,
+                            py: 1,
+                            textAlign: "center",
+                          }}
+                        >
+                          Подкатегории не найдены
+                        </Typography>
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1,
+                          }}
+                        >
+                          {subcategories.map((sub) => (
+                            <Box
+                              key={sub.id}
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: "8px 12px",
+                                backgroundColor: c.background,
+                                borderRadius: "8px",
+                                opacity: sub.is_active ? 1 : 0.5,
+                              }}
+                            >
+                              <Box sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography
+                                  sx={{
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    color: c.text,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {sub.name_ru}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: 11,
+                                    color: c.lightText,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {sub.name_en}
+                                  {sub.order !== undefined &&
+                                    ` · #${sub.order}`}
+                                </Typography>
+                              </Box>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                }}
+                              >
+                                <Switch
+                                  size="small"
+                                  checked={sub.is_active}
+                                  onChange={() => handleSubToggle(sub.id)}
+                                />
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleOpenSubEdit(sub)}
+                                >
+                                  <VuesaxIcon
+                                    name="edit-2"
+                                    size={16}
+                                    stroke={c.primary}
+                                  />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setDeleteSubConfirmId(sub.id)
+                                  }
+                                >
+                                  <VuesaxIcon
+                                    name="trash"
+                                    size={16}
+                                    stroke={c.error}
+                                  />
+                                </IconButton>
+                              </Box>
+                            </Box>
+                          ))}
+                        </Box>
+                      )}
+
+                      {/* Add subcategory button */}
+                      <Button
+                        size="small"
+                        onClick={handleOpenSubCreate}
+                        sx={{
+                          mt: 1,
+                          textTransform: "none",
+                          fontSize: 13,
+                          fontWeight: 500,
+                          width: "100%",
+                        }}
+                      >
+                        + Добавить подкатегорию
+                      </Button>
+                    </Box>
+                  </Collapse>
                 </Box>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         )}
       </Box>
 
-      {/* Диалог создания/редактирования */}
+      {/* Диалог создания/редактирования категории */}
       <Dialog
         open={dialogOpen}
         onClose={handleClose}
@@ -416,7 +720,7 @@ const Categories: FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Диалог подтверждения удаления */}
+      {/* Диалог подтверждения удаления категории */}
       <Dialog
         open={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
@@ -445,6 +749,132 @@ const Categories: FC = () => {
             variant="contained"
             color="error"
             onClick={handleDelete}
+            sx={{ textTransform: "none" }}
+          >
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Диалог создания/редактирования подкатегории */}
+      <Dialog
+        open={subDialogOpen}
+        onClose={handleSubClose}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            backgroundColor: c.background,
+            borderRadius: "16px",
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: c.text }}>
+          {editingSub
+            ? "Редактировать подкатегорию"
+            : "Новая подкатегория"}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            pt: "8px !important",
+          }}
+        >
+          <TextField
+            label="Название (RU)"
+            value={subFormData.name_ru}
+            onChange={(e) =>
+              setSubFormData((prev) => ({ ...prev, name_ru: e.target.value }))
+            }
+            required
+            fullWidth
+          />
+          <TextField
+            label="Name (EN)"
+            value={subFormData.name_en}
+            onChange={(e) =>
+              setSubFormData((prev) => ({ ...prev, name_en: e.target.value }))
+            }
+            required
+            fullWidth
+          />
+          <TextField
+            label="Порядок сортировки"
+            type="number"
+            value={subFormData.order ?? ""}
+            onChange={(e) =>
+              setSubFormData((prev) => ({
+                ...prev,
+                order:
+                  e.target.value === "" ? undefined : Number(e.target.value),
+              }))
+            }
+            fullWidth
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={subFormData.is_active}
+                onChange={(e) =>
+                  setSubFormData((prev) => ({
+                    ...prev,
+                    is_active: e.target.checked,
+                  }))
+                }
+              />
+            }
+            label="Активна"
+            sx={{ color: c.text }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={handleSubClose} sx={{ textTransform: "none" }}>
+            Отмена
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubSave}
+            disabled={!isSubFormValid || isSubSaving}
+            sx={{ textTransform: "none" }}
+          >
+            {isSubSaving ? "Сохранение..." : "Сохранить"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Диалог подтверждения удаления подкатегории */}
+      <Dialog
+        open={!!deleteSubConfirmId}
+        onClose={() => setDeleteSubConfirmId(null)}
+        PaperProps={{
+          sx: {
+            backgroundColor: c.background,
+            borderRadius: "16px",
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: c.text }}>
+          Удалить подкатегорию?
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: c.lightText }}>
+            Подкатегория «{deletingSub?.name_ru}» будет удалена. Это действие
+            нельзя отменить.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setDeleteSubConfirmId(null)}
+            sx={{ textTransform: "none" }}
+          >
+            Отмена
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleSubDelete}
             sx={{ textTransform: "none" }}
           >
             Удалить

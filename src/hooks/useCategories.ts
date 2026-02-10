@@ -1,3 +1,5 @@
+// sharity-web/src/hooks/useCategories.ts
+
 import { useState, useEffect, useCallback } from "react";
 
 const API_BASE_URL = (import.meta.env.VITE_APP_BASE_URL as string).replace(
@@ -56,14 +58,11 @@ export const useCategories = () => {
   };
 
   const updateCategory = async (id: string, data: UpdateCategoryData) => {
-    const res = await fetch(
-      new URL(`/api/categories/${id}`, API_BASE_URL),
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      },
-    );
+    const res = await fetch(new URL(`/api/categories/${id}`, API_BASE_URL), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const updated: CategoryData = await res.json();
     setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
@@ -82,10 +81,9 @@ export const useCategories = () => {
   };
 
   const deleteCategory = async (id: string) => {
-    const res = await fetch(
-      new URL(`/api/categories/${id}`, API_BASE_URL),
-      { method: "DELETE" },
-    );
+    const res = await fetch(new URL(`/api/categories/${id}`, API_BASE_URL), {
+      method: "DELETE",
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     setCategories((prev) => prev.filter((c) => c.id !== id));
   };
