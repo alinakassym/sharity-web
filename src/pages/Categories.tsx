@@ -61,7 +61,7 @@ const emptySubForm: CreateSubcategoryData = {
 };
 
 const emptySizeForm: CreateSizeData = {
-  manufacturer_size: undefined,
+  manufacturer_size: "",
   size_ua_ru: undefined,
   size_eu: undefined,
   height_from: undefined,
@@ -253,9 +253,7 @@ const Categories: FC = () => {
   // --- Subcategory handlers ---
 
   const handleToggleExpand = (categoryId: string) => {
-    setExpandedCategoryId((prev) =>
-      prev === categoryId ? null : categoryId,
-    );
+    setExpandedCategoryId((prev) => (prev === categoryId ? null : categoryId));
   };
 
   const handleOpenSubCreate = () => {
@@ -378,7 +376,7 @@ const Categories: FC = () => {
     setIsSizeSaving(true);
     try {
       const dataToSave: CreateSizeData = {
-        manufacturer_size: sizeFormData.manufacturer_size?.trim() || undefined,
+        manufacturer_size: sizeFormData.manufacturer_size.trim(),
         size_ua_ru: sizeFormData.size_ua_ru?.trim() || undefined,
         size_eu: sizeFormData.size_eu?.trim() || undefined,
         height_from:
@@ -446,8 +444,8 @@ const Categories: FC = () => {
 
   const sizeLabel = (size: SizeData): string => {
     const parts: string[] = [];
-    if (size.manufacturer_size) parts.push(size.manufacturer_size);
-    if (size.size_ua_ru) parts.push(`UA/RU: ${size.size_ua_ru}`);
+    // if (size.manufacturer_size) parts.push(size.manufacturer_size);
+    if (size.size_ua_ru) parts.push(`Размер UA/RU: ${size.size_ua_ru}`);
     if (size.size_eu) parts.push(`EU: ${size.size_eu}`);
     if (size.height_from != null || size.height_to != null)
       parts.push(
@@ -456,7 +454,7 @@ const Categories: FC = () => {
     if (size.length != null) parts.push(`Длина: ${size.length} см`);
     if (size.diameter != null) parts.push(`Диаметр: ${size.diameter} см`);
     if (size.foot_size) parts.push(`Нога: ${size.foot_size}`);
-    return parts.join(" · ") || "Пустой размер";
+    return parts.join("\n") || "Пустой размер";
   };
 
   const isFormValid = formData.name_ru.trim() && formData.name_en.trim();
@@ -768,9 +766,7 @@ const Categories: FC = () => {
                                 </IconButton>
                                 <IconButton
                                   size="small"
-                                  onClick={() =>
-                                    setDeleteSubConfirmId(sub.id)
-                                  }
+                                  onClick={() => setDeleteSubConfirmId(sub.id)}
                                 >
                                   <VuesaxIcon
                                     name="trash"
@@ -951,9 +947,7 @@ const Categories: FC = () => {
         }}
       >
         <DialogTitle sx={{ color: c.text }}>
-          {editingSub
-            ? "Редактировать подкатегорию"
-            : "Новая подкатегория"}
+          {editingSub ? "Редактировать подкатегорию" : "Новая подкатегория"}
         </DialogTitle>
         <DialogContent
           sx={{
@@ -1036,9 +1030,7 @@ const Categories: FC = () => {
           },
         }}
       >
-        <DialogTitle sx={{ color: c.text }}>
-          Удалить подкатегорию?
-        </DialogTitle>
+        <DialogTitle sx={{ color: c.text }}>Удалить подкатегорию?</DialogTitle>
         <DialogContent>
           <Typography sx={{ color: c.lightText }}>
             Подкатегория «{deletingSub?.name_ru}» будет удалена. Это действие
@@ -1107,57 +1099,87 @@ const Categories: FC = () => {
                 <Box
                   key={size.id}
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
                     padding: "8px 12px",
-                    backgroundColor: c.surfaceColor,
+                    display: "flex",
+                    flexDirection: "column",
                     borderRadius: "8px",
+
+                    backgroundColor: c.surfaceColor,
                     opacity: size.is_active ? 1 : 0.5,
                   }}
                 >
+                  <Box sx={{ display: "flex" }}>
+                    <Box
+                      sx={{
+                        minWidth: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        flex: 1,
+                        gap: 0.5,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          lineHeight: 1,
+                          color: c.text,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {size.manufacturer_size}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      <Switch
+                        size="small"
+                        checked={size.is_active}
+                        onChange={() => handleSizeToggle(size.id)}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenSizeEdit(size)}
+                      >
+                        <VuesaxIcon
+                          name="edit-2"
+                          size={16}
+                          stroke={c.primary}
+                        />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => setDeleteSizeConfirmId(size.id)}
+                      >
+                        <VuesaxIcon name="trash" size={16} stroke={c.error} />
+                      </IconButton>
+                    </Box>
+                  </Box>
                   <Box sx={{ minWidth: 0, flex: 1 }}>
+                    {size.order !== undefined && (
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          color: c.lightText,
+                        }}
+                      >
+                        #{size.order}
+                      </Typography>
+                    )}
                     <Typography
                       sx={{
                         fontSize: 13,
                         color: c.text,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+                        whiteSpace: "break-spaces",
                       }}
                     >
                       {sizeLabel(size)}
                     </Typography>
-                    {size.order !== undefined && (
-                      <Typography sx={{ fontSize: 11, color: c.lightText }}>
-                        #{size.order}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box
-                    sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                  >
-                    <Switch
-                      size="small"
-                      checked={size.is_active}
-                      onChange={() => handleSizeToggle(size.id)}
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => handleOpenSizeEdit(size)}
-                    >
-                      <VuesaxIcon
-                        name="edit-2"
-                        size={16}
-                        stroke={c.primary}
-                      />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => setDeleteSizeConfirmId(size.id)}
-                    >
-                      <VuesaxIcon name="trash" size={16} stroke={c.error} />
-                    </IconButton>
                   </Box>
                 </Box>
               ))}
@@ -1219,13 +1241,14 @@ const Categories: FC = () => {
           </Typography>
           <TextField
             label="Размер производителя"
-            value={sizeFormData.manufacturer_size ?? ""}
+            value={sizeFormData.manufacturer_size}
             onChange={(e) =>
               setSizeFormData((prev) => ({
                 ...prev,
                 manufacturer_size: e.target.value,
               }))
             }
+            required
             fullWidth
           />
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -1362,7 +1385,7 @@ const Categories: FC = () => {
           <Button
             variant="contained"
             onClick={handleSizeSave}
-            disabled={isSizeSaving}
+            disabled={!sizeFormData.manufacturer_size.trim() || isSizeSaving}
             sx={{ textTransform: "none" }}
           >
             {isSizeSaving ? "Сохранение..." : "Сохранить"}

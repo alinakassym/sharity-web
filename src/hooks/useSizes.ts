@@ -10,7 +10,7 @@ const API_BASE_URL = (import.meta.env.VITE_APP_BASE_URL as string).replace(
 export interface SizeData {
   id: string;
   subcategoryId: string;
-  manufacturer_size?: string;
+  manufacturer_size: string;
   size_ua_ru?: string;
   size_eu?: string;
   height_from?: number;
