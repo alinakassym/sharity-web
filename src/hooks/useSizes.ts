@@ -18,6 +18,7 @@ export interface SizeData {
   length?: number;
   diameter?: number;
   foot_size?: string;
+  circumference?: string;
   is_active: boolean;
   order?: number;
 }
