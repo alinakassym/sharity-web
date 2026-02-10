@@ -98,6 +98,7 @@ const Orders: FC = () => {
             : paddingTop + 64
       }
     >
+      <PageHeader title="Заказы" backTo="/profile" />
       <div
         style={{
           padding: 16,
@@ -106,8 +107,6 @@ const Orders: FC = () => {
           gap: 16,
         }}
       >
-        <PageHeader title="Заказы" backTo="/profile" />
-
         {/* Loading */}
         {isLoadingOrders && (
           <div

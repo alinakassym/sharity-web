@@ -4,15 +4,21 @@ import type { FC } from "react";
 import { Timestamp } from "firebase/firestore";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRequestGetOrders } from "@/hooks/useRequestGetOrders";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import Container from "@/components/Container";
+import PageHeader from "@/components/PageHeader";
 
 const MyOrders: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
-  const isTelegram = isTelegramApp();
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
   const { userData } = useCurrentUser();
   const { orders, isLoading } = useRequestGetOrders(
     userData?.telegramId?.toString(),
@@ -66,14 +72,16 @@ const MyOrders: FC = () => {
   };
 
   return (
-    <section
-      style={{
-        paddingTop: isTelegram ? 48 : 44,
-        minHeight: "100vh",
-        paddingBottom: "160px",
-        backgroundColor: c.background,
-      }}
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
     >
+      <PageHeader title="Мои заказы" backTo="/" />
       <div
         style={{
           padding: 16,
@@ -82,18 +90,6 @@ const MyOrders: FC = () => {
           gap: 16,
         }}
       >
-        {/* Header */}
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: c.text,
-            margin: 0,
-          }}
-        >
-          Мои заказы
-        </h1>
-
         {/* Loading */}
         {isLoading && (
           <div
@@ -268,7 +264,7 @@ const MyOrders: FC = () => {
             );
           })}
       </div>
-    </section>
+    </Container>
   );
 };
 
