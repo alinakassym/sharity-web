@@ -11,6 +11,7 @@ import { Colors } from "@/theme/colors";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 import { StepBasic } from "@/components/StepBasic";
+import { StepContacts } from "@/components/StepContacts";
 import { StepPhotos } from "@/components/StepPhotos";
 import { StepReview } from "@/components/StepReview";
 import { StepDetails } from "@/components/StepDetails";
@@ -27,9 +28,7 @@ import { useCreateProduct } from "@/hooks/useCreateProduct";
 import { isPhoneComplete } from "@/components/PhoneField";
 import { useNavigate } from "react-router-dom";
 
-import { moveSelectedToStart } from "@/utils";
-
-type StepType = "basic" | "photos" | "details" | "review";
+type StepType = "basic" | "contacts" | "photos" | "details" | "review";
 
 type CreateFormState = {
   categoryId: string;
@@ -127,9 +126,11 @@ const Create: FC = () => {
     subcategory?: string;
     size?: string;
     price?: string;
+    quantity?: string;
+  }>({});
+  const [contactErrors, setContactErrors] = useState<{
     contactName?: string;
     contactPhone?: string;
-    quantity?: string;
   }>({});
   const [filePreviews, setFilePreviews] = useState<
     Array<{ file: File; url: string }>
@@ -138,6 +139,15 @@ const Create: FC = () => {
 
   const clearBasicError = (field: keyof typeof basicErrors) => {
     setBasicErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const clearContactError = (field: keyof typeof contactErrors) => {
+    setContactErrors((prev) => {
       if (!prev[field]) return prev;
       const next = { ...prev };
       delete next[field];
@@ -161,8 +171,9 @@ const Create: FC = () => {
 
   // Загрузка данных из MongoDB API
   const { categories, isLoading: isLoadingCategories } = useCategories();
-  const { subcategories, isLoading: isLoadingSubcategories } =
-    useSubcategories(form.categoryId || null);
+  const { subcategories, isLoading: isLoadingSubcategories } = useSubcategories(
+    form.categoryId || null,
+  );
   const { sizes, isLoading: isLoadingSizes } = useSizes(
     form.categoryId || null,
     form.subcategoryId || null,
@@ -177,10 +188,7 @@ const Create: FC = () => {
     () => subcategories.filter((s) => s.is_active),
     [subcategories],
   );
-  const activeSizes = useMemo(
-    () => sizes.filter((s) => s.is_active),
-    [sizes],
-  );
+  const activeSizes = useMemo(() => sizes.filter((s) => s.is_active), [sizes]);
 
   // Опции для Select
   const categoryOptions = useMemo(
@@ -192,8 +200,7 @@ const Create: FC = () => {
     [activeSubcategories],
   );
   const sizeOptions = useMemo(
-    () =>
-      activeSizes.map((s) => ({ value: s.id, label: buildSizeLabel(s) })),
+    () => activeSizes.map((s) => ({ value: s.id, label: buildSizeLabel(s) })),
     [activeSizes],
   );
 
@@ -258,6 +265,7 @@ const Create: FC = () => {
   useEffect(() => {
     if (form.selectedFiles.length === 0) {
       setFilePreviews([]);
+      setCoverImageIndex(0);
       return;
     }
 
@@ -284,6 +292,11 @@ const Create: FC = () => {
       id: "details",
       title: "Описание",
       description: "Подробное описание товара",
+    },
+    {
+      id: "contacts",
+      title: "Контактные данные",
+      description: "Имя и телефон для связи",
     },
     {
       id: "review",
@@ -337,6 +350,16 @@ const Create: FC = () => {
         nextErrors.quantity = "Укажите количество (минимум 2)";
       }
 
+      setBasicErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
+    if (currentStep === "contacts") {
+      const nextErrors: typeof contactErrors = {};
+
       if (!form.contactName.trim()) {
         nextErrors.contactName = "Введите имя для связи";
       }
@@ -347,7 +370,7 @@ const Create: FC = () => {
         nextErrors.contactPhone = "Введите полный номер телефона";
       }
 
-      setBasicErrors(nextErrors);
+      setContactErrors(nextErrors);
 
       if (Object.keys(nextErrors).length > 0) {
         return;
@@ -382,63 +405,57 @@ const Create: FC = () => {
         categoryId: form.categoryId,
         subcategoryId: form.subcategoryId || undefined,
         sizeId: form.sizeId || undefined,
-        price: Number(form.price),
-        description: form.description.trim() || undefined,
         condition: form.condition || undefined,
+        price: Number(form.price),
+        description: form.description?.trim() || "",
         saleType: form.saleType,
-        quantity:
-          form.saleType === "group" ? Number(form.quantity) : undefined,
+        quantity: form.saleType === "group" ? Number(form.quantity) : undefined,
         contactName: form.contactName.trim(),
         contactPhone: form.contactPhone.trim(),
-        imagesArray:
-          imagesArray.length > 0
-            ? moveSelectedToStart(imagesArray, coverImageIndex)
-            : undefined,
+        images: imagesArray,
+        coverImageIndex,
         createdBy,
       };
 
       const result = await createProduct(productData);
 
-      if (result.success) {
-        alert("Товар успешно добавлен!");
-        navigate("/store");
+      if (result?.id) {
+        navigate(`/product/${result.id}`);
       } else {
-        alert(`Ошибка: ${result.error}`);
+        navigate("/");
       }
-    } catch (error) {
-      console.error("Ошибка при создании товара:", error);
-      alert(`Ошибка при загрузке изображений: ${error}`);
+    } catch (e) {
+      console.error(e);
+      navigate("/");
     } finally {
       setIsPublishing(false);
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+  const handleFileChange = (files: File[]) => {
+    if (!files || files.length === 0) return;
 
-    const filesArray = Array.from(files);
+    dispatch({ type: "ADD_FILES", files });
+  };
 
-    // Фильтруем только изображения
-    const imageFiles = filesArray.filter((file) =>
-      file.type.startsWith("image/"),
-    );
+  const handleFileInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = Array.from(event.target.files ?? []);
+    handleFileChange(files);
 
-    dispatch({ type: "ADD_FILES", files: imageFiles });
-    if (form.selectedFiles.length === 0) setCoverImageIndex(0);
+    // важно: чтобы можно было выбрать тот же файл повторно
     event.target.value = "";
   };
 
   const removeFile = (index: number) => {
     dispatch({ type: "REMOVE_FILE", index });
 
-    setFilePreviews((prev) => prev.filter((_, i) => i !== index));
-
-    setCoverImageIndex((prevCover) => {
-      if (index === prevCover) return 0;
-      if (index < prevCover) return Math.max(prevCover - 1, 0);
-      return prevCover;
-    });
+    if (coverImageIndex === index) {
+      setCoverImageIndex(0);
+    } else if (coverImageIndex > index) {
+      setCoverImageIndex((prev) => prev - 1);
+    }
   };
 
   return (
@@ -565,7 +582,7 @@ const Create: FC = () => {
               <StepPhotos
                 selectedFiles={form.selectedFiles}
                 filePreviews={filePreviews}
-                onFileChange={handleFileChange}
+                onFileChange={handleFileInputChange}
                 onRemoveFile={removeFile}
                 coverImageIndex={coverImageIndex}
                 onSetCoverImage={setCoverImageIndex}
@@ -574,6 +591,18 @@ const Create: FC = () => {
 
             {currentStep === "details" && (
               <StepDetails form={form} dispatch={dispatch} />
+            )}
+
+            {currentStep === "contacts" && (
+              <StepContacts
+                form={{
+                  contactName: form.contactName,
+                  contactPhone: form.contactPhone,
+                }}
+                dispatch={dispatch}
+                contactErrors={contactErrors}
+                clearContactError={clearContactError}
+              />
             )}
 
             {currentStep === "review" && (
