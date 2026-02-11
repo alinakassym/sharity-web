@@ -755,6 +755,91 @@ const icons: Record<string, IconDef> = {
       </>
     ),
   },
+  camera: {
+    viewBox: "0 0 24 24",
+    paths: ({ stroke, strokeWidth }) => (
+      <>
+        <path
+          d="M6.76005 22H17.24C20 22 21.1 20.31 21.23 18.25L21.75 9.99C21.89 7.83 20.17 6 18 6C17.39 6 16.83 5.65 16.55 5.11L15.83 3.66C15.37 2.75 14.17 2 13.15 2H10.86C9.83005 2 8.63005 2.75 8.17005 3.66L7.45005 5.11C7.17005 5.65 6.61005 6 6.00005 6C3.83005 6 2.11005 7.83 2.25005 9.99L2.77005 18.25C2.89005 20.31 4.00005 22 6.76005 22Z"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10.5 8H13.5"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 18C13.79 18 15.25 16.54 15.25 14.75C15.25 12.96 13.79 11.5 12 11.5C10.21 11.5 8.75 12.96 8.75 14.75C8.75 16.54 10.21 18 12 18Z"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    ),
+  },
+  gallery: {
+    viewBox: "0 0 24 24",
+    paths: ({ stroke, strokeWidth }) => (
+      <>
+        <path
+          d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9 10C10.1046 10 11 9.10457 11 8C11 6.89543 10.1046 6 9 6C7.89543 6 7 6.89543 7 8C7 9.10457 7.89543 10 9 10Z"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M2.67004 18.9501L7.60004 15.6401C8.39004 15.1101 9.53004 15.1701 10.24 15.7801L10.57 16.0701C11.35 16.7401 12.61 16.7401 13.39 16.0701L17.55 12.5001C18.33 11.8301 19.59 11.8301 20.37 12.5001L22 13.9001"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    ),
+  },
+  copy: {
+    viewBox: "0 0 24 24",
+    paths: ({ stroke, strokeWidth }) => (
+      <>
+        <path
+          d="M16 12.9V17.1C16 20.6 14.6 22 11.1 22H6.9C3.4 22 2 20.6 2 17.1V12.9C2 9.4 3.4 8 6.9 8H11.1C14.6 8 16 9.4 16 12.9Z"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M22 6.9V11.1C22 14.6 20.6 16 17.1 16H16V12.9C16 9.4 14.6 8 11.1 8H8V6.9C8 3.4 9.4 2 12.9 2H17.1C20.6 2 22 3.4 22 6.9Z"
+          fill="transparent"
+          stroke={stroke ?? "currentColor"}
+          strokeWidth={strokeWidth ?? "2"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    ),
+  },
 };
 
 const VuesaxIcon: FC<VuesaxIconProps> = ({

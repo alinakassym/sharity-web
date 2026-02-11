@@ -11,34 +11,40 @@ import { Colors } from "@/theme/colors";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 import { StepBasic } from "@/components/StepBasic";
+import { StepContacts } from "@/components/StepContacts";
 import { StepPhotos } from "@/components/StepPhotos";
 import { StepReview } from "@/components/StepReview";
 import { StepDetails } from "@/components/StepDetails";
 
-import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
-import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
-import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
+import { useCategories } from "@/hooks/useCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
+import { useSizes, type SizeData } from "@/hooks/useSizes";
 import { PRODUCTS_BUCKET, uploadFiles } from "@/lib/minio";
 
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
 
 import { getTelegramUser } from "@/lib/telegram";
-import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
+import { useCreateProduct } from "@/hooks/useCreateProduct";
+import { isPhoneComplete } from "@/components/PhoneField";
 import { useNavigate } from "react-router-dom";
 
 import { moveSelectedToStart } from "@/utils";
 
-type StepType = "basic" | "photos" | "details" | "review";
+type StepType = "basic" | "contacts" | "photos" | "details" | "review";
 
 type CreateFormState = {
-  category: string;
-  subcategory: string;
-  productSize: string;
+  categoryId: string;
+  subcategoryId: string;
+  sizeId: string;
   condition: string;
   selectedFiles: File[];
   productName: string;
   price: string;
   description: string;
+  saleType: "group" | "individual";
+  quantity: string;
+  contactName: string;
+  contactPhone: string;
 };
 
 type CreateFormAction =
@@ -53,14 +59,18 @@ type CreateFormAction =
   | { type: "RESET_SIZE" };
 
 const initialFormState: CreateFormState = {
-  category: "",
-  subcategory: "",
-  productSize: "",
+  categoryId: "",
+  subcategoryId: "",
+  sizeId: "",
   condition: "",
   selectedFiles: [],
   productName: "",
   price: "",
   description: "",
+  saleType: "individual",
+  quantity: "",
+  contactName: "",
+  contactPhone: "",
 };
 
 const formReducer = (
@@ -84,14 +94,27 @@ const formReducer = (
       };
 
     case "RESET_SUBCATEGORY_AND_SIZE":
-      return { ...state, subcategory: "", productSize: "" };
+      return { ...state, subcategoryId: "", sizeId: "" };
 
     case "RESET_SIZE":
-      return { ...state, productSize: "" };
+      return { ...state, sizeId: "" };
 
     default:
       return state;
   }
+};
+
+const buildSizeLabel = (size: SizeData): string => {
+  let label = size.manufacturer_size;
+  const details: string[] = [];
+  if (size.height_from != null || size.height_to != null) {
+    details.push(`рост ${size.height_from ?? "?"}–${size.height_to ?? "?"} см`);
+  }
+  if (size.diameter != null) details.push(`диаметр ${size.diameter} см`);
+  if (size.length != null) details.push(`длина ${size.length} см`);
+  if (size.circumference) details.push(`окружность ${size.circumference} мм`);
+  if (details.length > 0) label += ` (${details.join(", ")})`;
+  return label;
 };
 
 const Create: FC = () => {
@@ -103,8 +126,13 @@ const Create: FC = () => {
     productName?: string;
     category?: string;
     subcategory?: string;
-    productSize?: string;
+    size?: string;
     price?: string;
+    quantity?: string;
+  }>({});
+  const [contactErrors, setContactErrors] = useState<{
+    contactName?: string;
+    contactPhone?: string;
   }>({});
   const [filePreviews, setFilePreviews] = useState<
     Array<{ file: File; url: string }>
@@ -120,103 +148,126 @@ const Create: FC = () => {
     });
   };
 
+  const clearContactError = (field: keyof typeof contactErrors) => {
+    setContactErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
   const [form, dispatch] = useReducer(formReducer, initialFormState);
 
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 44);
   const platformName = useSafePlatform();
-  const { createProduct } = useRequestCreateProduct();
+  const { createProduct } = useCreateProduct();
   const navigate = useNavigate();
 
   // Refs для автофокуса
   const subcategoryInputRef = useRef<HTMLInputElement>(null);
   const sizeInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
-  const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
-    useRequestGetCategories();
-  const {
-    categories: gymnasticsCategories,
-    isLoading: isLoadingGymnasticsCategories,
-  } = useRequestGetGymnasticsCategories();
-  const { sizes: leotardSizes, isLoading: isLoadingLeotardSizes } =
-    useRequestGetLeotardSizes();
 
-  // Преобразуем категории из Firebase для использования в Select
-  const categoryOptions = useMemo(() => {
-    return categoriesFromFirebase;
-  }, [categoriesFromFirebase]);
+  // Загрузка данных из MongoDB API
+  const { categories, isLoading: isLoadingCategories } = useCategories();
+  const { subcategories, isLoading: isLoadingSubcategories } = useSubcategories(
+    form.categoryId || null,
+  );
+  const { sizes, isLoading: isLoadingSizes } = useSizes(
+    form.categoryId || null,
+    form.subcategoryId || null,
+  );
 
-  // Преобразуем подкатегории гимнастики для использования в Select
-  const gymnasticsSubcategoryOptions = useMemo(() => {
-    return gymnasticsCategories;
-  }, [gymnasticsCategories]);
+  // Фильтруем только активные
+  const activeCategories = useMemo(
+    () => categories.filter((c) => c.is_active),
+    [categories],
+  );
+  const activeSubcategories = useMemo(
+    () => subcategories.filter((s) => s.is_active),
+    [subcategories],
+  );
+  const activeSizes = useMemo(() => sizes.filter((s) => s.is_active), [sizes]);
 
-  // Преобразуем размеры купальников для использования в Select
-  const leotardSizeOptions = useMemo(() => {
-    return leotardSizes.map((size) => ({
-      value: `${size.size}`,
-      label: `${size.size} (${size.height})`,
-    }));
-  }, [leotardSizes]);
+  // Опции для Select
+  const categoryOptions = useMemo(
+    () => activeCategories.map((c) => ({ value: c.id, label: c.name_ru })),
+    [activeCategories],
+  );
+  const subcategoryOptions = useMemo(
+    () => activeSubcategories.map((s) => ({ value: s.id, label: s.name_ru })),
+    [activeSubcategories],
+  );
+  const sizeOptions = useMemo(
+    () => activeSizes.map((s) => ({ value: s.id, label: buildSizeLabel(s) })),
+    [activeSizes],
+  );
 
-  // Очищаем подкатегорию гимнастики при изменении основной категории
+  // Вычисляем выбранные объекты для отображения имён
+  const selectedCategory = useMemo(
+    () => categories.find((c) => c.id === form.categoryId),
+    [categories, form.categoryId],
+  );
+  const selectedSubcategory = useMemo(
+    () => subcategories.find((s) => s.id === form.subcategoryId),
+    [subcategories, form.subcategoryId],
+  );
+  const selectedSize = useMemo(
+    () => sizes.find((s) => s.id === form.sizeId),
+    [sizes, form.sizeId],
+  );
+
+  // Сбрасываем подкатегорию и размер при смене категории
   useEffect(() => {
-    if (form.category !== "Гимнастика") {
-      dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
-    }
-  }, [form.category]);
+    dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
+  }, [form.categoryId]);
 
-  // Очищаем размер купальника при изменении подкатегории
+  // Сбрасываем размер при смене подкатегории
   useEffect(() => {
-    if (form.subcategory !== "Купальник") {
-      dispatch({ type: "RESET_SIZE" });
-    }
-  }, [form.subcategory]);
+    dispatch({ type: "RESET_SIZE" });
+  }, [form.subcategoryId]);
 
   // Обработчик изменения категории
-  const handleCategoryChange = (newCategory: string) => {
+  const handleCategoryChange = (newCategoryId: string) => {
     clearBasicError("category");
-    dispatch({ type: "SET_FIELD", field: "category", value: newCategory });
-
-    if (newCategory !== "Гимнастика") {
-      dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
-    }
+    dispatch({ type: "SET_FIELD", field: "categoryId", value: newCategoryId });
 
     setTimeout(() => {
-      if (newCategory === "Гимнастика") {
-        subcategoryInputRef.current?.focus();
-      } else {
-        priceInputRef.current?.focus();
-      }
+      priceInputRef.current?.focus();
     }, 300);
   };
 
   // Обработчик изменения подкатегории
-  const handleSubcategoryChange = (newSubcategory: string) => {
+  const handleSubcategoryChange = (newSubcategoryId: string) => {
     clearBasicError("subcategory");
     dispatch({
       type: "SET_FIELD",
-      field: "subcategory",
-      value: newSubcategory,
+      field: "subcategoryId",
+      value: newSubcategoryId,
     });
 
-    if (newSubcategory !== "Купальник") {
-      dispatch({ type: "RESET_SIZE" });
-    }
+    setTimeout(() => {
+      priceInputRef.current?.focus();
+    }, 300);
+  };
+
+  // Обработчик изменения размера
+  const handleSizeChange = (newSizeId: string) => {
+    clearBasicError("size");
+    dispatch({ type: "SET_FIELD", field: "sizeId", value: newSizeId });
 
     setTimeout(() => {
-      if (newSubcategory === "Купальник") {
-        sizeInputRef.current?.focus();
-      } else {
-        priceInputRef.current?.focus();
-      }
+      priceInputRef.current?.focus();
     }, 300);
   };
 
   useEffect(() => {
     if (form.selectedFiles.length === 0) {
       setFilePreviews([]);
+      setCoverImageIndex(0);
       return;
     }
 
@@ -245,6 +296,11 @@ const Create: FC = () => {
       description: "Подробное описание товара",
     },
     {
+      id: "contacts",
+      title: "Контактные данные",
+      description: "Имя и телефон для связи",
+    },
+    {
       id: "review",
       title: "Проверка",
       description: "Проверьте данные перед публикацией",
@@ -269,20 +325,16 @@ const Create: FC = () => {
         nextErrors.productName = "Введите название товара";
       }
 
-      if (!form.category.trim()) {
+      if (!form.categoryId) {
         nextErrors.category = "Выберите категорию";
       }
 
-      if (form.category === "Гимнастика" && !form.subcategory.trim()) {
+      if (activeSubcategories.length > 0 && !form.subcategoryId) {
         nextErrors.subcategory = "Выберите подкатегорию";
       }
 
-      if (
-        form.category === "Гимнастика" &&
-        form.subcategory === "Купальник" &&
-        !form.productSize.trim()
-      ) {
-        nextErrors.productSize = "Выберите размер";
+      if (activeSizes.length > 0 && !form.sizeId) {
+        nextErrors.size = "Выберите размер";
       }
 
       const price = Number(form.price);
@@ -293,7 +345,34 @@ const Create: FC = () => {
         nextErrors.price = "Минимальная цена — 2500 ₸";
       }
 
+      if (
+        form.saleType === "group" &&
+        (!form.quantity || Number(form.quantity) < 2)
+      ) {
+        nextErrors.quantity = "Укажите количество (минимум 2)";
+      }
+
       setBasicErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+    }
+
+    if (currentStep === "contacts") {
+      const nextErrors: typeof contactErrors = {};
+
+      if (!form.contactName.trim()) {
+        nextErrors.contactName = "Введите имя для связи";
+      }
+
+      if (!form.contactPhone.trim()) {
+        nextErrors.contactPhone = "Введите номер телефона";
+      } else if (!isPhoneComplete(form.contactPhone)) {
+        nextErrors.contactPhone = "Введите полный номер телефона";
+      }
+
+      setContactErrors(nextErrors);
 
       if (Object.keys(nextErrors).length > 0) {
         return;
@@ -322,13 +401,19 @@ const Create: FC = () => {
 
       const productData = {
         name: form.productName.trim(),
-        category: form.category,
-        subcategory: form.subcategory || undefined,
-        productSize: form.productSize ? Number(form.productSize) : undefined,
-        price: Number(form.price),
-        description: form.description.trim() || undefined,
+        category: selectedCategory?.name_ru || "",
+        subcategory: selectedSubcategory?.name_ru || undefined,
+        productSize: selectedSize?.manufacturer_size || undefined,
+        categoryId: form.categoryId,
+        subcategoryId: form.subcategoryId || undefined,
+        sizeId: form.sizeId || undefined,
         condition: form.condition || undefined,
-        isFavorite: false,
+        price: Number(form.price),
+        description: form.description?.trim() || "",
+        saleType: form.saleType,
+        quantity: form.saleType === "group" ? Number(form.quantity) : undefined,
+        contactName: form.contactName.trim(),
+        contactPhone: form.contactPhone.trim(),
         imagesArray:
           imagesArray.length > 0
             ? moveSelectedToStart(imagesArray, coverImageIndex)
@@ -338,46 +423,43 @@ const Create: FC = () => {
 
       const result = await createProduct(productData);
 
-      if (result.success) {
-        alert("Товар успешно добавлен!");
-        navigate("/store");
+      if (result?.id) {
+        navigate(`/product/${result.id}`);
       } else {
-        alert(`Ошибка: ${result.error}`);
+        navigate("/");
       }
-    } catch (error) {
-      console.error("Ошибка при создании товара:", error);
-      alert(`Ошибка при загрузке изображений: ${error}`);
+    } catch (e) {
+      console.error(e);
+      navigate("/");
     } finally {
       setIsPublishing(false);
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+  const handleFileChange = (files: File[]) => {
+    if (!files || files.length === 0) return;
 
-    const filesArray = Array.from(files);
+    dispatch({ type: "ADD_FILES", files });
+  };
 
-    // Фильтруем только изображения
-    const imageFiles = filesArray.filter((file) =>
-      file.type.startsWith("image/"),
-    );
+  const handleFileInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = Array.from(event.target.files ?? []);
+    handleFileChange(files);
 
-    dispatch({ type: "ADD_FILES", files: imageFiles });
-    if (form.selectedFiles.length === 0) setCoverImageIndex(0);
+    // важно: чтобы можно было выбрать тот же файл повторно
     event.target.value = "";
   };
 
   const removeFile = (index: number) => {
     dispatch({ type: "REMOVE_FILE", index });
 
-    setFilePreviews((prev) => prev.filter((_, i) => i !== index));
-
-    setCoverImageIndex((prevCover) => {
-      if (index === prevCover) return 0;
-      if (index < prevCover) return Math.max(prevCover - 1, 0);
-      return prevCover;
-    });
+    if (coverImageIndex === index) {
+      setCoverImageIndex(0);
+    } else if (coverImageIndex > index) {
+      setCoverImageIndex((prev) => prev - 1);
+    }
   };
 
   return (
@@ -479,25 +561,24 @@ const Create: FC = () => {
                 dispatch={dispatch}
                 basicErrors={basicErrors}
                 clearBasicError={clearBasicError}
-                categoryOptions={categoryOptions.map((cat) => ({
-                  value: cat.name_ru,
-                  label: cat.name_ru,
-                }))}
-                gymnasticsSubcategoryOptions={gymnasticsSubcategoryOptions.map(
-                  (cat) => ({
-                    value: cat.name_ru,
-                    label: cat.name_ru,
-                  }),
-                )}
-                leotardSizeOptions={leotardSizeOptions}
+                categoryOptions={categoryOptions}
+                subcategoryOptions={subcategoryOptions}
+                sizeOptions={sizeOptions}
+                showSubcategory={activeSubcategories.length > 0}
+                showSize={activeSizes.length > 0}
                 isLoadingCategories={isLoadingCategories}
-                isLoadingGymnasticsCategories={isLoadingGymnasticsCategories}
-                isLoadingLeotardSizes={isLoadingLeotardSizes}
+                isLoadingSubcategories={isLoadingSubcategories}
+                isLoadingSizes={isLoadingSizes}
                 handleCategoryChange={handleCategoryChange}
                 handleSubcategoryChange={handleSubcategoryChange}
+                handleSizeChange={handleSizeChange}
                 subcategoryInputRef={subcategoryInputRef}
                 sizeInputRef={sizeInputRef}
                 priceInputRef={priceInputRef}
+                saleTypeOptions={[
+                  { value: "individual", label: "Индивидуально" },
+                  { value: "group", label: "Для группы" },
+                ]}
               />
             )}
 
@@ -505,7 +586,7 @@ const Create: FC = () => {
               <StepPhotos
                 selectedFiles={form.selectedFiles}
                 filePreviews={filePreviews}
-                onFileChange={handleFileChange}
+                onFileChange={handleFileInputChange}
                 onRemoveFile={removeFile}
                 coverImageIndex={coverImageIndex}
                 onSetCoverImage={setCoverImageIndex}
@@ -516,9 +597,22 @@ const Create: FC = () => {
               <StepDetails form={form} dispatch={dispatch} />
             )}
 
+            {currentStep === "contacts" && (
+              <StepContacts
+                form={{
+                  contactName: form.contactName,
+                  contactPhone: form.contactPhone,
+                }}
+                dispatch={dispatch}
+                contactErrors={contactErrors}
+                clearContactError={clearContactError}
+              />
+            )}
+
             {currentStep === "review" && (
               <StepReview
                 form={form}
+                categoryName={selectedCategory?.name_ru || ""}
                 filePreviews={filePreviews}
                 coverImageIndex={coverImageIndex}
               />

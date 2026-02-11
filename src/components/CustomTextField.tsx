@@ -25,14 +25,19 @@ export const CustomTextField: FC<CustomTextFieldProps> = (props) => {
 
   const composedHelperText: ReactNode =
     typeof maxSymbols === "number" ? (
-      <div
-        style={{ display: "flex", justifyContent: "space-between", gap: 12 }}
+      <span
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 12,
+          width: "100%",
+        }}
       >
         <span>{helperText || "\u00A0"}</span>
         <span style={{ opacity: 0.65, whiteSpace: "nowrap" }}>
           {used}/{maxSymbols}
         </span>
-      </div>
+      </span>
     ) : (
       helperText
     );

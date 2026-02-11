@@ -7,19 +7,24 @@ import { Colors } from "@/theme/colors";
 
 interface StepReviewProps {
   form: {
-    category: string;
     productName: string;
     price: string;
     description: string;
     condition: string;
     selectedFiles: File[];
+    saleType: "group" | "individual";
+    quantity: string;
+    contactName: string;
+    contactPhone: string;
   };
+  categoryName: string;
   filePreviews: Array<{ file: File; url: string }>;
   coverImageIndex: number;
 }
 
 export const StepReview: FC<StepReviewProps> = ({
   form,
+  categoryName,
   filePreviews,
   coverImageIndex,
 }) => {
@@ -40,13 +45,60 @@ export const StepReview: FC<StepReviewProps> = ({
           product={{
             id: "preview",
             image: previewImage,
-            category: form.category || "Без категории",
+            category: categoryName || "Без категории",
             title: form.productName || "Название товара",
             price: form.price
               ? `${Number(form.price).toLocaleString("ru-RU")} ₸`
               : "0 ₸",
           }}
         />
+      </div>
+
+      <div
+        style={{
+          padding: 16,
+          backgroundColor: c.surfaceColor,
+          borderRadius: 12,
+          marginTop: 8,
+        }}
+      >
+        <h4
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: c.text,
+            margin: "0 0 8px",
+          }}
+        >
+          Тип продажи
+        </h4>
+        <p style={{ fontSize: 14, color: c.text, margin: 0 }}>
+          {form.saleType === "group"
+            ? `Для группы (${form.quantity} шт.)`
+            : "Индивидуально"}
+        </p>
+      </div>
+
+      <div
+        style={{
+          padding: 16,
+          backgroundColor: c.surfaceColor,
+          borderRadius: 12,
+        }}
+      >
+        <h4
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: c.text,
+            margin: "0 0 8px",
+          }}
+        >
+          Контактные данные
+        </h4>
+        <p style={{ fontSize: 14, color: c.text, margin: 0, lineHeight: 1.5 }}>
+          {form.contactName}, {form.contactPhone}
+        </p>
       </div>
 
       {form.description && (

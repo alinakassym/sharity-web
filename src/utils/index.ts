@@ -1,3 +1,5 @@
+// sharity-web/src/utils/index.ts
+
 export const moveSelectedToStart = <T>(
   array: T[],
   selectedIndex: number,

@@ -1,4 +1,4 @@
-// src/pages/Store.tsx
+// sharity-web/src/pages/Store.tsx
 
 import type { FC } from "react";
 import { useState, useMemo } from "react";
@@ -15,8 +15,8 @@ import CategoryFilterSkeleton from "@/components/CategoryFilterSkeleton";
 import ProductGrid from "@/components/ProductGrid";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import type { ProductData } from "@/components/ProductCard";
-import { useRequestGetProducts } from "@/hooks/useRequestGetProducts";
-import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
+import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
 import { useFavorites } from "@/hooks/useFavorites";
 import Container from "@/components/Container";
 
@@ -38,10 +38,9 @@ const Store: FC = () => {
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [searchValue, setSearchValue] = useState("");
 
-  const { products: rows, isLoading: isLoadingProducts } =
-    useRequestGetProducts();
-  const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
-    useRequestGetCategories();
+  const { products: rows, isLoading: isLoadingProducts } = useProducts();
+  const { categories: categoriesFromAPI, isLoading: isLoadingCategories } =
+    useCategories();
 
   // Получаем список избранных продуктов текущего пользователя
   const { favorites: favoriteProductIds } = useFavorites("product");
@@ -49,40 +48,31 @@ const Store: FC = () => {
   // Определяем, откуда была открыта страница
   const backTo = (location.state as { from?: string })?.from || "/";
 
-  // Преобразуем категории из Firebase в формат Category для CategoryFilter
+  // Преобразуем категории из API в формат Category для CategoryFilter
   const categories: Category[] = useMemo(() => {
-    return categoriesFromFirebase.map((cat) => ({
-      id: cat.name_ru, // Используем русское название как ID для фильтрации
-      label: cat.name_ru,
-      icon: cat.icon || "category", // Fallback иконка если не указана
-    }));
-  }, [categoriesFromFirebase]);
+    return categoriesFromAPI
+      .filter((cat) => cat.is_active)
+      .map((cat) => ({
+        id: cat.name_ru,
+        label: cat.name_ru,
+        icon: cat.icon || "category",
+      }));
+  }, [categoriesFromAPI]);
 
-  // Firestore -> ProductData (для грида)
+  // API -> ProductData (для грида)
   const products: ProductData[] = useMemo(
     () =>
-      rows.map((r, i) => {
-        // Приоритет отображения изображений:
-        // 1. Первое изображение из imagesArray
-        // 2. Поле image (для совместимости)
-        // 3. Fallback заглушка
-        let imageUrl = `https://picsum.photos/600?${i + 1}`;
-
-        if (r.imagesArray && r.imagesArray.length > 0) {
-          imageUrl = r.imagesArray[0];
-        } else if (r.image) {
-          imageUrl = r.image;
-        }
-
-        return {
-          id: r.id,
-          image: imageUrl,
-          category: r.category ?? "",
-          title: r.name ?? "",
-          price: KZT.format(Number(r.price) || 0),
-          isFavorite: r.isFavorite ?? false,
-        };
-      }),
+      rows.map((r, i) => ({
+        id: r.id,
+        image:
+          r.imagesArray && r.imagesArray.length > 0
+            ? r.imagesArray[0]
+            : `https://picsum.photos/600?${i + 1}`,
+        category: r.category ?? "",
+        title: r.name ?? "",
+        price: KZT.format(r.price || 0),
+        isFavorite: r.isFavorite ?? false,
+      })),
     [rows],
   );
 
