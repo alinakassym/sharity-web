@@ -36,10 +36,15 @@ export const StepPhotos: FC<StepPhotosProps> = ({
           backgroundColor: c.surfaceColor,
         }}
       >
-        <VuesaxIcon name="camera" color={c.lightText} size={48} />
+        <VuesaxIcon
+          name="gallery"
+          stroke={c.lightText}
+          strokeWidth={1.5}
+          size={32}
+        />
         <p
           style={{
-            margin: "16px 0 8px",
+            margin: "8px 0 8px",
             fontSize: 16,
             fontWeight: 600,
             color: c.text,
