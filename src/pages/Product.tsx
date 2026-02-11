@@ -1,4 +1,4 @@
-// src/pages/Product.tsx
+// sharity-web/src/pages/Product.tsx
 
 import type { FC } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -7,7 +7,7 @@ import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
-import { useRequestGetProduct } from "@/hooks/useRequestGetProduct";
+import { useProduct } from "@/hooks/useProduct";
 import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
 import Container from "@/components/Container";
 import Carousel from "@/components/Carousel";
@@ -25,7 +25,7 @@ const Product: FC = () => {
 
   const backTo = (location.state as { from?: string })?.from || "/";
 
-  const { product: productData, isLoading, error } = useRequestGetProduct(id);
+  const { product: productData, isLoading, error } = useProduct(id);
   const { sizes: leotardSizes } = useRequestGetLeotardSizes();
 
   const handleBackClick = () => {
@@ -60,8 +60,8 @@ const Product: FC = () => {
   });
 
   // Функция для поиска роста по размеру купальника
-  const getHeightForSize = (size: number): string | undefined => {
-    const sizeData = leotardSizes.find((s) => s.size === size);
+  const getHeightForSize = (size: string): string | undefined => {
+    const sizeData = leotardSizes.find((s) => s.size === Number(size));
     return sizeData?.height;
   };
 
