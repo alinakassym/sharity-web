@@ -28,6 +28,8 @@ import { useCreateProduct } from "@/hooks/useCreateProduct";
 import { isPhoneComplete } from "@/components/PhoneField";
 import { useNavigate } from "react-router-dom";
 
+import { moveSelectedToStart } from "@/utils";
+
 type StepType = "basic" | "contacts" | "photos" | "details" | "review";
 
 type CreateFormState = {
@@ -412,8 +414,10 @@ const Create: FC = () => {
         quantity: form.saleType === "group" ? Number(form.quantity) : undefined,
         contactName: form.contactName.trim(),
         contactPhone: form.contactPhone.trim(),
-        images: imagesArray,
-        coverImageIndex,
+        imagesArray:
+          imagesArray.length > 0
+            ? moveSelectedToStart(imagesArray, coverImageIndex)
+            : undefined,
         createdBy,
       };
 
