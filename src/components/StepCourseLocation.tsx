@@ -1,10 +1,9 @@
-// src/components/StepCourseLocation.tsx
+// sharity-web/src/components/StepCourseLocation.tsx
 
 import type { FC } from "react";
-import { forwardRef } from "react";
 import { Button, IconButton, TextField } from "@mui/material";
-import { IMaskInput } from "react-imask";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import PhoneField from "@/components/PhoneField";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 
@@ -12,31 +11,6 @@ type LocationItem = {
   location: string;
   locationCoordinates: [number, number];
 };
-
-interface PhoneMaskProps {
-  onChange: (event: { target: { name: string; value: string } }) => void;
-  name: string;
-}
-
-const PhoneMask = forwardRef<HTMLInputElement, PhoneMaskProps>(
-  function PhoneMask(props, ref) {
-    const { onChange, ...other } = props;
-    return (
-      <IMaskInput
-        {...other}
-        mask="+7 (000) 000-00-00"
-        definitions={{
-          "0": /[0-9]/,
-        }}
-        inputRef={ref}
-        onAccept={(value: unknown) =>
-          onChange({ target: { name: props.name, value: value as string } })
-        }
-        overwrite
-      />
-    );
-  },
-);
 
 type LocationErrors = {
   locations?: string;
@@ -170,40 +144,26 @@ export const StepCourseLocation: FC<StepCourseLocationProps> = ({
           Контакты
         </h3>
 
-        <TextField
+        <PhoneField
           label="Телефон"
-          placeholder="+7 (___) ___-__-__"
           value={phone}
-          onChange={(e) => {
+          onChange={(value) => {
             clearLocationError("contacts");
-            onChangePhone(e.target.value);
+            onChangePhone(value);
           }}
           fullWidth
-          variant="outlined"
-          style={{ marginBottom: 16 }}
-          slotProps={{
-            input: {
-              inputComponent: PhoneMask as never,
-            },
-          }}
+          sx={{ mb: 2 }}
         />
 
-        <TextField
+        <PhoneField
           label="WhatsApp"
-          placeholder="+7 (___) ___-__-__"
           value={whatsapp}
-          onChange={(e) => {
+          onChange={(value) => {
             clearLocationError("contacts");
-            onChangeWhatsapp(e.target.value);
+            onChangeWhatsapp(value);
           }}
           fullWidth
-          variant="outlined"
-          style={{ marginBottom: 16 }}
-          slotProps={{
-            input: {
-              inputComponent: PhoneMask as never,
-            },
-          }}
+          sx={{ mb: 2 }}
         />
 
         <TextField

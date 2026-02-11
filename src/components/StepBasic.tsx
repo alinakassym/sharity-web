@@ -4,6 +4,7 @@ import type { FC, RefObject } from "react";
 import type { Dispatch } from "react";
 import { TextField } from "@mui/material";
 import ModalSelect from "@/components/ModalSelect";
+import PhoneField from "@/components/PhoneField";
 import { CustomTextField } from "./CustomTextField";
 
 type SelectOption = { value: string; label: string };
@@ -259,24 +260,16 @@ export const StepBasic: FC<StepBasicProps> = ({
         variant="outlined"
       />
 
-      <TextField
+      <PhoneField
         label="Телефон для связи *"
-        placeholder="+7 (___) ___-__-__"
-        type="tel"
-        inputMode="tel"
         value={form.contactPhone}
-        onChange={(e) => {
+        onChange={(value) => {
           clearBasicError("contactPhone");
-          dispatch({
-            type: "SET_FIELD",
-            field: "contactPhone",
-            value: e.target.value,
-          });
+          dispatch({ type: "SET_FIELD", field: "contactPhone", value });
         }}
         error={Boolean(basicErrors.contactPhone)}
         helperText={basicErrors.contactPhone}
         fullWidth
-        variant="outlined"
       />
     </div>
   );

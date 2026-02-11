@@ -24,6 +24,7 @@ import { Stepper, Step, StepLabel, Button } from "@mui/material";
 
 import { getTelegramUser } from "@/lib/telegram";
 import { useCreateProduct } from "@/hooks/useCreateProduct";
+import { isPhoneComplete } from "@/components/PhoneField";
 import { useNavigate } from "react-router-dom";
 
 import { moveSelectedToStart } from "@/utils";
@@ -342,6 +343,8 @@ const Create: FC = () => {
 
       if (!form.contactPhone.trim()) {
         nextErrors.contactPhone = "Введите номер телефона";
+      } else if (!isPhoneComplete(form.contactPhone)) {
+        nextErrors.contactPhone = "Введите полный номер телефона";
       }
 
       setBasicErrors(nextErrors);

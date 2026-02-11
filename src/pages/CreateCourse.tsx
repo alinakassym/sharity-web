@@ -18,6 +18,7 @@ import { StepCoursePhotos } from "@/components/StepCoursePhotos";
 import { StepCourseReview } from "@/components/StepCourseReview";
 import { StepCourseDetails } from "@/components/StepCourseDetails";
 import { StepCourseLocation } from "@/components/StepCourseLocation";
+import { isPhoneComplete } from "@/components/PhoneField";
 
 import { uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import {
@@ -327,6 +328,10 @@ const CreateCourse: FC = () => {
         form.phone.trim() || form.whatsapp.trim() || form.telegram.trim();
       if (!hasContact) {
         nextErrors.contacts = "Укажите хотя бы один способ связи";
+      } else if (form.phone.trim() && !isPhoneComplete(form.phone)) {
+        nextErrors.contacts = "Введите полный номер телефона";
+      } else if (form.whatsapp.trim() && !isPhoneComplete(form.whatsapp)) {
+        nextErrors.contacts = "Введите полный номер WhatsApp";
       }
 
       setLocationErrors(nextErrors);
