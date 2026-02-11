@@ -9,16 +9,21 @@ import { CustomTextField } from "./CustomTextField";
 type SelectOption = { value: string; label: string };
 
 type CreateFormState = {
-  category: string;
-  subcategory: string;
-  productSize: string;
+  categoryId: string;
+  subcategoryId: string;
+  sizeId: string;
   productName: string;
   price: string;
 };
 
 type CreateFormAction = {
   type: "SET_FIELD";
-  field: "category" | "subcategory" | "productSize" | "productName" | "price";
+  field:
+    | "categoryId"
+    | "subcategoryId"
+    | "sizeId"
+    | "productName"
+    | "price";
   value: string;
 };
 
@@ -26,7 +31,7 @@ type BasicErrors = {
   productName?: string;
   category?: string;
   subcategory?: string;
-  productSize?: string;
+  size?: string;
   price?: string;
 };
 
@@ -38,15 +43,19 @@ interface StepBasicProps {
   clearBasicError: (field: keyof BasicErrors) => void;
 
   categoryOptions: SelectOption[];
-  gymnasticsSubcategoryOptions: SelectOption[];
-  leotardSizeOptions: SelectOption[];
+  subcategoryOptions: SelectOption[];
+  sizeOptions: SelectOption[];
+
+  showSubcategory: boolean;
+  showSize: boolean;
 
   isLoadingCategories: boolean;
-  isLoadingGymnasticsCategories: boolean;
-  isLoadingLeotardSizes: boolean;
+  isLoadingSubcategories: boolean;
+  isLoadingSizes: boolean;
 
-  handleCategoryChange: (newCategory: string) => void;
-  handleSubcategoryChange: (newSubcategory: string) => void;
+  handleCategoryChange: (newCategoryId: string) => void;
+  handleSubcategoryChange: (newSubcategoryId: string) => void;
+  handleSizeChange: (newSizeId: string) => void;
 
   subcategoryInputRef: RefObject<HTMLInputElement | null>;
   sizeInputRef: RefObject<HTMLInputElement | null>;
@@ -60,13 +69,16 @@ export const StepBasic: FC<StepBasicProps> = ({
   basicErrors,
   clearBasicError,
   categoryOptions,
-  gymnasticsSubcategoryOptions,
-  leotardSizeOptions,
+  subcategoryOptions,
+  sizeOptions,
+  showSubcategory,
+  showSize,
   isLoadingCategories,
-  isLoadingGymnasticsCategories,
-  isLoadingLeotardSizes,
+  isLoadingSubcategories,
+  isLoadingSizes,
   handleCategoryChange,
   handleSubcategoryChange,
+  handleSizeChange,
   subcategoryInputRef,
   sizeInputRef,
   priceInputRef,
@@ -96,7 +108,7 @@ export const StepBasic: FC<StepBasicProps> = ({
       <ModalSelect
         searchable
         label="Категория"
-        value={form.category}
+        value={form.categoryId}
         onChange={handleCategoryChange}
         options={categoryOptions}
         placeholder={
@@ -108,50 +120,45 @@ export const StepBasic: FC<StepBasicProps> = ({
         helperText={basicErrors.category}
       />
 
-      {form.category === "Гимнастика" && (
-        <>
-          <ModalSelect
-            searchable
-            label="Подкатегория"
-            value={form.subcategory}
-            onChange={handleSubcategoryChange}
-            options={gymnasticsSubcategoryOptions}
-            placeholder={
-              isLoadingGymnasticsCategories
-                ? "Загрузка подкатегорий..."
-                : "Выберите подкатегорию"
-            }
-            disabled={isLoadingGymnasticsCategories}
-            inputRef={subcategoryInputRef}
-            error={Boolean(basicErrors.subcategory)}
-            helperText={basicErrors.subcategory}
-          />
-        </>
+      {showSubcategory && (
+        <ModalSelect
+          searchable
+          label="Подкатегория"
+          value={form.subcategoryId}
+          onChange={handleSubcategoryChange}
+          options={subcategoryOptions}
+          placeholder={
+            isLoadingSubcategories
+              ? "Загрузка подкатегорий..."
+              : "Выберите подкатегорию"
+          }
+          disabled={isLoadingSubcategories}
+          inputRef={subcategoryInputRef}
+          error={Boolean(basicErrors.subcategory)}
+          helperText={basicErrors.subcategory}
+        />
       )}
 
-      {form.category === "Гимнастика" && form.subcategory === "Купальник" && (
-        <>
-          <ModalSelect
-            label="Размер"
-            value={form.productSize}
-            onChange={(value) => {
-              clearBasicError("productSize");
-              dispatch({ type: "SET_FIELD", field: "productSize", value });
-              setTimeout(() => {
-                priceInputRef.current?.focus();
-              }, 300);
-            }}
-            options={leotardSizeOptions}
-            placeholder={
-              isLoadingLeotardSizes ? "Загрузка размеров..." : "Выберите размер"
-            }
-            disabled={isLoadingLeotardSizes}
-            searchable
-            inputRef={sizeInputRef}
-            error={Boolean(basicErrors.productSize)}
-            helperText={basicErrors.productSize}
-          />
-        </>
+      {showSize && (
+        <ModalSelect
+          label="Размер"
+          value={form.sizeId}
+          onChange={(value) => {
+            handleSizeChange(value);
+            setTimeout(() => {
+              priceInputRef.current?.focus();
+            }, 300);
+          }}
+          options={sizeOptions}
+          placeholder={
+            isLoadingSizes ? "Загрузка размеров..." : "Выберите размер"
+          }
+          disabled={isLoadingSizes}
+          searchable
+          inputRef={sizeInputRef}
+          error={Boolean(basicErrors.size)}
+          helperText={basicErrors.size}
+        />
       )}
 
       <TextField
@@ -175,7 +182,7 @@ export const StepBasic: FC<StepBasicProps> = ({
         variant="outlined"
         inputRef={priceInputRef}
         onFocus={() => {
-          // даём клавиатуре открыться, иначе скролл часто “съедается”
+          // даём клавиатуре открыться, иначе скролл часто "съедается"
           setTimeout(() => {
             contentRef.current?.scrollBy({ top: 124, behavior: "smooth" });
           }, 1850);

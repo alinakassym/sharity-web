@@ -7,16 +7,20 @@ import { db } from "@/lib/firebase";
 export interface CreateProductData {
   name: string;
   category: string;
-  subcategory?: string; // Подкатегория гимнастики (если выбрана)
-  size?: number; // Размер купальника (если выбран)
+  subcategory?: string;
+  productSize?: string;
+  // MongoDB IDs для будущей миграции
+  categoryId?: string;
+  subcategoryId?: string;
+  sizeId?: string;
   price: number;
   description?: string;
   condition?: string;
-  status?: "available" | "sold" | "reserved" | "draft"; // Статус товара
+  status?: "available" | "sold" | "reserved" | "draft";
   isFavorite?: boolean;
-  isDeleted?: boolean; // Флаг удаления продукта
+  isDeleted?: boolean;
   imagesArray?: string[];
-  createdBy?: string; // Telegram username пользователя
+  createdBy?: string;
   createdAt?: Date;
 }
 

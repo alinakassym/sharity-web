@@ -15,9 +15,9 @@ import { StepPhotos } from "@/components/StepPhotos";
 import { StepReview } from "@/components/StepReview";
 import { StepDetails } from "@/components/StepDetails";
 
-import { useRequestGetCategories } from "@/hooks/useRequestGetCategories";
-import { useRequestGetGymnasticsCategories } from "@/hooks/useRequestGetGymnasticsCategories";
-import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
+import { useCategories } from "@/hooks/useCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
+import { useSizes, type SizeData } from "@/hooks/useSizes";
 import { PRODUCTS_BUCKET, uploadFiles } from "@/lib/minio";
 
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
@@ -31,9 +31,9 @@ import { moveSelectedToStart } from "@/utils";
 type StepType = "basic" | "photos" | "details" | "review";
 
 type CreateFormState = {
-  category: string;
-  subcategory: string;
-  productSize: string;
+  categoryId: string;
+  subcategoryId: string;
+  sizeId: string;
   condition: string;
   selectedFiles: File[];
   productName: string;
@@ -53,9 +53,9 @@ type CreateFormAction =
   | { type: "RESET_SIZE" };
 
 const initialFormState: CreateFormState = {
-  category: "",
-  subcategory: "",
-  productSize: "",
+  categoryId: "",
+  subcategoryId: "",
+  sizeId: "",
   condition: "",
   selectedFiles: [],
   productName: "",
@@ -84,14 +84,27 @@ const formReducer = (
       };
 
     case "RESET_SUBCATEGORY_AND_SIZE":
-      return { ...state, subcategory: "", productSize: "" };
+      return { ...state, subcategoryId: "", sizeId: "" };
 
     case "RESET_SIZE":
-      return { ...state, productSize: "" };
+      return { ...state, sizeId: "" };
 
     default:
       return state;
   }
+};
+
+const buildSizeLabel = (size: SizeData): string => {
+  let label = size.manufacturer_size;
+  const details: string[] = [];
+  if (size.height_from != null || size.height_to != null) {
+    details.push(`рост ${size.height_from ?? "?"}–${size.height_to ?? "?"} см`);
+  }
+  if (size.diameter != null) details.push(`диаметр ${size.diameter} см`);
+  if (size.length != null) details.push(`длина ${size.length} см`);
+  if (size.circumference) details.push(`окружность ${size.circumference} мм`);
+  if (details.length > 0) label += ` (${details.join(", ")})`;
+  return label;
 };
 
 const Create: FC = () => {
@@ -103,7 +116,7 @@ const Create: FC = () => {
     productName?: string;
     category?: string;
     subcategory?: string;
-    productSize?: string;
+    size?: string;
     price?: string;
   }>({});
   const [filePreviews, setFilePreviews] = useState<
@@ -133,84 +146,100 @@ const Create: FC = () => {
   const subcategoryInputRef = useRef<HTMLInputElement>(null);
   const sizeInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
-  const { categories: categoriesFromFirebase, isLoading: isLoadingCategories } =
-    useRequestGetCategories();
-  const {
-    categories: gymnasticsCategories,
-    isLoading: isLoadingGymnasticsCategories,
-  } = useRequestGetGymnasticsCategories();
-  const { sizes: leotardSizes, isLoading: isLoadingLeotardSizes } =
-    useRequestGetLeotardSizes();
 
-  // Преобразуем категории из Firebase для использования в Select
-  const categoryOptions = useMemo(() => {
-    return categoriesFromFirebase;
-  }, [categoriesFromFirebase]);
+  // Загрузка данных из MongoDB API
+  const { categories, isLoading: isLoadingCategories } = useCategories();
+  const { subcategories, isLoading: isLoadingSubcategories } =
+    useSubcategories(form.categoryId || null);
+  const { sizes, isLoading: isLoadingSizes } = useSizes(
+    form.categoryId || null,
+    form.subcategoryId || null,
+  );
 
-  // Преобразуем подкатегории гимнастики для использования в Select
-  const gymnasticsSubcategoryOptions = useMemo(() => {
-    return gymnasticsCategories;
-  }, [gymnasticsCategories]);
+  // Фильтруем только активные
+  const activeCategories = useMemo(
+    () => categories.filter((c) => c.is_active),
+    [categories],
+  );
+  const activeSubcategories = useMemo(
+    () => subcategories.filter((s) => s.is_active),
+    [subcategories],
+  );
+  const activeSizes = useMemo(
+    () => sizes.filter((s) => s.is_active),
+    [sizes],
+  );
 
-  // Преобразуем размеры купальников для использования в Select
-  const leotardSizeOptions = useMemo(() => {
-    return leotardSizes.map((size) => ({
-      value: `${size.size}`,
-      label: `${size.size} (${size.height})`,
-    }));
-  }, [leotardSizes]);
+  // Опции для Select
+  const categoryOptions = useMemo(
+    () => activeCategories.map((c) => ({ value: c.id, label: c.name_ru })),
+    [activeCategories],
+  );
+  const subcategoryOptions = useMemo(
+    () => activeSubcategories.map((s) => ({ value: s.id, label: s.name_ru })),
+    [activeSubcategories],
+  );
+  const sizeOptions = useMemo(
+    () =>
+      activeSizes.map((s) => ({ value: s.id, label: buildSizeLabel(s) })),
+    [activeSizes],
+  );
 
-  // Очищаем подкатегорию гимнастики при изменении основной категории
+  // Вычисляем выбранные объекты для отображения имён
+  const selectedCategory = useMemo(
+    () => categories.find((c) => c.id === form.categoryId),
+    [categories, form.categoryId],
+  );
+  const selectedSubcategory = useMemo(
+    () => subcategories.find((s) => s.id === form.subcategoryId),
+    [subcategories, form.subcategoryId],
+  );
+  const selectedSize = useMemo(
+    () => sizes.find((s) => s.id === form.sizeId),
+    [sizes, form.sizeId],
+  );
+
+  // Сбрасываем подкатегорию и размер при смене категории
   useEffect(() => {
-    if (form.category !== "Гимнастика") {
-      dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
-    }
-  }, [form.category]);
+    dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
+  }, [form.categoryId]);
 
-  // Очищаем размер купальника при изменении подкатегории
+  // Сбрасываем размер при смене подкатегории
   useEffect(() => {
-    if (form.subcategory !== "Купальник") {
-      dispatch({ type: "RESET_SIZE" });
-    }
-  }, [form.subcategory]);
+    dispatch({ type: "RESET_SIZE" });
+  }, [form.subcategoryId]);
 
   // Обработчик изменения категории
-  const handleCategoryChange = (newCategory: string) => {
+  const handleCategoryChange = (newCategoryId: string) => {
     clearBasicError("category");
-    dispatch({ type: "SET_FIELD", field: "category", value: newCategory });
-
-    if (newCategory !== "Гимнастика") {
-      dispatch({ type: "RESET_SUBCATEGORY_AND_SIZE" });
-    }
+    dispatch({ type: "SET_FIELD", field: "categoryId", value: newCategoryId });
 
     setTimeout(() => {
-      if (newCategory === "Гимнастика") {
-        subcategoryInputRef.current?.focus();
-      } else {
-        priceInputRef.current?.focus();
-      }
+      priceInputRef.current?.focus();
     }, 300);
   };
 
   // Обработчик изменения подкатегории
-  const handleSubcategoryChange = (newSubcategory: string) => {
+  const handleSubcategoryChange = (newSubcategoryId: string) => {
     clearBasicError("subcategory");
     dispatch({
       type: "SET_FIELD",
-      field: "subcategory",
-      value: newSubcategory,
+      field: "subcategoryId",
+      value: newSubcategoryId,
     });
 
-    if (newSubcategory !== "Купальник") {
-      dispatch({ type: "RESET_SIZE" });
-    }
+    setTimeout(() => {
+      priceInputRef.current?.focus();
+    }, 300);
+  };
+
+  // Обработчик изменения размера
+  const handleSizeChange = (newSizeId: string) => {
+    clearBasicError("size");
+    dispatch({ type: "SET_FIELD", field: "sizeId", value: newSizeId });
 
     setTimeout(() => {
-      if (newSubcategory === "Купальник") {
-        sizeInputRef.current?.focus();
-      } else {
-        priceInputRef.current?.focus();
-      }
+      priceInputRef.current?.focus();
     }, 300);
   };
 
@@ -269,20 +298,16 @@ const Create: FC = () => {
         nextErrors.productName = "Введите название товара";
       }
 
-      if (!form.category.trim()) {
+      if (!form.categoryId) {
         nextErrors.category = "Выберите категорию";
       }
 
-      if (form.category === "Гимнастика" && !form.subcategory.trim()) {
+      if (activeSubcategories.length > 0 && !form.subcategoryId) {
         nextErrors.subcategory = "Выберите подкатегорию";
       }
 
-      if (
-        form.category === "Гимнастика" &&
-        form.subcategory === "Купальник" &&
-        !form.productSize.trim()
-      ) {
-        nextErrors.productSize = "Выберите размер";
+      if (activeSizes.length > 0 && !form.sizeId) {
+        nextErrors.size = "Выберите размер";
       }
 
       const price = Number(form.price);
@@ -322,9 +347,14 @@ const Create: FC = () => {
 
       const productData = {
         name: form.productName.trim(),
-        category: form.category,
-        subcategory: form.subcategory || undefined,
-        productSize: form.productSize ? Number(form.productSize) : undefined,
+        // Имена для обратной совместимости
+        category: selectedCategory?.name_ru || "",
+        subcategory: selectedSubcategory?.name_ru || undefined,
+        productSize: selectedSize?.manufacturer_size || undefined,
+        // MongoDB IDs для будущей миграции
+        categoryId: form.categoryId || undefined,
+        subcategoryId: form.subcategoryId || undefined,
+        sizeId: form.sizeId || undefined,
         price: Number(form.price),
         description: form.description.trim() || undefined,
         condition: form.condition || undefined,
@@ -479,22 +509,17 @@ const Create: FC = () => {
                 dispatch={dispatch}
                 basicErrors={basicErrors}
                 clearBasicError={clearBasicError}
-                categoryOptions={categoryOptions.map((cat) => ({
-                  value: cat.name_ru,
-                  label: cat.name_ru,
-                }))}
-                gymnasticsSubcategoryOptions={gymnasticsSubcategoryOptions.map(
-                  (cat) => ({
-                    value: cat.name_ru,
-                    label: cat.name_ru,
-                  }),
-                )}
-                leotardSizeOptions={leotardSizeOptions}
+                categoryOptions={categoryOptions}
+                subcategoryOptions={subcategoryOptions}
+                sizeOptions={sizeOptions}
+                showSubcategory={activeSubcategories.length > 0}
+                showSize={activeSizes.length > 0}
                 isLoadingCategories={isLoadingCategories}
-                isLoadingGymnasticsCategories={isLoadingGymnasticsCategories}
-                isLoadingLeotardSizes={isLoadingLeotardSizes}
+                isLoadingSubcategories={isLoadingSubcategories}
+                isLoadingSizes={isLoadingSizes}
                 handleCategoryChange={handleCategoryChange}
                 handleSubcategoryChange={handleSubcategoryChange}
+                handleSizeChange={handleSizeChange}
                 subcategoryInputRef={subcategoryInputRef}
                 sizeInputRef={sizeInputRef}
                 priceInputRef={priceInputRef}
@@ -519,6 +544,7 @@ const Create: FC = () => {
             {currentStep === "review" && (
               <StepReview
                 form={form}
+                categoryName={selectedCategory?.name_ru || ""}
                 filePreviews={filePreviews}
                 coverImageIndex={coverImageIndex}
               />

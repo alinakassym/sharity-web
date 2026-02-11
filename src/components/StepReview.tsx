@@ -7,19 +7,20 @@ import { Colors } from "@/theme/colors";
 
 interface StepReviewProps {
   form: {
-    category: string;
     productName: string;
     price: string;
     description: string;
     condition: string;
     selectedFiles: File[];
   };
+  categoryName: string;
   filePreviews: Array<{ file: File; url: string }>;
   coverImageIndex: number;
 }
 
 export const StepReview: FC<StepReviewProps> = ({
   form,
+  categoryName,
   filePreviews,
   coverImageIndex,
 }) => {
@@ -40,7 +41,7 @@ export const StepReview: FC<StepReviewProps> = ({
           product={{
             id: "preview",
             image: previewImage,
-            category: form.category || "Без категории",
+            category: categoryName || "Без категории",
             title: form.productName || "Название товара",
             price: form.price
               ? `${Number(form.price).toLocaleString("ru-RU")} ₸`
