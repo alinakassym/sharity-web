@@ -14,6 +14,10 @@ type CreateFormState = {
   sizeId: string;
   productName: string;
   price: string;
+  saleType: "group" | "individual";
+  quantity: string;
+  contactName: string;
+  contactPhone: string;
 };
 
 type CreateFormAction = {
@@ -23,7 +27,11 @@ type CreateFormAction = {
     | "subcategoryId"
     | "sizeId"
     | "productName"
-    | "price";
+    | "price"
+    | "saleType"
+    | "quantity"
+    | "contactName"
+    | "contactPhone";
   value: string;
 };
 
@@ -33,6 +41,9 @@ type BasicErrors = {
   subcategory?: string;
   size?: string;
   price?: string;
+  contactName?: string;
+  contactPhone?: string;
+  quantity?: string;
 };
 
 interface StepBasicProps {
@@ -61,6 +72,8 @@ interface StepBasicProps {
   sizeInputRef: RefObject<HTMLInputElement | null>;
   priceInputRef: RefObject<HTMLInputElement | null>;
   contentRef: RefObject<HTMLDivElement | null>;
+
+  saleTypeOptions: SelectOption[];
 }
 
 export const StepBasic: FC<StepBasicProps> = ({
@@ -83,6 +96,7 @@ export const StepBasic: FC<StepBasicProps> = ({
   sizeInputRef,
   priceInputRef,
   contentRef,
+  saleTypeOptions,
 }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -187,6 +201,82 @@ export const StepBasic: FC<StepBasicProps> = ({
             contentRef.current?.scrollBy({ top: 124, behavior: "smooth" });
           }, 1850);
         }}
+      />
+
+      <ModalSelect
+        label="Тип продажи"
+        value={form.saleType}
+        onChange={(value) => {
+          dispatch({ type: "SET_FIELD", field: "saleType", value });
+          if (value === "individual") {
+            dispatch({ type: "SET_FIELD", field: "quantity", value: "" });
+            clearBasicError("quantity");
+          }
+        }}
+        options={saleTypeOptions}
+        placeholder="Выберите тип продажи"
+        required
+      />
+
+      {form.saleType === "group" && (
+        <TextField
+          label="Количество *"
+          placeholder="Минимум 2"
+          type="number"
+          inputMode="numeric"
+          value={form.quantity}
+          onChange={(e) => {
+            clearBasicError("quantity");
+            dispatch({
+              type: "SET_FIELD",
+              field: "quantity",
+              value: e.target.value,
+            });
+          }}
+          error={Boolean(basicErrors.quantity)}
+          helperText={basicErrors.quantity}
+          slotProps={{ htmlInput: { min: 2, pattern: "[0-9]*" } }}
+          fullWidth
+          variant="outlined"
+        />
+      )}
+
+      <TextField
+        label="Имя для связи *"
+        placeholder="Ваше имя"
+        value={form.contactName}
+        onChange={(e) => {
+          clearBasicError("contactName");
+          dispatch({
+            type: "SET_FIELD",
+            field: "contactName",
+            value: e.target.value,
+          });
+        }}
+        error={Boolean(basicErrors.contactName)}
+        helperText={basicErrors.contactName}
+        fullWidth
+        variant="outlined"
+      />
+
+      <TextField
+        label="Телефон для связи *"
+        placeholder="+7 (___) ___-__-__"
+        type="tel"
+        inputMode="tel"
+        value={form.contactPhone}
+        onChange={(e) => {
+          clearBasicError("contactPhone");
+          dispatch({
+            type: "SET_FIELD",
+            field: "contactPhone",
+            value: e.target.value,
+          });
+        }}
+        error={Boolean(basicErrors.contactPhone)}
+        helperText={basicErrors.contactPhone}
+        fullWidth
+        variant="outlined"
       />
     </div>
   );

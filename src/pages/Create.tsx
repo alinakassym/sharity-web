@@ -23,7 +23,7 @@ import { PRODUCTS_BUCKET, uploadFiles } from "@/lib/minio";
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
 
 import { getTelegramUser } from "@/lib/telegram";
-import { useRequestCreateProduct } from "@/hooks/useRequestCreateProduct";
+import { useCreateProduct } from "@/hooks/useCreateProduct";
 import { useNavigate } from "react-router-dom";
 
 import { moveSelectedToStart } from "@/utils";
@@ -39,6 +39,10 @@ type CreateFormState = {
   productName: string;
   price: string;
   description: string;
+  saleType: "group" | "individual";
+  quantity: string;
+  contactName: string;
+  contactPhone: string;
 };
 
 type CreateFormAction =
@@ -61,6 +65,10 @@ const initialFormState: CreateFormState = {
   productName: "",
   price: "",
   description: "",
+  saleType: "individual",
+  quantity: "",
+  contactName: "",
+  contactPhone: "",
 };
 
 const formReducer = (
@@ -118,6 +126,9 @@ const Create: FC = () => {
     subcategory?: string;
     size?: string;
     price?: string;
+    contactName?: string;
+    contactPhone?: string;
+    quantity?: string;
   }>({});
   const [filePreviews, setFilePreviews] = useState<
     Array<{ file: File; url: string }>
@@ -139,7 +150,7 @@ const Create: FC = () => {
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 44);
   const platformName = useSafePlatform();
-  const { createProduct } = useRequestCreateProduct();
+  const { createProduct } = useCreateProduct();
   const navigate = useNavigate();
 
   // Refs для автофокуса
@@ -318,6 +329,21 @@ const Create: FC = () => {
         nextErrors.price = "Минимальная цена — 2500 ₸";
       }
 
+      if (
+        form.saleType === "group" &&
+        (!form.quantity || Number(form.quantity) < 2)
+      ) {
+        nextErrors.quantity = "Укажите количество (минимум 2)";
+      }
+
+      if (!form.contactName.trim()) {
+        nextErrors.contactName = "Введите имя для связи";
+      }
+
+      if (!form.contactPhone.trim()) {
+        nextErrors.contactPhone = "Введите номер телефона";
+      }
+
       setBasicErrors(nextErrors);
 
       if (Object.keys(nextErrors).length > 0) {
@@ -347,18 +373,20 @@ const Create: FC = () => {
 
       const productData = {
         name: form.productName.trim(),
-        // Имена для обратной совместимости
         category: selectedCategory?.name_ru || "",
         subcategory: selectedSubcategory?.name_ru || undefined,
         productSize: selectedSize?.manufacturer_size || undefined,
-        // MongoDB IDs для будущей миграции
-        categoryId: form.categoryId || undefined,
+        categoryId: form.categoryId,
         subcategoryId: form.subcategoryId || undefined,
         sizeId: form.sizeId || undefined,
         price: Number(form.price),
         description: form.description.trim() || undefined,
         condition: form.condition || undefined,
-        isFavorite: false,
+        saleType: form.saleType,
+        quantity:
+          form.saleType === "group" ? Number(form.quantity) : undefined,
+        contactName: form.contactName.trim(),
+        contactPhone: form.contactPhone.trim(),
         imagesArray:
           imagesArray.length > 0
             ? moveSelectedToStart(imagesArray, coverImageIndex)
@@ -523,6 +551,10 @@ const Create: FC = () => {
                 subcategoryInputRef={subcategoryInputRef}
                 sizeInputRef={sizeInputRef}
                 priceInputRef={priceInputRef}
+                saleTypeOptions={[
+                  { value: "individual", label: "Индивидуально" },
+                  { value: "group", label: "Для группы" },
+                ]}
               />
             )}
 
