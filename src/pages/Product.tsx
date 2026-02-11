@@ -7,6 +7,7 @@ import { Box, Typography, Divider } from "@mui/material";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
 import { isTelegramApp } from "@/lib/telegram";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useProduct } from "@/hooks/useProduct";
 import { useSizes } from "@/hooks/useSizes";
@@ -52,6 +53,13 @@ const Product: FC = () => {
   const activeSizes = sizes.filter((s) => s.is_active);
 
   const [sizeChartOpen, setSizeChartOpen] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
+
+  const handleCopyPhone = async (phone: string) => {
+    await navigator.clipboard.writeText(phone);
+    setPhoneCopied(true);
+    setTimeout(() => setPhoneCopied(false), 2000);
+  };
 
   const handleBackClick = () => {
     navigate(-1);
@@ -274,7 +282,51 @@ const Product: FC = () => {
                 <DetailRow label="Имя" value={product.contactName} c={c} />
               )}
               {product.contactPhone && (
-                <DetailRow label="Телефон" value={product.contactPhone} c={c} />
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Typography
+                    sx={{ fontSize: 14, color: c.lightText, flexShrink: 0 }}
+                  >
+                    Телефон
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Typography
+                      sx={{ fontSize: 14, fontWeight: 500, color: c.text }}
+                    >
+                      {phoneCopied ? "Скопировано!" : product.contactPhone}
+                    </Typography>
+                    <Box
+                      component="button"
+                      onClick={() => handleCopyPhone(product.contactPhone)}
+                      sx={{
+                        background: "none",
+                        border: "none",
+                        padding: 0.5,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <VuesaxIcon
+                        name="copy"
+                        size={18}
+                        color={c.primary}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
               )}
             </Box>
           </Box>
