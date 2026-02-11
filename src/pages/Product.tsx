@@ -1,6 +1,7 @@
 // sharity-web/src/pages/Product.tsx
 
 import type { FC } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
@@ -8,9 +9,10 @@ import { isTelegramApp } from "@/lib/telegram";
 import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import ProductHeader from "@/components/ProductHeader";
 import { useProduct } from "@/hooks/useProduct";
-import { useRequestGetLeotardSizes } from "@/hooks/useRequestGetLeotardSizes";
+import { useSizes } from "@/hooks/useSizes";
 import Container from "@/components/Container";
 import Carousel from "@/components/Carousel";
+import SizeChartModal from "@/components/SizeChartModal";
 
 const Product: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +28,13 @@ const Product: FC = () => {
   const backTo = (location.state as { from?: string })?.from || "/";
 
   const { product: productData, isLoading, error } = useProduct(id);
-  const { sizes: leotardSizes } = useRequestGetLeotardSizes();
+  const { sizes } = useSizes(
+    productData?.categoryId ?? null,
+    productData?.subcategoryId ?? null,
+  );
+  const activeSizes = sizes.filter((s) => s.is_active);
+
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -58,12 +66,6 @@ const Product: FC = () => {
     currency: "KZT",
     maximumFractionDigits: 0,
   });
-
-  // Функция для поиска роста по размеру купальника
-  const getHeightForSize = (size: string): string | undefined => {
-    const sizeData = leotardSizes.find((s) => s.size === Number(size));
-    return sizeData?.height;
-  };
 
   const product = productData
     ? {
@@ -184,15 +186,29 @@ const Product: FC = () => {
               style={{
                 fontSize: 16,
                 color: c.text,
+                margin: 0,
               }}
             >
-              Размер: {product.size} {/* Размер купальника с ростом */}
-              {product.category === "Гимнастика" &&
-                product.subcategory === "Купальник" &&
-                product.size &&
-                getHeightForSize(product.size) &&
-                ` (рост ${getHeightForSize(product.size)})`}
+              Размер: {product.size}
             </p>
+          )}
+          {activeSizes.length > 0 && (
+            <button
+              onClick={() => setSizeChartOpen(true)}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                fontSize: 14,
+                fontWeight: 600,
+                color: c.primary,
+                cursor: "pointer",
+                textAlign: "left",
+                textDecoration: "underline",
+              }}
+            >
+              Таблица размеров
+            </button>
           )}
           <div>
             <p
@@ -240,6 +256,12 @@ const Product: FC = () => {
           </button>
         </div>
       </div>
+
+      <SizeChartModal
+        open={sizeChartOpen}
+        onClose={() => setSizeChartOpen(false)}
+        sizes={activeSizes}
+      />
     </Container>
   );
 };
