@@ -156,7 +156,7 @@ const ModalSelect: FC<ModalSelectProps> = ({
             justifyContent: "space-between",
           }}
         >
-          <Typography variant="h6" sx={{ m: 0 }}>
+          <Typography variant="h6" component="span" sx={{ m: 0 }}>
             {displayLabel}
           </Typography>
 
