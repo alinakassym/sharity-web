@@ -43,6 +43,7 @@ import {
   CircularProgress,
   Collapse,
   Chip,
+  MenuItem,
 } from "@mui/material";
 
 const emptyForm: CreateCategoryData = {
@@ -57,7 +58,14 @@ const emptySubForm: CreateSubcategoryData = {
   name_ru: "",
   name_en: "",
   is_active: true,
+  saleType: "all",
   order: undefined,
+};
+
+const saleTypeLabels: Record<string, string> = {
+  all: "Индивидуально и группы",
+  group: "Группа",
+  individual: "Индивид.",
 };
 
 const emptySizeForm: CreateSizeData = {
@@ -269,6 +277,7 @@ const Categories: FC = () => {
       name_ru: sub.name_ru,
       name_en: sub.name_en,
       is_active: sub.is_active,
+      saleType: sub.saleType ?? "all",
       order: sub.order,
     });
     setSubDialogOpen(true);
@@ -287,6 +296,7 @@ const Categories: FC = () => {
         name_ru: subFormData.name_ru.trim(),
         name_en: subFormData.name_en.trim(),
         is_active: subFormData.is_active,
+        saleType: subFormData.saleType ?? "all",
         order:
           subFormData.order !== undefined && subFormData.order !== null
             ? Number(subFormData.order)
@@ -700,49 +710,117 @@ const Categories: FC = () => {
                             <Box
                               key={sub.id}
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
                                 padding: "8px 12px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 0.5,
                                 backgroundColor: c.background,
                                 borderRadius: "8px",
                                 opacity: sub.is_active ? 1 : 0.5,
                               }}
                             >
-                              <Box sx={{ minWidth: 0, flex: 1 }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: 14,
-                                    fontWeight: 500,
-                                    color: c.text,
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {sub.name_ru}
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: 11,
-                                    color: c.lightText,
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {sub.name_en}
-                                  {sub.order !== undefined &&
-                                    ` · #${sub.order}`}
-                                </Typography>
-                              </Box>
                               <Box
                                 sx={{
+                                  width: "100%",
                                   display: "flex",
-                                  alignItems: "center",
-                                  gap: 0.5,
+                                  flexDirection: "row",
+                                  justifyContent: "space-between",
                                 }}
                               >
+                                <Box sx={{ minWidth: 0, flex: 1 }}>
+                                  <Typography
+                                    sx={{
+                                      fontSize: 14,
+                                      fontWeight: 500,
+                                      color: c.text,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {sub.name_ru}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      fontSize: 11,
+                                      color: c.lightText,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {sub.name_en}
+                                    {sub.order !== undefined &&
+                                      ` · #${sub.order}`}
+                                  </Typography>
+                                </Box>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  <Switch
+                                    size="small"
+                                    checked={sub.is_active}
+                                    onChange={() => handleSubToggle(sub.id)}
+                                  />
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleOpenSubEdit(sub)}
+                                  >
+                                    <VuesaxIcon
+                                      name="edit-2"
+                                      size={16}
+                                      stroke={c.primary}
+                                    />
+                                  </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      setDeleteSubConfirmId(sub.id)
+                                    }
+                                  >
+                                    <VuesaxIcon
+                                      name="trash"
+                                      size={16}
+                                      stroke={c.error}
+                                    />
+                                  </IconButton>
+                                </Box>
+                              </Box>
+
+                              <Box
+                                sx={{
+                                  width: "100%",
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  flexWrap: "wrap",
+                                  gap: 1,
+                                }}
+                              >
+                                <Chip
+                                  label={
+                                    saleTypeLabels[sub.saleType ?? "all"] ??
+                                    "Индивидуально и группы"
+                                  }
+                                  size="small"
+                                  sx={{
+                                    fontSize: 11,
+                                    height: 24,
+                                    backgroundColor:
+                                      sub.saleType === "group"
+                                        ? c.accent
+                                        : sub.saleType === "individual"
+                                          ? c.primary
+                                          : undefined,
+                                    color:
+                                      sub.saleType && sub.saleType !== "all"
+                                        ? c.lighter
+                                        : undefined,
+                                  }}
+                                />
                                 <Chip
                                   label="Размеры"
                                   size="small"
@@ -753,31 +831,6 @@ const Categories: FC = () => {
                                     cursor: "pointer",
                                   }}
                                 />
-                                <Switch
-                                  size="small"
-                                  checked={sub.is_active}
-                                  onChange={() => handleSubToggle(sub.id)}
-                                />
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleOpenSubEdit(sub)}
-                                >
-                                  <VuesaxIcon
-                                    name="edit-2"
-                                    size={16}
-                                    stroke={c.primary}
-                                  />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => setDeleteSubConfirmId(sub.id)}
-                                >
-                                  <VuesaxIcon
-                                    name="trash"
-                                    size={16}
-                                    stroke={c.error}
-                                  />
-                                </IconButton>
                               </Box>
                             </Box>
                           ))}
@@ -992,6 +1045,22 @@ const Categories: FC = () => {
             }
             fullWidth
           />
+          <TextField
+            select
+            label="Тип продажи"
+            value={subFormData.saleType ?? "all"}
+            onChange={(e) =>
+              setSubFormData((prev) => ({
+                ...prev,
+                saleType: e.target.value as "group" | "individual" | "all",
+              }))
+            }
+            fullWidth
+          >
+            <MenuItem value="all">Оба варианта</MenuItem>
+            <MenuItem value="group">Для группы</MenuItem>
+            <MenuItem value="individual">Индивидуально</MenuItem>
+          </TextField>
           <FormControlLabel
             control={
               <Switch

@@ -13,6 +13,7 @@ export interface SubcategoryData {
   name_ru: string;
   name_en: string;
   is_active: boolean;
+  saleType?: "group" | "individual" | "all";
   order?: number;
 }
 

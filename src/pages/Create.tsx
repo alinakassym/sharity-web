@@ -249,6 +249,19 @@ const Create: FC = () => {
       value: newSubcategoryId,
     });
 
+    // Авто-установка saleType если подкатегория ограничивает выбор
+    const sub = activeSubcategories.find((s) => s.id === newSubcategoryId);
+    if (sub?.saleType && sub.saleType !== "all") {
+      dispatch({
+        type: "SET_FIELD",
+        field: "saleType",
+        value: sub.saleType,
+      });
+      if (sub.saleType === "individual") {
+        dispatch({ type: "SET_FIELD", field: "quantity", value: "" });
+      }
+    }
+
     setTimeout(() => {
       priceInputRef.current?.focus();
     }, 300);
@@ -575,10 +588,20 @@ const Create: FC = () => {
                 subcategoryInputRef={subcategoryInputRef}
                 sizeInputRef={sizeInputRef}
                 priceInputRef={priceInputRef}
-                saleTypeOptions={[
-                  { value: "individual", label: "Индивидуально" },
-                  { value: "group", label: "Для группы" },
-                ]}
+                saleTypeOptions={(() => {
+                  const sub = activeSubcategories.find(
+                    (s) => s.id === form.subcategoryId,
+                  );
+                  const st = sub?.saleType ?? "all";
+                  if (st === "group")
+                    return [{ value: "group", label: "Для группы" }];
+                  if (st === "individual")
+                    return [{ value: "individual", label: "Индивидуально" }];
+                  return [
+                    { value: "individual", label: "Индивидуально" },
+                    { value: "group", label: "Для группы" },
+                  ];
+                })()}
               />
             )}
 
