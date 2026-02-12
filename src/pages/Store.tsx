@@ -277,9 +277,7 @@ const Store: FC = () => {
                 <button
                   key={key}
                   onClick={() =>
-                    setSelectedSaleType((prev) =>
-                      prev === key ? null : key,
-                    )
+                    setSelectedSaleType((prev) => (prev === key ? null : key))
                   }
                   style={{
                     padding: "6px 14px",

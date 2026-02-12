@@ -23,17 +23,16 @@ const CategoryFilterSkeleton: FC = () => {
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
           gap: 12,
         }}
       >
-        {Array.from({ length: 9 }).map((_, index) => (
+        {Array.from({ length: 3 }).map((_, index) => (
           <Skeleton
             key={index}
             variant="rounded"
             height={44}
             sx={{
-              minHeight: 44,
+              minHeight: 36,
               borderRadius: "24px",
               minWidth: "30%",
               flex: "0 0 auto",
