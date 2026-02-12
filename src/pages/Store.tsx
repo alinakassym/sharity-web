@@ -17,6 +17,7 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import type { ProductData } from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
 import { useFavorites } from "@/hooks/useFavorites";
 import Container from "@/components/Container";
 
@@ -36,6 +37,7 @@ const Store: FC = () => {
   const platformName = useSafePlatform();
 
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
+  const [selectedSubs, setSelectedSubs] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
 
   const { products: rows, isLoading: isLoadingProducts } = useProducts();
@@ -59,6 +61,28 @@ const Store: FC = () => {
       }));
   }, [categoriesFromAPI]);
 
+  // Lookup: name_ru → id для получения подкатегорий
+  const categoryNameToId = useMemo(() => {
+    const map = new Map<string, string>();
+    categoriesFromAPI.forEach((cat) => map.set(cat.name_ru, cat.id));
+    return map;
+  }, [categoriesFromAPI]);
+
+  // Подкатегории для единственной выбранной категории
+  const selectedCategoryId =
+    selected.length === 1 && selected[0] !== "Избранное"
+      ? categoryNameToId.get(selected[0]) ?? null
+      : null;
+
+  const { subcategories, isLoading: isLoadingSubcategories } =
+    useSubcategories(selectedCategoryId);
+  const activeSubcategories = subcategories.filter((s) => s.is_active);
+
+  const handleCategoryChange = (next: string[]) => {
+    setSelected(next);
+    setSelectedSubs([]);
+  };
+
   // API -> ProductData (для грида)
   const products: ProductData[] = useMemo(
     () =>
@@ -69,6 +93,7 @@ const Store: FC = () => {
             ? r.imagesArray[0]
             : `https://picsum.photos/600?${i + 1}`,
         category: r.category ?? "",
+        subcategory: r.subcategory ?? "",
         title: r.name ?? "",
         price: KZT.format(r.price || 0),
         isFavorite: r.isFavorite ?? false,
@@ -81,7 +106,9 @@ const Store: FC = () => {
     return new Set(selected);
   }, [selected]);
 
-  // фильтрация по категориям и поиску
+  // фильтрация по категориям, подкатегориям и поиску
+  const selectedSubSet = useMemo(() => new Set(selectedSubs), [selectedSubs]);
+
   const filtered = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
     return products.filter((p) => {
@@ -92,13 +119,16 @@ const Store: FC = () => {
       let byCat = true;
       if (selectedLabels.size > 0) {
         if (isFavoritesSelected) {
-          // Если выбрано "Избранное" - показываем только избранные продукты пользователя
           byCat = favoriteProductIds.has(p.id);
         } else {
-          // Иначе фильтруем по обычным категориям
           byCat = selectedLabels.has(p.category);
         }
       }
+
+      // Фильтрация по подкатегориям
+      const bySub =
+        selectedSubSet.size === 0 ||
+        selectedSubSet.has(p.subcategory ?? "");
 
       // Фильтрация по поиску
       const byQuery =
@@ -106,9 +136,9 @@ const Store: FC = () => {
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q);
 
-      return byCat && byQuery;
+      return byCat && bySub && byQuery;
     });
-  }, [products, selectedLabels, searchValue, favoriteProductIds]);
+  }, [products, selectedLabels, selectedSubSet, searchValue, favoriteProductIds]);
 
   return (
     <Container
@@ -143,10 +173,55 @@ const Store: FC = () => {
           <CategoryFilter
             categories={categories}
             selectedIds={selected}
-            onChange={setSelected}
+            onChange={handleCategoryChange}
             multi={true}
             onOpenFilter={() => console.log("open filter modal")}
           />
+        )}
+
+        {/* Подкатегории */}
+        {!isLoadingSubcategories && activeSubcategories.length > 0 && (
+          <div
+            style={{
+              paddingLeft: 16,
+              marginLeft: -16,
+              marginRight: -16,
+              width: "calc(100% + 32px)",
+              display: "flex",
+              gap: 8,
+              overflowX: "auto",
+            }}
+          >
+            {activeSubcategories.map((sub) => {
+              const active = selectedSubSet.has(sub.name_ru);
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => {
+                    setSelectedSubs((prev) =>
+                      prev.includes(sub.name_ru)
+                        ? prev.filter((s) => s !== sub.name_ru)
+                        : [...prev, sub.name_ru],
+                    );
+                  }}
+                  style={{
+                    padding: "6px 14px",
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: 20,
+                    backgroundColor: active ? c.primary : c.controlColor,
+                    color: active ? c.lighter : c.text,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    whiteSpace: "nowrap",
+                    outline: "none",
+                  }}
+                >
+                  {sub.name_ru}
+                </button>
+              );
+            })}
+          </div>
         )}
 
         {isLoadingProducts ? (

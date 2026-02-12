@@ -10,6 +10,7 @@ export type ProductData = {
   id: string;
   image: string;
   category: string;
+  subcategory?: string;
   title: string;
   price: string;
   isFavorite?: boolean;
