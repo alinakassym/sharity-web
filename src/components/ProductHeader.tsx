@@ -8,7 +8,10 @@ import VuesaxIcon from "./icons/VuesaxIcon";
 import { CloseWebViewButton } from "./CloseWebViewButton";
 import { isTelegramApp } from "@/lib/telegram";
 import LocationButton from "./LocationButton";
-import { useTelegramSafeArea } from "@/hooks/useTelegramSafeArea";
+import {
+  useSafePaddingTop,
+  useTelegramSafeArea,
+} from "@/hooks/useTelegramSafeArea";
 
 interface ProductHeaderProps {
   location?: string;
@@ -31,6 +34,8 @@ const ProductHeader: FC<ProductHeaderProps> = ({
 
   const topPadding = isTelegram ? (safeArea.top > 0 ? safeArea.top + 0 : 0) : 0;
 
+  const paddingTop = useSafePaddingTop(88, 0);
+
   const handleClose = () => {
     // Переходим на указанную страницу или на главную по умолчанию
     navigate(backTo || "/");
@@ -43,7 +48,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: isTelegram ? 92 : 0,
+        paddingTop: paddingTop + 48,
         borderBottom: "1px solid " + c.surfaceColor,
         backgroundColor: isTelegram ? c.background : c.background,
         zIndex: 100,

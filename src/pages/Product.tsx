@@ -14,6 +14,10 @@ import { useSizes } from "@/hooks/useSizes";
 import Container from "@/components/Container";
 import Carousel from "@/components/Carousel";
 import SizeChartModal from "@/components/SizeChartModal";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
 
 const DetailRow: FC<{
   label: string;
@@ -40,6 +44,8 @@ const Product: FC = () => {
   const c = Colors[scheme];
 
   const isTelegram = isTelegramApp();
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
 
   const location = useLocation();
 
@@ -136,7 +142,15 @@ const Product: FC = () => {
   }
 
   return (
-    <Container paddingTop={isTelegram ? 110 : 64}>
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 112
+          : platformName === "unknown"
+            ? 112
+            : paddingTop + 112
+      }
+    >
       {/* Header с кнопкой назад */}
       <ProductHeader onGoBack={handleBackClick} backTo={backTo} />
 
@@ -153,7 +167,7 @@ const Product: FC = () => {
         <div>
           <Carousel
             items={product.images}
-            aspectRatio={320 / 360}
+            aspectRatio={360 / 360}
             autoPlay={false}
           />
         </div>
@@ -319,11 +333,7 @@ const Product: FC = () => {
                         alignItems: "center",
                       }}
                     >
-                      <VuesaxIcon
-                        name="copy"
-                        size={18}
-                        color={c.primary}
-                      />
+                      <VuesaxIcon name="copy" size={18} color={c.primary} />
                     </Box>
                   </Box>
                 </Box>
