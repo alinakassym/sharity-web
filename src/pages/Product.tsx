@@ -145,10 +145,10 @@ const Product: FC = () => {
     <Container
       paddingTop={
         platformName === "desktop"
-          ? 112
+          ? 64
           : platformName === "unknown"
-            ? 112
-            : paddingTop + 112
+            ? 64
+            : paddingTop + 64
       }
     >
       {/* Header с кнопкой назад */}
