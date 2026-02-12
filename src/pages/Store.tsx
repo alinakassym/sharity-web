@@ -38,6 +38,9 @@ const Store: FC = () => {
 
   const [selected, setSelected] = useState<string[]>([]); // пусто = все категории
   const [selectedSubs, setSelectedSubs] = useState<string[]>([]);
+  const [selectedSaleType, setSelectedSaleType] = useState<
+    "group" | "individual" | null
+  >(null);
   const [searchValue, setSearchValue] = useState("");
 
   const { products: rows, isLoading: isLoadingProducts } = useProducts();
@@ -81,7 +84,25 @@ const Store: FC = () => {
   const handleCategoryChange = (next: string[]) => {
     setSelected(next);
     setSelectedSubs([]);
+    setSelectedSaleType(null);
   };
+
+  // Доступные типы продажи для выбранных подкатегорий
+  const availableSaleTypes = useMemo(() => {
+    if (selectedSubs.length === 0) return new Set<string>();
+    const types = new Set<string>();
+    for (const subName of selectedSubs) {
+      const sub = activeSubcategories.find((s) => s.name_ru === subName);
+      if (!sub) continue;
+      if (sub.saleType === "all" || !sub.saleType) {
+        types.add("group");
+        types.add("individual");
+      } else {
+        types.add(sub.saleType);
+      }
+    }
+    return types;
+  }, [selectedSubs, activeSubcategories]);
 
   // API -> ProductData (для грида)
   const products: ProductData[] = useMemo(
@@ -94,6 +115,7 @@ const Store: FC = () => {
             : `https://picsum.photos/600?${i + 1}`,
         category: r.category ?? "",
         subcategory: r.subcategory ?? "",
+        saleType: r.saleType,
         title: r.name ?? "",
         price: KZT.format(r.price || 0),
         isFavorite: r.isFavorite ?? false,
@@ -130,15 +152,24 @@ const Store: FC = () => {
         selectedSubSet.size === 0 ||
         selectedSubSet.has(p.subcategory ?? "");
 
+      // Фильтрация по типу продажи
+      const effectiveSaleType =
+        selectedSaleType ??
+        (availableSaleTypes.size === 1
+          ? (availableSaleTypes.values().next().value as string)
+          : null);
+      const bySaleType =
+        !effectiveSaleType || p.saleType === effectiveSaleType;
+
       // Фильтрация по поиску
       const byQuery =
         q.length === 0 ||
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q);
 
-      return byCat && bySub && byQuery;
+      return byCat && bySub && bySaleType && byQuery;
     });
-  }, [products, selectedLabels, selectedSubSet, searchValue, favoriteProductIds]);
+  }, [products, selectedLabels, selectedSubSet, selectedSaleType, availableSaleTypes, searchValue, favoriteProductIds]);
 
   return (
     <Container
@@ -198,11 +229,14 @@ const Store: FC = () => {
                 <button
                   key={sub.id}
                   onClick={() => {
-                    setSelectedSubs((prev) =>
-                      prev.includes(sub.name_ru)
+                    setSelectedSubs((prev) => {
+                      const next = prev.includes(sub.name_ru)
                         ? prev.filter((s) => s !== sub.name_ru)
-                        : [...prev, sub.name_ru],
-                    );
+                        : [...prev, sub.name_ru];
+                      // Сбрасываем фильтр типа продажи при изменении подкатегорий
+                      setSelectedSaleType(null);
+                      return next;
+                    });
                   }}
                   style={{
                     padding: "6px 14px",
@@ -218,6 +252,49 @@ const Store: FC = () => {
                   }}
                 >
                   {sub.name_ru}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Тип продажи */}
+        {availableSaleTypes.size === 2 && (
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+            }}
+          >
+            {(
+              [
+                { key: "group", label: "Для группы" },
+                { key: "individual", label: "Индивидуально" },
+              ] as const
+            ).map(({ key, label }) => {
+              const active = selectedSaleType === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() =>
+                    setSelectedSaleType((prev) =>
+                      prev === key ? null : key,
+                    )
+                  }
+                  style={{
+                    padding: "6px 14px",
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: 20,
+                    backgroundColor: active ? c.primary : c.controlColor,
+                    color: active ? c.lighter : c.text,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    whiteSpace: "nowrap",
+                    outline: "none",
+                  }}
+                >
+                  {label}
                 </button>
               );
             })}

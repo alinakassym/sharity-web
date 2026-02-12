@@ -34,7 +34,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({
 
   const topPadding = isTelegram ? (safeArea.top > 0 ? safeArea.top + 0 : 0) : 0;
 
-  const paddingTop = useSafePaddingTop(88, 0);
+  const paddingTop = useSafePaddingTop(64, 0);
 
   const handleClose = () => {
     // Переходим на указанную страницу или на главную по умолчанию
@@ -48,7 +48,7 @@ const ProductHeader: FC<ProductHeaderProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: paddingTop + 48,
+        paddingTop: paddingTop,
         borderBottom: "1px solid " + c.surfaceColor,
         backgroundColor: isTelegram ? c.background : c.background,
         zIndex: 100,

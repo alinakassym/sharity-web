@@ -11,6 +11,7 @@ export type ProductData = {
   image: string;
   category: string;
   subcategory?: string;
+  saleType?: "group" | "individual";
   title: string;
   price: string;
   isFavorite?: boolean;
