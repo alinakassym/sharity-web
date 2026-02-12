@@ -1,10 +1,10 @@
-// src/App.tsx
+// sharity-web/src/App.tsx
 
 import type { FC } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useBodyBackground } from "./hooks/useBodyBackground";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import StoreTabBar from "./components/StoreTabBar";
+// import StoreTabBar from "./components/StoreTabBar";
 import MainTabBar from "./components/MainTabBar";
 import TelegramUserInit from "./components/TelegramUserInit";
 import Home from "./pages/Home";
@@ -42,9 +42,9 @@ const AppContent: FC = () => {
   const { pathname } = useLocation();
   const path = pathname.replace(import.meta.env.BASE_URL, "/");
   const showMainTabBar = ["/", "/add", "/profile"].includes(path);
-  const showStoreTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
-    path,
-  );
+  // const showStoreTabBar = ["/store", "/favorites", "/cart", "/orders"].includes(
+  //   path,
+  // );
   const safeArea = useTelegramSafeArea();
 
   return (
@@ -87,7 +87,7 @@ const AppContent: FC = () => {
         <Route path="add-card" element={<AddCard />} />
       </Routes>
       {showMainTabBar && <MainTabBar />}
-      {showStoreTabBar && <StoreTabBar />}
+      {/* {showStoreTabBar && <StoreTabBar />} */}
     </div>
   );
 };
