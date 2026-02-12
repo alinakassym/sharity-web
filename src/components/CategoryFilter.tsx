@@ -88,10 +88,13 @@ export const CategoryFilter: FC<Props> = ({
       {/* Сетка карточек-пилюль */}
       <div
         style={{
+          paddingLeft: 16,
+          marginLeft: -16,
+          marginRight: -16,
+          width: "calc(100% + 32px)",
           display: "flex",
-          flexWrap: "wrap",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: 12,
+          overflowX: "auto",
         }}
       >
         {categories.map((c) => {
@@ -105,7 +108,7 @@ export const CategoryFilter: FC<Props> = ({
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                padding: "8px 12px",
+                padding: "4px 12px",
                 border: "none",
                 cursor: "pointer",
                 borderRadius: 24,
@@ -118,16 +121,16 @@ export const CategoryFilter: FC<Props> = ({
             >
               <span
                 style={{
-                  width: 28,
-                  height: 28,
+                  width: 24,
+                  height: 24,
                   borderRadius: 14,
                   display: "grid",
                   placeItems: "center",
                 }}
               >
-                <VuesaxIcon name={c.icon} size={24} />
+                <VuesaxIcon name={c.icon} size={20} />
               </span>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{c.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 500 }}>{c.label}</span>
             </button>
           );
         })}
