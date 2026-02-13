@@ -10,7 +10,7 @@ import {
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
 import { getTelegramUser } from "@/lib/telegram";
-import { useRequestCreateEvent } from "@/hooks/useRequestCreateEvent";
+import { useCreateEvent } from "@/hooks/useCreateEvent";
 import { uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
 import { type EventType } from "@/components/EventTypePicker";
@@ -49,7 +49,7 @@ const CreateEvent: FC = () => {
   const [customEventType, setCustomEventType] = useState("");
   const locationInputRef = useRef<HTMLDivElement>(null);
 
-  const { createEvent } = useRequestCreateEvent();
+  const { createEvent } = useCreateEvent();
   const { categories, isLoading: categoriesLoading } = useCategories();
   const categoryOptions = categories
     .filter((cat) => cat.is_active)
@@ -131,7 +131,7 @@ const CreateEvent: FC = () => {
         name: eventName.trim(),
         category, // Категория из MongoDB
         eventType: finalEventType, // Тип события
-        date: eventDateTime, // Дата + время вместе
+        date: eventDateTime.toISOString(), // Дата + время как ISO-строка
         time: time || "00:00", // Время отдельно как строка
         url: url.trim() || undefined,
         description: description.trim() || undefined,

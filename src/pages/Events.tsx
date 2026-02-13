@@ -6,7 +6,7 @@ import Container from "@/components/Container";
 import SearchHeader from "@/components/SearchHeader";
 import DateFilter, { type DateFilterOption } from "@/components/DateFilter";
 import EventCard from "@/components/EventCard";
-import { useRequestGetEvents } from "@/hooks/useRequestGetEvents";
+import { useEvents } from "@/hooks/useEvents";
 
 const Events: FC = () => {
   const scheme = useColorScheme();
@@ -16,54 +16,28 @@ const Events: FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilterOption>("all");
 
-  const { events: eventsFromFirebase, isLoading } = useRequestGetEvents();
+  const { events, isLoading } = useEvents();
 
-  // Преобразуем и фильтруем данные из Firebase
   const filteredEvents = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return eventsFromFirebase
-      .sort((a, b) => {
-        // Сортируем по дате от раннего к позднему
-        const dateA = a.date instanceof Date ? a.date :
-                     a.date?.toDate ? a.date.toDate() : new Date(a.date);
-        const dateB = b.date instanceof Date ? b.date :
-                     b.date?.toDate ? b.date.toDate() : new Date(b.date);
-        return dateA.getTime() - dateB.getTime();
-      })
+    return events
       .map((event, index) => {
         // Обработка изображений
-        let imageUrl = `https://picsum.photos/320/200?random=${index + 10}`;
-        if (event.imagesArray && event.imagesArray.length > 0) {
-          imageUrl = event.imagesArray[0];
-        } else if (event.image) {
-          imageUrl = event.image;
-        }
+        const imageUrl =
+          event.imagesArray && event.imagesArray.length > 0
+            ? event.imagesArray[0]
+            : `https://picsum.photos/320/200?random=${index + 10}`;
 
-        // Обработка даты
-        let eventDate: Date | null = null;
-        let formattedDate = "";
-
-        if (event.date) {
-          try {
-            eventDate =
-              event.date instanceof Date
-                ? event.date
-                : event.date.toDate
-                  ? event.date.toDate()
-                  : new Date(event.date);
-
-            if (eventDate) {
-              formattedDate = `${eventDate.getDate()} ${eventDate
-                .toLocaleDateString("ru-RU", { month: "short" })
-                .toUpperCase()
-                .replace(".", "")}`;
-            }
-          } catch (e) {
-            console.error("Ошибка форматирования даты:", e);
-          }
-        }
+        // Обработка даты (API возвращает ISO-строку)
+        const eventDate = event.date ? new Date(event.date) : null;
+        const formattedDate = eventDate
+          ? `${eventDate.getDate()} ${eventDate
+              .toLocaleDateString("ru-RU", { month: "short" })
+              .toUpperCase()
+              .replace(".", "")}`
+          : "";
 
         return {
           id: event.id,
@@ -73,8 +47,8 @@ const Events: FC = () => {
           title: event.name ?? "",
           location: event.location ?? "",
           url: event.url ?? "",
-          participants: event.participants ?? 0,
-          participantAvatars: event.participantAvatars ?? [],
+          participants: 0,
+          participantAvatars: [] as string[],
           eventDate,
         };
       })
@@ -153,7 +127,7 @@ const Events: FC = () => {
 
         return matchesSearch && matchesDate;
       });
-  }, [eventsFromFirebase, searchValue, dateFilter]);
+  }, [events, searchValue, dateFilter]);
 
   return (
     <Container paddingTop={isTelegram ? 112 : 64}>
