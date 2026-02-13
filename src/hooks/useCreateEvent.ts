@@ -9,8 +9,8 @@ const API_BASE_URL = (import.meta.env.VITE_APP_BASE_URL as string).replace(
 
 export interface CreateEventPayload {
   name: string;
-  category: string;
-  eventType: string;
+  categoryId: string;
+  eventTypeId: string;
   date: string;
   time?: string;
   url?: string;

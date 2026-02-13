@@ -53,11 +53,11 @@ const CreateEvent: FC = () => {
   const { categories, isLoading: categoriesLoading } = useCategories();
   const categoryOptions = categories
     .filter((cat) => cat.is_active)
-    .map((cat) => ({ value: cat.name_ru, label: cat.name_ru }));
+    .map((cat) => ({ value: cat.id, label: cat.name_ru }));
   const { eventTypes, isLoading: eventTypesLoading } = useEventTypes();
   const eventTypeOptions = eventTypes
     .filter((et) => et.is_active)
-    .map((et) => ({ value: et.name_ru, label: et.name_ru }));
+    .map((et) => ({ value: et.id, label: et.name_ru }));
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
@@ -123,8 +123,8 @@ const CreateEvent: FC = () => {
         eventDateTime.setHours(hours, minutes, 0, 0);
       }
 
-      // Определяем итоговый тип события
-      const finalEventType =
+      // Определяем итоговый тип события (ID или custom string)
+      const finalEventTypeId =
         eventType === "Другое" ? customEventType.trim() : eventType;
 
       // Получаем данные пользователя Telegram
@@ -133,8 +133,8 @@ const CreateEvent: FC = () => {
 
       const eventData = {
         name: eventName.trim(),
-        category, // Категория из MongoDB
-        eventType: finalEventType, // Тип события
+        categoryId: category, // ID категории из MongoDB
+        eventTypeId: finalEventTypeId, // ID типа события из MongoDB
         date: eventDateTime.toISOString(), // Дата + время как ISO-строка
         time: time || "00:00", // Время отдельно как строка
         url: url.trim() || undefined,
