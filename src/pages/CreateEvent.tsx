@@ -22,12 +22,10 @@ import {
   IconButton,
 } from "@mui/material";
 import EventCard from "@/components/EventCard";
-import DatePicker from "@/components/DatePicker";
-import TimePicker from "@/components/TimePicker";
 import YandexMap from "@/components/YandexMap";
-import EventCategoryPicker from "@/components/EventCategoryPicker";
-import EventTypePicker, { type EventType } from "@/components/EventTypePicker";
+import { type EventType } from "@/components/EventTypePicker";
 import { useCategories } from "@/hooks/useCategories";
+import { StepEventBasic } from "@/components/StepEventBasic";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 import { CustomTextField } from "@/components/CustomTextField";
@@ -240,46 +238,22 @@ const CreateEvent: FC = () => {
         }}
       >
         {currentStep === "basic" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <CustomTextField
-              maxSymbols={50}
-              label="Заголовок *"
-              placeholder="Введите заголовок"
-              value={eventName}
-              onChange={(e) => setCourseName(e.target.value)}
-              fullWidth
-              variant="outlined"
-            />
-
-            <EventTypePicker
-              value={eventType}
-              onChange={setEventType}
-              customValue={customEventType}
-              onCustomValueChange={setCustomEventType}
-            />
-
-            <EventCategoryPicker
-              value={category}
-              onChange={setCategory}
-              categories={categoryOptions}
-              isLoading={categoriesLoading}
-            />
-
-            <DatePicker
-              label="Дата события *"
-              value={date}
-              onChange={setDate}
-              placeholder="Выберите дату события"
-              minDate={new Date()}
-            />
-
-            <TimePicker
-              label="Время события *"
-              value={time}
-              onChange={setTime}
-              placeholder="00:00"
-            />
-          </div>
+          <StepEventBasic
+            eventName={eventName}
+            onEventNameChange={setCourseName}
+            eventType={eventType}
+            onEventTypeChange={setEventType}
+            customEventType={customEventType}
+            onCustomEventTypeChange={setCustomEventType}
+            category={category}
+            onCategoryChange={setCategory}
+            categoryOptions={categoryOptions}
+            categoriesLoading={categoriesLoading}
+            date={date}
+            onDateChange={setDate}
+            time={time}
+            onTimeChange={setTime}
+          />
         )}
 
         {currentStep === "location" && (
@@ -325,7 +299,12 @@ const CreateEvent: FC = () => {
                 backgroundColor: c.surfaceColor,
               }}
             >
-              <VuesaxIcon name="camera" color={c.lightText} size={48} />
+              <VuesaxIcon
+                name="gallery"
+                stroke={c.lightText}
+                strokeWidth={1.5}
+                size={32}
+              />
               <p
                 style={{
                   margin: "16px 0 8px",
