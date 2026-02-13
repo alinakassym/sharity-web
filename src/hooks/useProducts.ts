@@ -25,7 +25,6 @@ export interface ProductFromAPI {
   contactPhone: string;
   imagesArray?: string[];
   status: "available" | "sold" | "reserved" | "draft";
-  isFavorite?: boolean;
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;

@@ -118,7 +118,6 @@ const Store: FC = () => {
         saleType: r.saleType,
         title: r.name ?? "",
         price: KZT.format(r.price || 0),
-        isFavorite: r.isFavorite ?? false,
       })),
     [rows],
   );

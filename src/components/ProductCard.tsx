@@ -14,7 +14,6 @@ export type ProductData = {
   saleType?: "group" | "individual";
   title: string;
   price: string;
-  isFavorite?: boolean;
 };
 
 type Props = {

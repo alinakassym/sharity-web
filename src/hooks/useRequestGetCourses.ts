@@ -16,7 +16,6 @@ interface CourseFromDB {
   shortDescription?: string;
   image?: string;
   imagesArray?: string[];
-  isFavorite?: boolean;
   isDeleted?: boolean;
   createdBy?: string;
   createdAt?: Date;

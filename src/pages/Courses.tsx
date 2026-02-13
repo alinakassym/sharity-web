@@ -70,7 +70,6 @@ const Courses: FC = () => {
           category: r.category ?? "",
           title: r.name ?? "",
           shortDescription: r.shortDescription ?? "",
-          isFavorite: r.isFavorite ?? false,
           ageFrom: r.ageFrom,
           ageTo: r.ageTo,
           priceFrom: r.priceFrom,

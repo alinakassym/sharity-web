@@ -13,7 +13,6 @@ interface ProductFromDB {
   condition?: string;
   image?: string;
   imagesArray?: string[];
-  isFavorite?: boolean;
   isDeleted?: boolean;
   createdBy?: string;
   createdAt?: Date;

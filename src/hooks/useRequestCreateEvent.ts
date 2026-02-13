@@ -9,7 +9,6 @@ export interface CreateEventData {
   time?: string;
   url?: string;
   description?: string;
-  isFavorite?: boolean;
   location: string;
   locationCoordinates?: [number, number];
   imagesArray?: string[];

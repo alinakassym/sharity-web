@@ -5,7 +5,6 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export interface UpdateProductData {
-  isFavorite?: boolean;
   isDeleted?: boolean; // Флаг удаления продукта
   status?: "available" | "sold" | "reserved" | "draft"; // Статус товара
   // Можно добавить другие поля для обновления в будущем
@@ -55,13 +54,6 @@ export const useRequestUpdateProduct = () => {
     }
   };
 
-  const toggleFavorite = async (
-    productId: string,
-    currentFavoriteState: boolean,
-  ) => {
-    return updateProduct(productId, { isFavorite: !currentFavoriteState });
-  };
-
   const resetState = () => {
     setError(null);
     setSuccess(false);
@@ -70,7 +62,6 @@ export const useRequestUpdateProduct = () => {
 
   return {
     updateProduct,
-    toggleFavorite,
     isLoading,
     error,
     success,

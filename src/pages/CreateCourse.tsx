@@ -406,7 +406,6 @@ const CreateCourse: FC = () => {
         category: form.category,
         description: form.description.trim() || undefined,
         shortDescription: form.shortDescription.trim() ?? undefined,
-        isFavorite: false,
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
         createdBy, // Добавляем username пользователя Telegram
         locations: form.locations.length > 0 ? form.locations : undefined, // Массив локаций

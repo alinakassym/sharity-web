@@ -92,7 +92,6 @@ const UserProductsCard: FC = () => {
               category: product.category || "Без категории",
               title: product.name || "Без названия",
               price: product.price ? `${product.price} ₽` : "Цена не указана",
-              isFavorite: product.isFavorite || false,
             };
 
             return (

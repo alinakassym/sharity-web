@@ -12,7 +12,6 @@ export type CourseData = {
   image: string;
   category: string;
   title: string;
-  isFavorite?: boolean;
   ageFrom?: number;
   ageTo?: number;
   priceFrom?: number;

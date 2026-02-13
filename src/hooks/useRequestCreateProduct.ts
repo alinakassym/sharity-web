@@ -17,7 +17,6 @@ export interface CreateProductData {
   description?: string;
   condition?: string;
   status?: "available" | "sold" | "reserved" | "draft";
-  isFavorite?: boolean;
   isDeleted?: boolean;
   imagesArray?: string[];
   createdBy?: string;

@@ -1,69 +1,54 @@
 // src/hooks/useFavorites.ts
 
 import { useEffect, useState, useCallback } from "react";
-import {
-  collection,
-  doc,
-  setDoc,
-  deleteDoc,
-  onSnapshot,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { getTelegramUser } from "@/lib/telegram";
 
 export type FavoriteType = "course" | "product";
 
+const API_BASE_URL = (import.meta.env.VITE_APP_BASE_URL as string).replace(
+  /\/+$/,
+  "",
+);
+
 /**
- * Хук для управления избранным пользователя
- * Использует Firestore subcollection: users/{userId}/favorites/{itemId}
+ * Хук для управления избранным пользователя через MongoDB API
  */
 export const useFavorites = (type: FavoriteType) => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Получаем ID пользователя из Telegram
   const { user } = getTelegramUser();
-  const userId = user?.id?.toString();
+  const telegramId = user?.id;
 
-  useEffect(() => {
-    // Если нет userId, возвращаем пустой список
-    if (!userId) {
+  const fetchFavorites = useCallback(async () => {
+    if (!telegramId) {
       setIsLoading(false);
       setFavorites(new Set());
       return;
     }
 
-    // Подписываемся на изменения в коллекции favorites пользователя
-    const favoritesRef = collection(db, "users", userId, "favorites");
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        new URL(
+          `/api/favorites?telegramId=${telegramId}&type=${type}`,
+          API_BASE_URL,
+        ),
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const itemIds: string[] = await res.json();
+      setFavorites(new Set(itemIds));
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [telegramId, type]);
 
-    const unsubscribe = onSnapshot(
-      favoritesRef,
-      (snapshot) => {
-        const favoriteIds = new Set<string>();
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
-        snapshot.docs.forEach((doc) => {
-          const data = doc.data();
-          // Фильтруем только по типу (course или product)
-          if (data.type === type) {
-            favoriteIds.add(doc.id);
-          }
-        });
-
-        setFavorites(favoriteIds);
-        setIsLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching favorites:", error);
-        setIsLoading(false);
-      },
-    );
-
-    return () => unsubscribe();
-  }, [userId, type]);
-
-  /**
-   * Проверяет, находится ли элемент в избранном
-   */
   const isFavorite = useCallback(
     (itemId: string): boolean => {
       return favorites.has(itemId);
@@ -71,34 +56,44 @@ export const useFavorites = (type: FavoriteType) => {
     [favorites],
   );
 
-  /**
-   * Добавляет или удаляет элемент из избранного
-   */
   const toggleFavorite = useCallback(
     async (itemId: string) => {
-      if (!userId) {
+      if (!telegramId) {
         console.warn("Cannot toggle favorite: user not authenticated");
         return;
       }
 
-      const favoriteRef = doc(db, "users", userId, "favorites", itemId);
-
       try {
         if (favorites.has(itemId)) {
-          // Удаляем из избранного
-          await deleteDoc(favoriteRef);
+          // Optimistic update: убираем сразу
+          setFavorites((prev) => {
+            const next = new Set(prev);
+            next.delete(itemId);
+            return next;
+          });
+          await fetch(
+            new URL(
+              `/api/favorites/${itemId}?telegramId=${telegramId}`,
+              API_BASE_URL,
+            ),
+            { method: "DELETE" },
+          );
         } else {
-          // Добавляем в избранное
-          await setDoc(favoriteRef, {
-            type,
-            createdAt: new Date(),
+          // Optimistic update: добавляем сразу
+          setFavorites((prev) => new Set(prev).add(itemId));
+          await fetch(new URL("/api/favorites", API_BASE_URL), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ telegramId, itemId, type }),
           });
         }
       } catch (error) {
         console.error("Error toggling favorite:", error);
+        // При ошибке перезапрашиваем актуальное состояние
+        fetchFavorites();
       }
     },
-    [userId, favorites, type],
+    [telegramId, favorites, type, fetchFavorites],
   );
 
   return {

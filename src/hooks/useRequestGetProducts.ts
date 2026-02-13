@@ -17,7 +17,6 @@ interface ProductFromDB {
   status?: "available" | "sold" | "reserved" | "draft"; // Статус товара
   image?: string;
   imagesArray?: string[];
-  isFavorite?: boolean;
   isDeleted?: boolean;
   createdBy?: string;
   createdAt?: Date;

@@ -136,7 +136,6 @@ const CreateEvent: FC = () => {
         time: time || "00:00", // Время отдельно как строка
         url: url.trim() || undefined,
         description: description.trim() || undefined,
-        isFavorite: false,
         location: location.trim() || "string",
         locationCoordinates: locationCoordinates || undefined, // Координаты [lat, lng]
         imagesArray: imagesArray.length > 0 ? imagesArray : undefined,
