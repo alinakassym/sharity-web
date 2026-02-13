@@ -1,9 +1,10 @@
+// sharity-web/src/pages/MyPublications.tsx
+
 import type { FC } from "react";
 import { useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/theme/colors";
-import { isTelegramApp } from "@/lib/telegram";
-import { useRequestGetUserProducts } from "@/hooks/useRequestGetUserProducts";
+import { useUserProducts } from "@/hooks/useUserProducts";
 import {
   useSafePaddingTop,
   useSafePlatform,
@@ -13,13 +14,18 @@ import ProductCard from "@/components/ProductCard";
 import LoadingScreen from "@/components/LoadingScreen";
 import Container from "@/components/Container";
 
+const KZT = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "KZT",
+  maximumFractionDigits: 0,
+});
+
 const MyPublications: FC = () => {
   const scheme = useColorScheme();
   const c = Colors[scheme];
   const paddingTop = useSafePaddingTop(48, 0);
   const platformName = useSafePlatform();
-  const isTelegram = isTelegramApp();
-  const { products, isLoading, error } = useRequestGetUserProducts();
+  const { products, isLoading, error } = useUserProducts();
   const [searchValue, setSearchValue] = useState("");
 
   // Фильтрация продуктов по поисковому запросу
@@ -49,7 +55,7 @@ const MyPublications: FC = () => {
       {/* Main Content */}
       <div
         style={{
-          paddingTop: isTelegram ? 156 : 64,
+          paddingTop: 16,
           padding: 16,
           display: "flex",
           flexDirection: "column",
@@ -104,16 +110,15 @@ const MyPublications: FC = () => {
             }}
           >
             {filteredProducts.map((product) => {
-              // Преобразуем данные из Firebase в формат ProductCard
               const productData = {
                 id: product.id,
                 image:
                   product.imagesArray && product.imagesArray.length > 0
                     ? product.imagesArray[0]
                     : "https://via.placeholder.com/300",
-                category: product.category || "Без категории",
-                title: product.name || "Без названия",
-                price: product.price ? `${product.price} ₽` : "Цена не указана",
+                category: product.category ?? "",
+                title: product.name ?? "",
+                price: KZT.format(product.price || 0),
               };
 
               return (
