@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import EventCategoryPicker from "@/components/EventCategoryPicker";
-import EventTypePicker, { type EventType } from "@/components/EventTypePicker";
+import EventTypePicker from "@/components/EventTypePicker";
 import DatePicker from "@/components/DatePicker";
 import TimePicker from "@/components/TimePicker";
 import { CustomTextField } from "@/components/CustomTextField";
@@ -11,10 +11,12 @@ interface StepEventBasicProps {
   eventName: string;
   onEventNameChange: (value: string) => void;
 
-  eventType: EventType | string;
-  onEventTypeChange: (value: EventType | string) => void;
+  eventType: string;
+  onEventTypeChange: (value: string) => void;
   customEventType: string;
   onCustomEventTypeChange: (value: string) => void;
+  eventTypeOptions: SelectOption[];
+  eventTypesLoading: boolean;
 
   category: string;
   onCategoryChange: (value: string) => void;
@@ -35,6 +37,8 @@ export const StepEventBasic: FC<StepEventBasicProps> = ({
   onEventTypeChange,
   customEventType,
   onCustomEventTypeChange,
+  eventTypeOptions,
+  eventTypesLoading,
   category,
   onCategoryChange,
   categoryOptions,
@@ -59,6 +63,8 @@ export const StepEventBasic: FC<StepEventBasicProps> = ({
       <EventTypePicker
         value={eventType}
         onChange={onEventTypeChange}
+        eventTypes={eventTypeOptions}
+        isLoading={eventTypesLoading}
         customValue={customEventType}
         onCustomValueChange={onCustomEventTypeChange}
       />

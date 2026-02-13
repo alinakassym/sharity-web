@@ -13,8 +13,8 @@ import { getTelegramUser } from "@/lib/telegram";
 import { useCreateEvent } from "@/hooks/useCreateEvent";
 import { uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
-import { type EventType } from "@/components/EventTypePicker";
 import { useCategories } from "@/hooks/useCategories";
+import { useEventTypes } from "@/hooks/useEventTypes";
 import { StepEventBasic } from "@/components/StepEventBasic";
 import { StepEventLocation } from "@/components/StepEventLocation";
 import { StepEventPhoto } from "@/components/StepEventPhoto";
@@ -45,7 +45,7 @@ const CreateEvent: FC = () => {
   >();
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [eventType, setEventType] = useState<EventType | string>("");
+  const [eventType, setEventType] = useState("");
   const [customEventType, setCustomEventType] = useState("");
   const locationInputRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +54,10 @@ const CreateEvent: FC = () => {
   const categoryOptions = categories
     .filter((cat) => cat.is_active)
     .map((cat) => ({ value: cat.name_ru, label: cat.name_ru }));
+  const { eventTypes, isLoading: eventTypesLoading } = useEventTypes();
+  const eventTypeOptions = eventTypes
+    .filter((et) => et.is_active)
+    .map((et) => ({ value: et.name_ru, label: et.name_ru }));
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
@@ -232,6 +236,8 @@ const CreateEvent: FC = () => {
             onEventTypeChange={setEventType}
             customEventType={customEventType}
             onCustomEventTypeChange={setCustomEventType}
+            eventTypeOptions={eventTypeOptions}
+            eventTypesLoading={eventTypesLoading}
             category={category}
             onCategoryChange={setCategory}
             categoryOptions={categoryOptions}

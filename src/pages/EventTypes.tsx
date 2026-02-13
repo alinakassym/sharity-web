@@ -1,0 +1,394 @@
+// sharity-web/src/pages/EventTypes.tsx
+
+import { useState } from "react";
+import type { FC } from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/theme/colors";
+import {
+  useSafePaddingTop,
+  useSafePlatform,
+} from "@/hooks/useTelegramSafeArea";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import {
+  useEventTypes,
+  type EventTypeData,
+  type CreateEventTypeData,
+} from "@/hooks/useEventTypes";
+import LoadingScreen from "@/components/LoadingScreen";
+import Container from "@/components/Container";
+import PageHeader from "@/components/PageHeader";
+import VuesaxIcon from "@/components/icons/VuesaxIcon";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Switch,
+  IconButton,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+
+const emptyForm: CreateEventTypeData = {
+  name_ru: "",
+  name_en: "",
+  is_active: true,
+  order: undefined,
+};
+
+const EventTypes: FC = () => {
+  const scheme = useColorScheme();
+  const c = Colors[scheme];
+  const paddingTop = useSafePaddingTop(48, 0);
+  const platformName = useSafePlatform();
+  const { userData, isLoading: isUserLoading } = useCurrentUser();
+  const {
+    eventTypes,
+    isLoading,
+    error,
+    createEventType,
+    updateEventType,
+    toggleActive,
+    deleteEventType,
+  } = useEventTypes();
+
+  // --- Dialog state ---
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<EventTypeData | null>(null);
+  const [formData, setFormData] = useState<CreateEventTypeData>(emptyForm);
+  const [isSaving, setIsSaving] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  if (isUserLoading) return <LoadingScreen />;
+
+  const isAdmin = userData?.role === "admin";
+
+  if (!isAdmin) {
+    return (
+      <Container
+        paddingTop={
+          platformName === "desktop"
+            ? paddingTop + 92
+            : platformName === "unknown"
+              ? 88
+              : paddingTop + 44
+        }
+      >
+        <PageHeader title="Типы событий" backTo="/dictionaries" />
+        <Box
+          sx={{
+            padding: 5,
+            textAlign: "center",
+            color: c.error,
+          }}
+        >
+          У вас нет доступа к этой странице
+        </Box>
+      </Container>
+    );
+  }
+
+  // --- Handlers ---
+
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setFormData(emptyForm);
+    setDialogOpen(true);
+  };
+
+  const handleOpenEdit = (item: EventTypeData) => {
+    setEditingItem(item);
+    setFormData({
+      name_ru: item.name_ru,
+      name_en: item.name_en,
+      is_active: item.is_active,
+      order: item.order,
+    });
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
+    setEditingItem(null);
+    setFormData(emptyForm);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const dataToSave: CreateEventTypeData = {
+        name_ru: formData.name_ru.trim(),
+        name_en: formData.name_en.trim(),
+        is_active: formData.is_active,
+        order:
+          formData.order !== undefined && formData.order !== null
+            ? Number(formData.order)
+            : undefined,
+      };
+
+      if (editingItem) {
+        await updateEventType(editingItem.id, dataToSave);
+      } else {
+        await createEventType(dataToSave);
+      }
+      handleClose();
+    } catch (err) {
+      alert(
+        `Ошибка: ${err instanceof Error ? err.message : "Не удалось сохранить"}`,
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleToggle = async (id: string) => {
+    try {
+      await toggleActive(id);
+    } catch (err) {
+      alert(
+        `Ошибка: ${err instanceof Error ? err.message : "Не удалось переключить"}`,
+      );
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await deleteEventType(deleteConfirmId);
+      setDeleteConfirmId(null);
+    } catch (err) {
+      alert(
+        `Ошибка: ${err instanceof Error ? err.message : "Не удалось удалить"}`,
+      );
+    }
+  };
+
+  const isFormValid = formData.name_ru.trim() && formData.name_en.trim();
+  const deletingItem = eventTypes.find((et) => et.id === deleteConfirmId);
+
+  return (
+    <Container
+      paddingTop={
+        platformName === "desktop"
+          ? 64
+          : platformName === "unknown"
+            ? 64
+            : paddingTop + 64
+      }
+    >
+      <PageHeader title="Типы событий" backTo="/dictionaries" />
+
+      <Box
+        sx={{ padding: 2, display: "flex", flexDirection: "column", gap: 2 }}
+      >
+        {/* Описание */}
+        <Box
+          sx={{
+            padding: 2,
+            backgroundColor: c.surfaceColor,
+            borderRadius: "12px",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: 14,
+              color: c.lightText,
+              lineHeight: 1.5,
+            }}
+          >
+            Управление типами событий. Добавляйте, редактируйте и переключайте
+            активность типов событий.
+          </Typography>
+        </Box>
+
+        {/* Кнопка добавления */}
+        <Button
+          variant="contained"
+          onClick={handleOpenCreate}
+          sx={{ borderRadius: "20px", textTransform: "none", fontWeight: 600 }}
+        >
+          Добавить тип события
+        </Button>
+
+        {/* Список */}
+        {isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box
+            sx={{
+              padding: 2,
+              backgroundColor: c.surfaceColor,
+              borderRadius: "12px",
+              textAlign: "center",
+            }}
+          >
+            <Typography sx={{ color: c.error, fontSize: 14 }}>
+              {error}
+            </Typography>
+          </Box>
+        ) : eventTypes.length === 0 ? (
+          <Box
+            sx={{
+              padding: 4,
+              textAlign: "center",
+            }}
+          >
+            <Typography sx={{ color: c.lightText, fontSize: 14 }}>
+              Типы событий не найдены
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {eventTypes.map((item) => (
+              <Box
+                key={item.id}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 16px",
+                  backgroundColor: c.surfaceColor,
+                  borderRadius: "12px",
+                  opacity: item.is_active ? 1 : 0.5,
+                }}
+              >
+                {/* Left: names */}
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography
+                    sx={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: c.text,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.name_ru}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: c.lightText,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.name_en}
+                    {item.order !== undefined && ` · #${item.order}`}
+                  </Typography>
+                </Box>
+
+                {/* Right: switch + edit + delete */}
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                >
+                  <Switch
+                    size="small"
+                    checked={item.is_active}
+                    onChange={() => handleToggle(item.id)}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={() => handleOpenEdit(item)}
+                  >
+                    <VuesaxIcon
+                      name="edit-2"
+                      size={18}
+                      stroke={c.primary}
+                    />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => setDeleteConfirmId(item.id)}
+                  >
+                    <VuesaxIcon name="trash" size={18} stroke={c.error} />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+
+      {/* Create/Edit Dialog */}
+      <Dialog open={dialogOpen} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          {editingItem ? "Редактировать тип события" : "Новый тип события"}
+        </DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}
+        >
+          <TextField
+            label="Название (RU) *"
+            value={formData.name_ru}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, name_ru: e.target.value }))
+            }
+            fullWidth
+            variant="outlined"
+          />
+          <TextField
+            label="Название (EN) *"
+            value={formData.name_en}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, name_en: e.target.value }))
+            }
+            fullWidth
+            variant="outlined"
+          />
+          <TextField
+            label="Порядок сортировки"
+            type="number"
+            value={formData.order ?? ""}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                order: e.target.value ? Number(e.target.value) : undefined,
+              }))
+            }
+            fullWidth
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Отмена</Button>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!isFormValid || isSaving}
+          >
+            {isSaving ? "Сохранение..." : "Сохранить"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+      >
+        <DialogTitle>Удалить тип события?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Вы уверены, что хотите удалить &quot;{deletingItem?.name_ru}&quot;?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmId(null)}>Отмена</Button>
+          <Button variant="contained" color="error" onClick={handleDelete}>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
+  );
+};
+
+export default EventTypes;

@@ -1,3 +1,5 @@
+// sharity-web/src/pages/Dictionaries.tsx
+
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -104,6 +106,11 @@ const Dictionaries: FC = () => {
           <NavigationButton
             label="Категории"
             onClick={() => navigate("/dictionaries/categories")}
+          />
+
+          <NavigationButton
+            label="Типы событий"
+            onClick={() => navigate("/dictionaries/event-types")}
           />
 
           <NavigationButton

@@ -26,6 +26,7 @@ import MyPublications from "./pages/MyPublications";
 import Users from "./pages/Users";
 import Dictionaries from "./pages/Dictionaries";
 import Categories from "./pages/Categories";
+import EventTypes from "./pages/EventTypes";
 import AuthRequired from "./pages/AuthRequired";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
@@ -74,6 +75,7 @@ const AppContent: FC = () => {
         <Route path="users" element={<Users />} />
         <Route path="dictionaries" element={<Dictionaries />} />
         <Route path="dictionaries/categories" element={<Categories />} />
+        <Route path="dictionaries/event-types" element={<EventTypes />} />
         <Route path="create" element={<Create />} />
         <Route path="create-course" element={<CreateCourse />} />
         <Route path="create-event" element={<CreateEvent />} />

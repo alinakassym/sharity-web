@@ -5,26 +5,20 @@ import {
   Select,
   MenuItem,
   TextField,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 
-export type EventType =
-  | "Турниры"
-  | "Конкурсы"
-  | "Мастер-классы"
-  | "Развлечения"
-  | "Другое";
-
-const eventTypes: EventType[] = [
-  "Турниры",
-  "Конкурсы",
-  "Мастер-классы",
-  "Развлечения",
-  "Другое",
-];
+interface EventTypeOption {
+  value: string;
+  label: string;
+}
 
 interface EventTypePickerProps {
-  value: EventType | string;
-  onChange: (eventType: EventType | string) => void;
+  value: string;
+  onChange: (eventType: string) => void;
+  eventTypes: EventTypeOption[];
+  isLoading?: boolean;
   customValue?: string;
   onCustomValueChange?: (value: string) => void;
   label?: string;
@@ -33,24 +27,35 @@ interface EventTypePickerProps {
 const EventTypePicker: FC<EventTypePickerProps> = ({
   value,
   onChange,
+  eventTypes,
+  isLoading = false,
   customValue = "",
   onCustomValueChange,
   label = "Тип события *",
 }) => {
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <FormControl fullWidth>
         <InputLabel>{label}</InputLabel>
         <Select
           value={value}
-          onChange={(e) => onChange(e.target.value as EventType)}
+          onChange={(e) => onChange(e.target.value)}
           label={label}
         >
           {eventTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
+            <MenuItem key={type.value} value={type.value}>
+              {type.label}
             </MenuItem>
           ))}
+          <MenuItem value="Другое">Другое</MenuItem>
         </Select>
       </FormControl>
 
