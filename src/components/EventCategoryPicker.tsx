@@ -4,67 +4,53 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 
-export type EventCategory =
-  | "Турниры"
-  | "Конкурсы"
-  | "Мастер-классы"
-  | "Развлечения"
-  | "Другое";
+interface CategoryOption {
+  value: string;
+  label: string;
+}
 
 interface EventCategoryPickerProps {
-  value: EventCategory | string;
-  onChange: (category: EventCategory | string) => void;
-  customValue?: string;
-  onCustomValueChange?: (value: string) => void;
+  value: string;
+  onChange: (category: string) => void;
+  categories: CategoryOption[];
+  isLoading?: boolean;
   label?: string;
 }
 
 const EventCategoryPicker: FC<EventCategoryPickerProps> = ({
   value,
   onChange,
-  customValue = "",
-  onCustomValueChange,
-  label = "Категория события *",
+  categories,
+  isLoading = false,
+  label = "Категория *",
 }) => {
-  const categories: EventCategory[] = [
-    "Турниры",
-    "Конкурсы",
-    "Мастер-классы",
-    "Развлечения",
-    "Другое",
-  ];
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <FormControl fullWidth>
-        <InputLabel>{label}</InputLabel>
-        <Select
-          value={value}
-          onChange={(e) => onChange(e.target.value as EventCategory)}
-          label={label}
-        >
-          {categories.map((category) => (
-            <MenuItem key={category} value={category}>
-              {category}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      {value === "Другое" && (
-        <TextField
-          label="Укажите категорию"
-          placeholder="Введите свою категорию"
-          value={customValue}
-          onChange={(e) => onCustomValueChange?.(e.target.value)}
-          fullWidth
-          variant="outlined"
-        />
-      )}
-    </div>
+    <FormControl fullWidth>
+      <InputLabel>{label}</InputLabel>
+      <Select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        label={label}
+      >
+        {categories.map((cat) => (
+          <MenuItem key={cat.value} value={cat.value}>
+            {cat.label}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };
 

@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 export interface CreateEventData {
   name: string;
   category: string;
+  eventType: string;
   date: Date;
   time?: string;
   url?: string;

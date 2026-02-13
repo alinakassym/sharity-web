@@ -1,3 +1,5 @@
+// sharity-web/src/pages/CreateEvent.tsx
+
 import type { FC } from "react";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,9 +25,9 @@ import EventCard from "@/components/EventCard";
 import DatePicker from "@/components/DatePicker";
 import TimePicker from "@/components/TimePicker";
 import YandexMap from "@/components/YandexMap";
-import EventCategoryPicker, {
-  type EventCategory,
-} from "@/components/EventCategoryPicker";
+import EventCategoryPicker from "@/components/EventCategoryPicker";
+import EventTypePicker, { type EventType } from "@/components/EventTypePicker";
+import { useCategories } from "@/hooks/useCategories";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 import { CustomTextField } from "@/components/CustomTextField";
@@ -51,11 +53,16 @@ const CreateEvent: FC = () => {
     [number, number] | undefined
   >();
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<EventCategory | string>("");
-  const [customCategory, setCustomCategory] = useState("");
+  const [category, setCategory] = useState("");
+  const [eventType, setEventType] = useState<EventType | string>("");
+  const [customEventType, setCustomEventType] = useState("");
   const locationInputRef = useRef<HTMLDivElement>(null);
 
   const { createEvent } = useRequestCreateEvent();
+  const { categories, isLoading: categoriesLoading } = useCategories();
+  const categoryOptions = categories
+    .filter((cat) => cat.is_active)
+    .map((cat) => ({ value: cat.name_ru, label: cat.name_ru }));
 
   const steps: Array<{ id: StepType; title: string; description: string }> = [
     {
@@ -121,9 +128,9 @@ const CreateEvent: FC = () => {
         eventDateTime.setHours(hours, minutes, 0, 0);
       }
 
-      // Определяем итоговую категорию
-      const finalCategory =
-        category === "Другое" ? customCategory.trim() : category;
+      // Определяем итоговый тип события
+      const finalEventType =
+        eventType === "Другое" ? customEventType.trim() : eventType;
 
       // Получаем данные пользователя Telegram
       const { user } = getTelegramUser();
@@ -131,7 +138,8 @@ const CreateEvent: FC = () => {
 
       const eventData = {
         name: eventName.trim(),
-        category: finalCategory, // Категория события
+        category, // Категория из MongoDB
+        eventType: finalEventType, // Тип события
         date: eventDateTime, // Дата + время вместе
         time: time || "00:00", // Время отдельно как строка
         url: url.trim() || undefined,
@@ -243,11 +251,18 @@ const CreateEvent: FC = () => {
               variant="outlined"
             />
 
+            <EventTypePicker
+              value={eventType}
+              onChange={setEventType}
+              customValue={customEventType}
+              onCustomValueChange={setCustomEventType}
+            />
+
             <EventCategoryPicker
               value={category}
               onChange={setCategory}
-              customValue={customCategory}
-              onCustomValueChange={setCustomCategory}
+              categories={categoryOptions}
+              isLoading={categoriesLoading}
             />
 
             <DatePicker
