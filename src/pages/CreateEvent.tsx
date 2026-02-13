@@ -10,25 +10,18 @@ import {
 } from "@/hooks/useTelegramSafeArea";
 import { Colors } from "@/theme/colors";
 import { getTelegramUser } from "@/lib/telegram";
-import VuesaxIcon from "@/components/icons/VuesaxIcon";
 import { useRequestCreateEvent } from "@/hooks/useRequestCreateEvent";
 import { uploadFiles, PRODUCTS_BUCKET } from "@/lib/minio";
-import {
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  TextField,
-  IconButton,
-} from "@mui/material";
-import EventCard from "@/components/EventCard";
-import YandexMap from "@/components/YandexMap";
+import { Stepper, Step, StepLabel, Button } from "@mui/material";
 import { type EventType } from "@/components/EventTypePicker";
 import { useCategories } from "@/hooks/useCategories";
 import { StepEventBasic } from "@/components/StepEventBasic";
+import { StepEventLocation } from "@/components/StepEventLocation";
+import { StepEventPhoto } from "@/components/StepEventPhoto";
+import { StepEventDetails } from "@/components/StepEventDetails";
+import { StepEventReview } from "@/components/StepEventReview";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
-import { CustomTextField } from "@/components/CustomTextField";
 
 type StepType = "basic" | "location" | "photos" | "details" | "review";
 
@@ -174,12 +167,6 @@ const CreateEvent: FC = () => {
     }
   };
 
-  const removeFile = (indexToRemove: number) => {
-    setSelectedFiles(
-      selectedFiles.filter((_, index) => index !== indexToRemove),
-    );
-  };
-
   return (
     <Container
       paddingTop={
@@ -257,227 +244,44 @@ const CreateEvent: FC = () => {
         )}
 
         {currentStep === "location" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <div style={{ width: "80%", alignSelf: "center" }}>
-              <YandexMap
-                apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
-                height={300}
-                onLocationSelect={(address, coordinates) => {
-                  setLocation(address);
-                  setLocationCoordinates(coordinates);
-                }}
-              />
-            </div>
-            <TextField
-              ref={locationInputRef}
-              label="Локация/адрес *"
-              placeholder="Введите локацию/адрес"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onFocus={() => {
-                setTimeout(() => {
-                  locationInputRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                  });
-                }, 400);
-              }}
-              fullWidth
-              variant="outlined"
-            />
-          </div>
+          <StepEventLocation
+            location={location}
+            onLocationChange={setLocation}
+            onLocationSelect={(address, coordinates) => {
+              setLocation(address);
+              setLocationCoordinates(coordinates);
+            }}
+            locationInputRef={locationInputRef}
+          />
         )}
 
         {currentStep === "photos" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div
-              style={{
-                border: `2px dashed ${c.border}`,
-                borderRadius: 12,
-                padding: 32,
-                textAlign: "center",
-                backgroundColor: c.surfaceColor,
-              }}
-            >
-              <VuesaxIcon
-                name="gallery"
-                stroke={c.lightText}
-                strokeWidth={1.5}
-                size={32}
-              />
-              <p
-                style={{
-                  margin: "16px 0 8px",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: c.text,
-                }}
-              >
-                Добавьте изображение/фото
-              </p>
-              <p
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 14,
-                  color: c.lightText,
-                }}
-              >
-                Выберите изображение
-              </p>
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={
-                  <VuesaxIcon name="camera" color={c.lighter} size={20} />
-                }
-              >
-                Выбрать
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleFileChange}
-                />
-              </Button>
-            </div>
-
-            {selectedFiles.length > 0 && (
-              <div style={{ marginTop: 16 }}>
-                <h3
-                  style={{
-                    margin: "0 0 12px",
-                    fontSize: 16,
-                    color: c.text,
-                  }}
-                >
-                  Выбранное изображение:
-                </h3>
-                <div
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    maxWidth: 200,
-                    height: 200,
-                    borderRadius: 12,
-                    overflow: "hidden",
-                    backgroundColor: c.controlColor,
-                  }}
-                >
-                  <img
-                    src={URL.createObjectURL(selectedFiles[0])}
-                    alt="Selected"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => removeFile(0)}
-                    size="small"
-                    sx={{
-                      position: "absolute",
-                      top: 8,
-                      right: 8,
-                      borderColor: c.error,
-                      borderWidth: 1,
-                      borderStyle: "solid",
-                      boxSizing: "content-box",
-                      backgroundColor: `${c.error}40`,
-                    }}
-                  >
-                    <VuesaxIcon name="close" size={6} color={c.error} />
-                  </IconButton>
-                </div>
-              </div>
-            )}
-          </div>
+          <StepEventPhoto
+            selectedFile={selectedFiles[0] ?? null}
+            onFileChange={handleFileChange}
+            onRemoveFile={() => setSelectedFiles([])}
+          />
         )}
 
         {currentStep === "details" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <CustomTextField
-              maxSymbols={1000}
-              label="Описание"
-              placeholder="Опишите подробно"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              multiline
-              rows={6}
-              fullWidth
-              variant="outlined"
-            />
-            <TextField
-              label="Ссылка на источник"
-              placeholder="Вставьте ссылку"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              rows={6}
-              fullWidth
-              variant="outlined"
-            />
-          </div>
+          <StepEventDetails
+            description={description}
+            onDescriptionChange={setDescription}
+            url={url}
+            onUrlChange={setUrl}
+          />
         )}
 
         {currentStep === "review" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <EventCard
-                image={
-                  selectedFiles.length > 0
-                    ? URL.createObjectURL(selectedFiles[0])
-                    : "https://picsum.photos/600?preview"
-                }
-                date={
-                  date
-                    ? `${date.getDate()} ${date
-                        .toLocaleDateString("ru-RU", {
-                          month: "short",
-                        })
-                        .toUpperCase()
-                        .replace(".", "")}`
-                    : ""
-                }
-                time={time}
-                title={eventName}
-                location={location}
-                url={url}
-                id="preview"
-              />
-            </div>
-
-            {description && (
-              <div
-                style={{
-                  padding: 16,
-                  backgroundColor: c.surfaceColor,
-                  borderRadius: 12,
-                  marginTop: 8,
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: c.text,
-                    margin: "0 0 8px",
-                  }}
-                >
-                  Описание
-                </h4>
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: c.text,
-                    margin: 0,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {description}
-                </p>
-              </div>
-            )}
-          </div>
+          <StepEventReview
+            eventName={eventName}
+            date={date}
+            time={time}
+            location={location}
+            url={url}
+            description={description}
+            selectedFile={selectedFiles[0] ?? null}
+          />
         )}
       </div>
 
