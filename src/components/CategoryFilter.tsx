@@ -111,7 +111,7 @@ export const CategoryFilter: FC<Props> = ({
                 padding: "4px 12px",
                 border: "none",
                 cursor: "pointer",
-                borderRadius: 24,
+                borderRadius: 20,
                 backgroundColor: active ? colors.primary : colors.controlColor,
                 color: active ? colors.lighter : colors.text,
                 textAlign: "left",

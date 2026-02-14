@@ -62,7 +62,7 @@ const DateFilter: FC<DateFilterProps> = ({ selected, onChange }) => {
             style={{
               flex: "0 0 auto",
               minWidth: 150,
-              padding: "12px 20px",
+              padding: "8px 16px",
               borderRadius: 20,
               border: "none",
               backgroundColor: isSelected ? c.primary : c.surfaceColor,
@@ -74,9 +74,9 @@ const DateFilter: FC<DateFilterProps> = ({ selected, onChange }) => {
           >
             <div
               style={{
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 600,
-                marginBottom: 4,
+                marginBottom: 2,
               }}
             >
               {option.label}
